@@ -1,0 +1,16 @@
+language: python
+os:
+- linux
+services:
+- docker
+python:
+- '3.6'
+install:
+- pip install .
+script: 'true'
+deploy:
+- provider: script
+  script: "./devel/travis_deploy.sh"
+  on:
+    tags: true
+  skip_cleanup: true
