@@ -7,13 +7,12 @@ python:
 - '3.6'
 install:
 - pip install .
-script: 'true'
+script: python setup.py test
 deploy:
-- provider: script
-  script: "./devel/travis_deploy.sh"
+  provider: pypi
+  user: magland
   on:
     tags: true
-  skip_cleanup: true
 env:
   global:
   - secure: QEDJaYBpVX1ERv9U/9Gvp/vmn1N3NQMv/N33u39Lx0hyHbY9BmLsz6z2PylFxhbUWH2AKqTBSKeBD1U67ZY720QtQeJLQVvrQrnk72etxdhoLW7d/L1gnPzl+o3KmMt50cq6nOl1KnhV91fNIMutqWCy9LQQjSWmYlpGOokDBYi1nwJ3gOHoA2MW1M2R+qFJ4mT601JTnzzBrCQeetYj6cLs/93E2AHa2+ymuEs692QpORvtdG5StNmjNya/UnXQbzx/3wPm73ZtlSo68TYMgiBEzdM39EwXz/6mPt6NOAItBPJfLSfh23l1NjfS5UnhutExMhbTpX3FF2sQtDhKd33ARWS7ZhaQd/Oq23ziNc1hyAiw4kamPQfT0Q3weI2hQmhrPtLx2nBiMuxe4M61TDjR1eFx0l6FP5vj4XkB1DKRDEH+8MdVzzoheO9mhCvFUfaDK8CSytOoMIQqGqIXiCBv0rw0GxjJ7Hw2JdLM95Wni0seYU2x/VZpX9yqgFc8aWtwiCoJz5MKExinChmMjXSqpkTL/ABD5Z+KWDtwIL4EjqrLQ+0MXHqzLPynoq2NVA7jqA4SYzQqcoKSaZSaZ47UfWkMEb1I1t30rd7gOOfx1a5QDGTQRugGwWP0Uy1oThNpPIVqNbLehuj8ei3kNMmeTMTid3imfMg1WPWhzHc=
