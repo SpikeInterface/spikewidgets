@@ -10,7 +10,7 @@ def my_test_suite():
 
 setuptools.setup(
     name=pkg_name,
-    version="0.1.3",
+    version="0.1.4",
     author="Jeremy Magland",
     author_email="jmagland@flatironinstitute.org",
     description="Python widgets for use with spike sorting and electrophysiology",
