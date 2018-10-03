@@ -3,7 +3,7 @@ import numpy as np
 import ipywidgets as widgets
 
 class UnitWaveformsWidget:
-    def __init__(self,*,input_extractor,output_extractor,channels=None,unit_ids=None,width=14,height=7):
+    def __init__(self,*,input_extractor,output_extractor,channels=None,unit_ids=None,width=14,height=7,snippet_len=100):
         self._IX=input_extractor
         self._OX=output_extractor
         self._channels=channels
@@ -11,6 +11,7 @@ class UnitWaveformsWidget:
         self._width=width
         self._height=height
         self._figure=None
+        self._snippet_len=snippet_len
     def plot(self):
         self._do_plot()
     def figure(self):
@@ -32,7 +33,7 @@ class UnitWaveformsWidget:
             spikes=self._get_random_spike_waveforms(unit=unit,max_num=50,channels=channels)
             item=dict(
                 representative_waveforms=spikes,
-                title='Unit {}'.format(unit)
+                title='Unit {}'.format(int(unit))
             )
             list.append(item)
         with plt.rc_context({'axes.edgecolor':'gray'}):
@@ -46,7 +47,7 @@ class UnitWaveformsWidget:
         else:
             event_indices=range(num_events)
         
-        spikes=self._IX.getRawSnippets(center_frames=st[event_indices].astype(int),snippet_len=100,channel_ids=channels)
+        spikes=self._IX.getRawSnippets(center_frames=st[event_indices].astype(int),snippet_len=self._snippet_len,channel_ids=channels)
         spikes=np.dstack(tuple(spikes))
         return spikes
     def _plot_spike_shapes(self, *, representative_waveforms=None, average_waveform=None, channel_locations=None, ylim=None, max_representatives=None, color='blue',title=''):
