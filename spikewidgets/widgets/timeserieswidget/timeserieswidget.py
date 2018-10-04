@@ -62,7 +62,7 @@ class TimeseriesWidget:
         with self._widget:
             self._do_plot()
     def _do_plot(self):
-        chunk0=self._input_extractor.getRawTraces(
+        chunk0=self._input_extractor.getTraces(
             channel_ids=self._visible_channels,
             start_frame=self._visible_trange[0],
             end_frame=self._visible_trange[1]
@@ -129,7 +129,7 @@ class TimeseriesWidget:
         self._channel_stats={}
         #M=self._reader.numChannels()
         #N=self._reader.numTimepoints()
-        chunk0=self._input_extractor.getRawTraces(
+        chunk0=self._input_extractor.getTraces(
             channel_ids=self._visible_channels,
             start_frame=self._visible_trange[0],
             end_frame=self._visible_trange[1]
