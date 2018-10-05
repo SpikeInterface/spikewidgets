@@ -16,7 +16,7 @@ def toy_example1():
     labels=labels.astype(np.int64)
     OX=si.NumpySortingExtractor()
     OX.setTimesLabels(times,labels)
-    X=synthesize_timeseries(output_extractor=OX,waveforms=waveforms,noise_level=10,samplerate=samplerate,duration=duration,waveform_upsamplefac=upsamplefac)
+    X=synthesize_timeseries(sorting=OX,waveforms=waveforms,noise_level=10,samplerate=samplerate,duration=duration,waveform_upsamplefac=upsamplefac)
 
     IX=si.NumpyRecordingExtractor(timeseries=X,samplerate=samplerate,geom=geom)
     return (IX,OX)

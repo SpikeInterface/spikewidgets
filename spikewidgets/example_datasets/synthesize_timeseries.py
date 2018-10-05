@@ -1,6 +1,6 @@
 import numpy as np
 
-def synthesize_timeseries(*,output_extractor,waveforms,noise_level=1,samplerate=30000,duration=60,waveform_upsamplefac=13):
+def synthesize_timeseries(*,sorting,waveforms,noise_level=1,samplerate=30000,duration=60,waveform_upsamplefac=13):
     num_timepoints=np.int64(samplerate*duration)
     waveform_upsamplefac=int(waveform_upsamplefac)
     W=waveforms
@@ -13,10 +13,10 @@ def synthesize_timeseries(*,output_extractor,waveforms,noise_level=1,samplerate=
             
     X=np.random.randn(M,N)*noise_level
 
-    unit_ids=output_extractor.getUnitIds()
+    unit_ids=sorting.getUnitIds()
     for k0 in unit_ids:
         waveform0=waveforms[:,:,k0-1]
-        times0=output_extractor.getUnitSpikeTrain(unit_id=k0)
+        times0=sorting.getUnitSpikeTrain(unit_id=k0)
         for t0 in times0:
             amp0=1
             frac_offset=int(np.floor((t0-np.floor(t0))*waveform_upsamplefac))

@@ -3,10 +3,10 @@ import numpy as np
 import ipywidgets as widgets
 from matplotlib.ticker import MaxNLocator
 
-def plot_timeseries(*,input_extractor,output_extractor=None,channels=None,trange=None,width=None,height=None):
+def plot_timeseries(*,recording,sorting=None,channels=None,trange=None,width=None,height=None):
     W=TimeseriesWidget(
-        input_extractor=input_extractor,
-        output_extractor=output_extractor,
+        recording=recording,
+        sorting=sorting,
         channels=channels,
         trange=trange,
         width=width,
@@ -14,10 +14,10 @@ def plot_timeseries(*,input_extractor,output_extractor=None,channels=None,trange
     )
     W.plot()
     
-def view_timeseries(*,input_extractor,output_extractor=None,channels=None,trange=None,width=None,height=None):
+def view_timeseries(*,recording,sorting=None,channels=None,trange=None,width=None,height=None):
     W=TimeseriesWidget(
-        input_extractor=input_extractor,
-        output_extractor=output_extractor,
+        recording=recording,
+        sorting=sorting,
         channels=channels,
         trange=trange,
         width=width,
@@ -26,10 +26,10 @@ def view_timeseries(*,input_extractor,output_extractor=None,channels=None,trange
     W.display()
 
 class TimeseriesWidget:
-    def __init__(self,*,input_extractor,output_extractor=None,channels=None,trange=None,width=None,height=None):
-        self._input_extractor=input_extractor
-        self._output_extractor=output_extractor
-        self._samplerate=input_extractor.getSamplingFrequency()
+    def __init__(self,*,recording,sorting=None,channels=None,trange=None,width=None,height=None):
+        self._recording=recording
+        self._sorting=sorting
+        self._samplerate=recording.getSamplingFrequency()
         self._width=width
         self._height=height
         self._visible_channels=channels
@@ -38,10 +38,10 @@ class TimeseriesWidget:
         if self._height is None:
             self._height=6
         if self._visible_channels is None:
-            self._visible_channels=range(input_extractor.getNumChannels())
+            self._visible_channels=range(recording.getNumChannels())
         self._visible_trange=trange
         if self._visible_trange is None:
-            self._visible_trange=[0,np.minimum(10000,input_extractor.getNumFrames())]
+            self._visible_trange=[0,np.minimum(10000,recording.getNumFrames())]
         self._initialize_stats()
         self._vspacing=self._mean_channel_std*15
         self._widget=widgets.Output()
@@ -62,7 +62,7 @@ class TimeseriesWidget:
         with self._widget:
             self._do_plot()
     def _do_plot(self):
-        chunk0=self._input_extractor.getTraces(
+        chunk0=self._recording.getTraces(
             channel_ids=self._visible_channels,
             start_frame=self._visible_trange[0],
             end_frame=self._visible_trange[1]
@@ -96,7 +96,7 @@ class TimeseriesWidget:
         self._visible_trange=new_trange
         self._update_plot()
     def _fix_trange(self,trange):
-        N=self._input_extractor.getNumFrames()
+        N=self._recording.getNumFrames()
         if trange[1]>N:
             trange[0]+=N-trange[1]
             trange[1]+=N-trange[1]
@@ -129,7 +129,7 @@ class TimeseriesWidget:
         self._channel_stats={}
         #M=self._reader.numChannels()
         #N=self._reader.numTimepoints()
-        chunk0=self._input_extractor.getTraces(
+        chunk0=self._recording.getTraces(
             channel_ids=self._visible_channels,
             start_frame=self._visible_trange[0],
             end_frame=self._visible_trange[1]

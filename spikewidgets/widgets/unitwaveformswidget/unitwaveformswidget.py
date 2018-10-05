@@ -3,9 +3,9 @@ import numpy as np
 import ipywidgets as widgets
 
 class UnitWaveformsWidget:
-    def __init__(self,*,input_extractor,output_extractor,channels=None,unit_ids=None,width=14,height=7,snippet_len=100):
-        self._IX=input_extractor
-        self._OX=output_extractor
+    def __init__(self,*,recording,sorting,channels=None,unit_ids=None,width=14,height=7,snippet_len=100):
+        self._IX=recording
+        self._OX=sorting
         self._channels=channels
         self._unit_ids=unit_ids
         self._width=width
@@ -47,7 +47,7 @@ class UnitWaveformsWidget:
         else:
             event_indices=range(num_events)
         
-        spikes=self._IX.getRawSnippets(center_frames=st[event_indices].astype(int),snippet_len=self._snippet_len,channel_ids=channels)
+        spikes=self._IX.getSnippets(center_frames=st[event_indices].astype(int),snippet_len=self._snippet_len,channel_ids=channels)
         spikes=np.dstack(tuple(spikes))
         return spikes
     def _plot_spike_shapes(self, *, representative_waveforms=None, average_waveform=None, channel_locations=None, ylim=None, max_representatives=None, color='blue',title=''):
