@@ -3,7 +3,7 @@ import numpy as np
 import ipywidgets as widgets
 
 class UnitWaveformsWidget:
-    def __init__(self,*,recording,sorting,channels=None,unit_ids=None,width=14,height=7,snippet_len=100):
+    def __init__(self,*,recording,sorting,channels=None,unit_ids=None,width=14,height=7,snippet_len=100,title=''):
         self._IX=recording
         self._OX=sorting
         self._channels=channels
@@ -12,6 +12,7 @@ class UnitWaveformsWidget:
         self._height=height
         self._figure=None
         self._snippet_len=snippet_len
+        self._title=title
     def plot(self):
         self._do_plot()
     def figure(self):
@@ -122,7 +123,7 @@ class UnitWaveformsWidget:
         else:
             ylim=self._determine_global_ylim(list)
         nrows = np.ceil(len(list) / ncols)
-        plt.figure(figsize=(3 * ncols, 3 * nrows))
+        self._figure=plt.figure(figsize=(3 * ncols, 3 * nrows))
         for i, item in enumerate(list):
             plt.subplot(nrows, ncols, i + 1)
             self._plot_spike_shapes(**item, **kwargs, ylim=ylim)
