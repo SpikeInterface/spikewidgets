@@ -1,12 +1,4 @@
-FROM magland/jp_proxy_widget:20180831
-
-RUN conda install python=3.6
-
-# See https://stackoverflow.com/questions/52582563/pip-install-attributeerror-distinfodistribution-dep-map
-RUN conda install 'testpath<0.4'
-RUN pip install --upgrade pip
-
-RUN apt-get update && apt-get install -y build-essential
+FROM magland/jp_proxy_widget:20181005
 
 ### Add this repo
 ADD . /working/spikewidgets
