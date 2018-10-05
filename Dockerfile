@@ -1,9 +1,4 @@
-FROM continuumio/miniconda3:latest
-
-RUN conda install jupyterlab
-RUN conda install -c conda-forge nodejs
-
-RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
+FROM magland/jp_proxy_widget:20180831
 
 RUN conda install python=3.6
 
