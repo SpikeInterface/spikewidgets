@@ -48,7 +48,7 @@ class UnitWaveformsWidget:
         else:
             event_indices=range(num_events)
         
-        spikes=self._IX.getSnippets(center_frames=st[event_indices].astype(int),snippet_len=self._snippet_len,channel_ids=channels)
+        spikes=self._IX.getSnippets(reference_frames=st[event_indices].astype(int),snippet_len_before=int(self._snippet_len/2),snippet_len_after=int(self._snippet_len/2),channel_ids=channels)
         spikes=np.dstack(tuple(spikes))
         return spikes
     def _plot_spike_shapes(self, *, representative_waveforms=None, average_waveform=None, channel_locations=None, ylim=None, max_representatives=None, color='blue',title=''):

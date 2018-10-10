@@ -207,9 +207,9 @@ class MappedSortingExtractor(si.SortingExtractor):
     def getUnitIds(self):
         return self._unit_ids
     
-    def getUnitSpikeTrain(self,unit_id):
+    def getUnitSpikeTrain(self,unit_id,start_frame=None,end_frame=None):
         unit2=self._reverse_map[unit_id]
-        return self._sorting.getUnitSpikeTrain(unit2)
+        return self._sorting.getUnitSpikeTrain(unit2,start_frame=start_frame,end_frame=end_frame)
     
 def count_matching_events(times1,times2,delta=20):
     times_concat=np.concatenate((times1,times2))
