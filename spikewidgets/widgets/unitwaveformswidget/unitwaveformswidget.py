@@ -25,7 +25,7 @@ class UnitWaveformsWidget:
         M=self._IX.getNumChannels()
         channel_locations=np.zeros((M,2))
         for ch in range(M):
-            loc=self._IX.getChannelInfo(ch)['location']
+            loc=self._IX.getChannelProperty(ch,'location')
             channel_locations[ch,:]=loc[-2:]
         if channels is None:
             channels=range(M)

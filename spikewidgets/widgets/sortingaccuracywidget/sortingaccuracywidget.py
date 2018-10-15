@@ -12,7 +12,7 @@ class SortingAccuracyWidget:
         units=SC.getSorting1().getUnitIds()
         agreements=[SC.getAgreementFraction(unit) for unit in units]
         if self._property_name:
-            xvals=SC.getSorting1().getUnitProperty(unit_id=units,property_name=self._property_name)
+            xvals=SC.getSorting1().getUnitsProperty(unit_ids=units,property_name=self._property_name)
             plt.plot(xvals,agreements,'.')
             plt.xlabel(self._property_name)
         else:

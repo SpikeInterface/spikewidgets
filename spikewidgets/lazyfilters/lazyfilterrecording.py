@@ -9,6 +9,7 @@ class LazyFilterRecording(si.RecordingExtractor):
         self._chunk_size=chunk_size
         self._filtered_chunks=dict()
         self.getNumChannels=recording.getNumChannels
+        self.copyChannelProperties(recording)
         
     def getNumChannels(self):
         return self._recording.getNumChannels()
@@ -53,7 +54,4 @@ class LazyFilterRecording(si.RecordingExtractor):
             end0=(ind+1)*self._chunk_size
             self._filtered_chunks[code]=self.filterChunk(start_frame=start0,end_frame=end0)
         return self._filtered_chunks[code]
-    
-    def getChannelInfo(self, channel_id):
-        return self._recording.getChannelInfo(channel_id=channel_id)
     
