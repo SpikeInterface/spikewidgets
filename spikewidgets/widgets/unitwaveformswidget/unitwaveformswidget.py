@@ -31,12 +31,16 @@ class UnitWaveformsWidget:
             channels=range(M)
         list=[]
         for unit in units:
-            spikes=self._get_random_spike_waveforms(unit=unit,max_num=50,channels=channels)
-            item=dict(
-                representative_waveforms=spikes,
-                title='Unit {}'.format(int(unit))
-            )
-            list.append(item)
+            st = self._OX.getUnitSpikeTrain(unit_id=unit)
+            if st is not None:
+                spikes=self._get_random_spike_waveforms(unit=unit,max_num=50,channels=channels)
+                item=dict(
+                    representative_waveforms=spikes,
+                    title='Unit {}'.format(int(unit))
+                )
+                list.append(item)
+            else:
+                print(unit, ' spike train is None')
         with plt.rc_context({'axes.edgecolor':'gray'}):
             #self._plot_spike_shapes_multi(list,channel_locations=channel_locations[np.array(channels),:])
             self._plot_spike_shapes_multi(list,channel_locations=None)
