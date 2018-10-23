@@ -10,7 +10,7 @@ class SortingComparisonTable():
             prop=self._unit_properties[i]
             if type(prop)!=dict:
                 self._unit_properties[i]={'name':prop}
-    def display(self):
+    def getDataframe(self):
         SC=self._comparison
         rows=[]
         if self._reference == 1:
@@ -57,4 +57,8 @@ class SortingComparisonTable():
         # df['Best match'] = df['Accuracy'].map('{:,.2f}'.format)
         df['f.n.'] = df['f.n.'].map('{:,.2f}'.format)
         df['f.p.'] = df['f.p.'].map('{:,.2f}'.format)
+        return df
+    def display(self):
+        df=self.getDataframe()
         display(HTML(df.to_html(index=False)))
+        
