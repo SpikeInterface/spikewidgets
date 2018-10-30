@@ -22,11 +22,12 @@ class UnitWaveformsWidget:
         channels=self._channels
         if units is None:
             units=self._OX.getUnitIds()
-        M=self._IX.getNumChannels()
+        channel_ids=self._IX.getChannelIds()
+        M=len(channel_ids)
         channel_locations=np.zeros((M,2))
-        for ch in range(M):
+        for ii,ch in enumerate(channel_ids):
             loc=self._IX.getChannelProperty(ch,'location')
-            channel_locations[ch,:]=loc[-2:]
+            channel_locations[ii,:]=loc[-2:]
         if channels is None:
             channels=range(M)
         list=[]

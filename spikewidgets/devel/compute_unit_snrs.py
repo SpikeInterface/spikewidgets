@@ -27,11 +27,12 @@ def compute_template_snr(template,channel_noise_levels):
     return np.max(channel_snrs)
     
 def compute_channel_noise_levels(recording):
-    M=recording.getNumChannels()
+    channel_ids=recording.getChannelIds()
+    M=len(channel_ids)
     X=recording.getTraces(start_frame=0,end_frame=np.minimum(1000,recording.getNumFrames()))
     ret=[]
-    for ch in range(M):
-        noise_level=np.std(X[ch,:])
+    for ii in len(channel_ids):
+        noise_level=np.std(X[ii,:])
         ret.append(noise_level)
     return ret
 

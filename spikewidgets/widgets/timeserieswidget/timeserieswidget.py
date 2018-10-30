@@ -38,7 +38,7 @@ class TimeseriesWidget:
         if self._height is None:
             self._height=6
         if self._visible_channels is None:
-            self._visible_channels=range(recording.getNumChannels())
+            self._visible_channels=recording.getChannelIds()
         self._visible_trange=trange
         if self._visible_trange is None:
             self._visible_trange=[0,np.minimum(10000,recording.getNumFrames())]

@@ -4,7 +4,7 @@ pkg_name="spikewidgets"
 
 setuptools.setup(
     name=pkg_name,
-    version="0.1.16",
+    version="0.1.17",
     author="Jeremy Magland",
     author_email="jmagland@flatironinstitute.org",
     description="Python widgets for use with spike sorting and electrophysiology",

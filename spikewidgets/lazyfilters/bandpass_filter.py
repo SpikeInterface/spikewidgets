@@ -57,7 +57,8 @@ class BandpassFilterRecording(LazyFilterRecording):
         chunk_filtered=np.fft.irfft(chunk_fft)
         return chunk_filtered
     def _read_chunk(self,i1,i2):
-        M=self._recording.getNumChannels()
+        channel_ids=self._recording.getChannelIds()
+        M=len(channel_ids)
         N=self._recording.getNumFrames()
         if i1<0:
             i1b=0
