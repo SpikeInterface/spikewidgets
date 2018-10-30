@@ -4,7 +4,7 @@ pkg_name="spikewidgets"
 
 setuptools.setup(
     name=pkg_name,
-    version="0.1.17",
+    version="0.1.18",
     author="Jeremy Magland",
     author_email="jmagland@flatironinstitute.org",
     description="Python widgets for use with spike sorting and electrophysiology",
@@ -18,7 +18,8 @@ setuptools.setup(
         'ipywidgets',
         'matplotlib',
         'spikeinterface',
-        'ml_ms4alg'
+        'ml_ms4alg',
+        'pandas'
     ],
     classifiers=(
         "Programming Language :: Python :: 3",
