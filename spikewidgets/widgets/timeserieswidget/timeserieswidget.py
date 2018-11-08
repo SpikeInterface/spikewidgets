@@ -48,10 +48,11 @@ class TimeseriesWidget:
         self._control_panel=self._create_control_panel()
         self._main_widget=widgets.VBox([self._control_panel,self._widget])
         self._visible_trange=self._fix_trange(self._visible_trange)
-        self._update_plot()
+        #self._update_plot()
     def plot(self):
         self._do_plot()
     def display(self):
+        self._update_plot()
         display(self._main_widget)
     def widget(self):
         return self._widget
@@ -83,7 +84,7 @@ class TimeseriesWidget:
             self._plots[m]=plt.plot(tt,self._plot_offsets[m]+chunk0[im,:])
             offset0=offset0-self._vspacing
         self._figure=plt.gcf()
-        plt.show()
+        #plt.show()
     def _pan_left(self):
         self._pan(-0.1)
     def _pan_right(self):

@@ -3,7 +3,7 @@ import numpy as np
 import ipywidgets as widgets
 
 class UnitWaveformsWidget:
-    def __init__(self,*,recording,sorting,channels=None,unit_ids=None,width=14,height=7,snippet_len=100,title=''):
+    def __init__(self,*,recording,sorting,channels=None,unit_ids=None,width=14,height=7,snippet_len=100,title='',max_num_spikes_per_unit=50):
         self._IX=recording
         self._OX=sorting
         self._channels=channels
@@ -13,6 +13,7 @@ class UnitWaveformsWidget:
         self._figure=None
         self._snippet_len=snippet_len
         self._title=title
+        self._max_num_spikes_per_unit=max_num_spikes_per_unit
     def plot(self):
         self._do_plot()
     def figure(self):
@@ -34,7 +35,7 @@ class UnitWaveformsWidget:
         for unit in units:
             st = self._OX.getUnitSpikeTrain(unit_id=unit)
             if st is not None:
-                spikes=self._get_random_spike_waveforms(unit=unit,max_num=50,channels=channels)
+                spikes=self._get_random_spike_waveforms(unit=unit,max_num=self._max_num_spikes_per_unit,channels=channels)
                 item=dict(
                     representative_waveforms=spikes,
                     title='Unit {}'.format(int(unit))
