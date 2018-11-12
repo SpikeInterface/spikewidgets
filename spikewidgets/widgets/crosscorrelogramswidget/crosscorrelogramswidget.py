@@ -45,7 +45,7 @@ class CrossCorrelogramsWidget:
 
     def _plot_correlograms_multi(self, list, *, ncols=5, **kwargs):
         nrows = np.ceil(len(list) / ncols)
-        plt.figure(figsize=(3 * ncols, 3 * nrows))
+        plt.figure(figsize=(3 * ncols+0.1, 3 * nrows+0.1))
         for i, item in enumerate(list):
             plt.subplot(nrows, ncols, i + 1)
             self._plot_correlogram(**item, **kwargs)

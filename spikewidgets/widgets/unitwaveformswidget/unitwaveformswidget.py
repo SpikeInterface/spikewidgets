@@ -42,7 +42,7 @@ class UnitWaveformsWidget:
                 )
                 list.append(item)
             else:
-                print(unit, ' spike train is None')
+                print (unit, ' spike train is None')
         with plt.rc_context({'axes.edgecolor':'gray'}):
             #self._plot_spike_shapes_multi(list,channel_locations=channel_locations[np.array(channels),:])
             self._plot_spike_shapes_multi(list,channel_locations=None)
@@ -129,7 +129,7 @@ class UnitWaveformsWidget:
         else:
             ylim=self._determine_global_ylim(list)
         nrows = np.ceil(len(list) / ncols)
-        self._figure=plt.figure(figsize=(3 * ncols, 3 * nrows))
+        self._figure=plt.figure(figsize=(3 * ncols+0.1, 3 * nrows+0.1))
         for i, item in enumerate(list):
             plt.subplot(nrows, ncols, i + 1)
             self._plot_spike_shapes(**item, **kwargs, ylim=ylim)

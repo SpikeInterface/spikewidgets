@@ -24,8 +24,10 @@ class LazyFilterRecording(si.RecordingExtractor):
             start_frame=0
         if end_frame is None:
             end_frame=self.getNumFrames()
+        all_channel_ids=self.getChannelIds()
         if channel_ids is None:
-            channel_ids=self.getChannelIds()
+            channel_ids=all_channel_ids
+        channel_indices=[all_channel_ids.index(ch) for ch in channel_ids]
         ich1=int(start_frame/self._chunk_size)
         ich2=int((end_frame-1)/self._chunk_size)
         filtered_chunk_list=[]
@@ -39,7 +41,7 @@ class LazyFilterRecording(si.RecordingExtractor):
                 end0=end_frame-ich*self._chunk_size
             else:
                 end0=self._chunk_size
-            filtered_chunk_list.append(filtered_chunk0[channel_ids,start0:end0])
+            filtered_chunk_list.append(filtered_chunk0[channel_indices,start0:end0])
         return np.concatenate(filtered_chunk_list,axis=1)
     
     @abstractmethod
