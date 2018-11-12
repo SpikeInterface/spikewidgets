@@ -30,7 +30,7 @@ class UnitWaveformsWidget:
             loc=self._IX.getChannelProperty(ch,'location')
             channel_locations[ii,:]=loc[-2:]
         if channels is None:
-            channels=range(M)
+            channels=channel_ids
         list=[]
         for unit in units:
             st = self._OX.getUnitSpikeTrain(unit_id=unit)
@@ -53,7 +53,7 @@ class UnitWaveformsWidget:
             event_indices=np.random.choice(range(num_events),size=max_num,replace=False)
         else:
             event_indices=range(num_events)
-        
+
         spikes=self._IX.getSnippets(reference_frames=st[event_indices].astype(int),snippet_len=self._snippet_len,channel_ids=channels)
         spikes=np.dstack(tuple(spikes))
         return spikes
