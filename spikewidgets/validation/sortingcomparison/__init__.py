@@ -1,1 +1,0 @@
-from .sortingcomparison import SortingComparison

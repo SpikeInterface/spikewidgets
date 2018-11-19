@@ -10,3 +10,4 @@ from .validation.sortingcomparison import SortingComparison
 from . import example_datasets
 from . import lazyfilters
 from . import devel
+from . import plotting
