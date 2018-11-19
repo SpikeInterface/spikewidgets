@@ -16,8 +16,12 @@ class UnitWaveformsWidget:
         self._max_num_spikes_per_unit=max_num_spikes_per_unit
     def plot(self):
         self._do_plot()
+        fig = self.figure()
+        fig.suptitle(self._title)
+
     def figure(self):
         return self._figure
+
     def _do_plot(self):
         units=self._unit_ids
         channels=self._channels
@@ -46,6 +50,7 @@ class UnitWaveformsWidget:
         with plt.rc_context({'axes.edgecolor':'gray'}):
             #self._plot_spike_shapes_multi(list,channel_locations=channel_locations[np.array(channels),:])
             self._plot_spike_shapes_multi(list,channel_locations=None)
+
     def _get_random_spike_waveforms(self,*,unit,max_num,channels):
         st=self._OX.getUnitSpikeTrain(unit_id=unit)
         num_events=len(st)
@@ -54,10 +59,13 @@ class UnitWaveformsWidget:
         else:
             event_indices=range(num_events)
 
-        spikes=self._IX.getSnippets(reference_frames=st[event_indices].astype(int),snippet_len=self._snippet_len,channel_ids=channels)
+        spikes=self._IX.getSnippets(reference_frames=st[event_indices].astype(int),
+                                    snippet_len=self._snippet_len,channel_ids=channels)
         spikes=np.dstack(tuple(spikes))
         return spikes
-    def _plot_spike_shapes(self, *, representative_waveforms=None, average_waveform=None, channel_locations=None, ylim=None, max_representatives=None, color='blue',title=''):
+
+    def _plot_spike_shapes(self, *, representative_waveforms=None, average_waveform=None, channel_locations=None,
+                           ylim=None, max_representatives=None, color='blue', title=''):
         if average_waveform is None:
             if representative_waveforms is None:
                 raise Exception('You must provide either average_waveform, representative waveforms, or both')
@@ -105,6 +113,7 @@ class UnitWaveformsWidget:
         plt.gca().get_yaxis().set_ticks([])
         if title:
             plt.title(title,color='gray')
+
     def _get_ylim_for_item(self,average_waveform=None,representative_waveforms=None):
         if average_waveform is None:
             if representative_waveforms is None:
