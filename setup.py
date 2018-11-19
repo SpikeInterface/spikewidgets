@@ -1,6 +1,6 @@
 import setuptools
 
-pkg_name="spikewidgets"
+pkg_name = "spikewidgets"
 
 setuptools.setup(
     name=pkg_name,
@@ -17,7 +17,7 @@ setuptools.setup(
         'vdom',
         'ipywidgets',
         'matplotlib',
-        'spikeinterface',
+        'spikeextractors',
         'ml_ms4alg',
         'pandas'
     ],
