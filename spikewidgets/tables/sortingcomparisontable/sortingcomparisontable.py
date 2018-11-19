@@ -8,13 +8,13 @@ class SortingComparisonTable():
         self._unit_properties = unit_properties
         self._reference = reference
         for i in range(len(self._unit_properties)):
-            prop=self._unit_properties[i]
-            if type(prop)!=dict:
-                self._unit_properties[i]={'name':prop}
+            prop = self._unit_properties[i]
+            if type(prop) != dict:
+                self._unit_properties[i] = {'name': prop}
 
     def getDataframe(self):
-        SC=self._comparison
-        rows=[]
+        SC = self._comparison
+        rows = []
         if self._reference == 1:
             for u_1, unit1 in enumerate(SC.getSorting1().getUnitIds()):
                 unit2 = SC.getBestUnitMatch1(unit1)
@@ -62,7 +62,5 @@ class SortingComparisonTable():
         return df
 
     def display(self):
-        df=self.getDataframe()
+        df = self.getDataframe()
         display(HTML(df.to_html(index=False)))
-        
-

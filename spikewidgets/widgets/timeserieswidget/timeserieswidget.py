@@ -41,8 +41,8 @@ class TimeseriesWidget:
         if self._height is None:
             self._height = 6
         if self._visible_channels is None:
-            self._visible_channels=recording.getChannelIds()
-        self._visible_trange=trange
+            self._visible_channels = recording.getChannelIds()
+        self._visible_trange = trange
 
         if self._visible_trange is None:
             self._visible_trange = [0, np.minimum(10000, recording.getNumFrames())]
@@ -85,16 +85,16 @@ class TimeseriesWidget:
         plt.gca().get_yaxis().set_ticks([])
         plt.xlabel('Time (sec)')
 
-        self._plots={}
-        self._plot_offsets={}
-        offset0=self._vspacing*(len(self._visible_channels)-1)
-        tt=np.arange(self._visible_trange[0],self._visible_trange[1])/self._samplerate
-        for im,m in enumerate(self._visible_channels):
-            self._plot_offsets[m]=offset0
-            self._plots[m]=plt.plot(tt,self._plot_offsets[m]+chunk0[im,:])
-            offset0=offset0-self._vspacing
-        self._figure=plt.gcf()
-        #plt.show()
+        self._plots = {}
+        self._plot_offsets = {}
+        offset0 = self._vspacing * (len(self._visible_channels) - 1)
+        tt = np.arange(self._visible_trange[0], self._visible_trange[1]) / self._samplerate
+        for im, m in enumerate(self._visible_channels):
+            self._plot_offsets[m] = offset0
+            self._plots[m] = plt.plot(tt, self._plot_offsets[m] + chunk0[im, :])
+            offset0 = offset0 - self._vspacing
+        self._figure = plt.gcf()
+        # plt.show()
 
     def _pan_left(self):
         self._pan(-0.1)

@@ -1,6 +1,6 @@
 import setuptools
 
-pkg_name="spikewidgets"
+pkg_name = "spikewidgets"
 
 setuptools.setup(
     name=pkg_name,
