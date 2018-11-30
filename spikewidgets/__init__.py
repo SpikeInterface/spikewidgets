@@ -2,6 +2,7 @@ from .widgets.timeserieswidget import TimeseriesWidget
 from .widgets.unitwaveformswidget import UnitWaveformsWidget
 from .widgets.crosscorrelogramswidget import CrossCorrelogramsWidget
 from .widgets.sortingaccuracywidget import SortingAccuracyWidget
+from .widgets.electrodegeometrywidget import ElectrodeGeometryWidget
 
 from .tables.sortingcomparisontable import SortingComparisonTable
 
