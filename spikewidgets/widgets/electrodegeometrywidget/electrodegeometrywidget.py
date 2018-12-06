@@ -17,7 +17,7 @@ class ElectrodeGeometryWidget:
     geom=self._get_geom()
     
     fig = plt.figure(figsize=(width,height))
-    ax = fig.add_axes([0, 0, 2, 2])
+    ax = fig.add_axes([0, 0, 1, 1])
     ax.axis('off')
     
     x=geom[:,0]
@@ -25,8 +25,8 @@ class ElectrodeGeometryWidget:
     xmin=np.min(x); xmax=np.max(x)
     ymin=np.min(y); ymax=np.max(y)
     
-    marker_size=width*fig.dpi/4
-    margin=np.maximum(xmax-xmin,ymax-ymin)*0.1
+    marker_size=width*fig.dpi/6
+    margin=np.maximum(xmax-xmin,ymax-ymin)*0.2
 
     plt.scatter(x,y,marker='o', s=int(marker_size**2))
     plt.axis('equal')
@@ -34,4 +34,4 @@ class ElectrodeGeometryWidget:
     plt.yticks([])
     plt.xlim(xmin-margin,xmax+margin)
     plt.ylim(ymin-margin,ymax+margin)
-    plt.show()
+    #plt.show()

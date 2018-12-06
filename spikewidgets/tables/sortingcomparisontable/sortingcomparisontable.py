@@ -19,13 +19,13 @@ class SortingComparisonTable():
             for u_1, unit1 in enumerate(SC.getSorting1().getUnitIds()):
                 unit2 = SC.getBestUnitMatch1(unit1)
                 row0 = {
-                    'Unit ID': unit1,
-                    'Accuracy': SC.getAgreementFraction(unit1, unit2),
-                    'Best unit': unit2,
-                    'Matched unit': SC.getMappedSorting1().getMappedUnitIds(unit1),
-                    '# matches': SC.getMatchingEventCount(unit1, unit2),
-                    'f.n.': SC.getFalseNegativeFraction(unit1),
-                    'f.p.': SC.getFalsePositiveFraction(unit1),
+                    'unit_id': unit1,
+                    'accuracy': SC.getAgreementFraction(unit1, unit2),
+                    'best_unit': unit2,
+                    'matched_unit': SC.getMappedSorting1().getMappedUnitIds(unit1),
+                    'num_matches': SC.getMatchingEventCount(unit1, unit2),
+                    'f_n': SC.getFalseNegativeFraction(unit1),
+                    'f_p': SC.getFalsePositiveFraction(unit1),
                 }
                 for prop in self._unit_properties:
                     pname = prop['name']
@@ -35,13 +35,13 @@ class SortingComparisonTable():
             for u_1, unit1 in enumerate(SC.getSorting2().getUnitIds()):
                 unit2 = SC.getBestUnitMatch2(unit1)
                 row0 = {
-                    'Unit ID': unit1,
-                    'Accuracy': SC.getAgreementFraction(unit2, unit1),
-                    'Best unit': unit2,
-                    'Matched unit': SC.getMappedSorting2().getMappedUnitIds(unit1),
-                    '# matches': SC.getMatchingEventCount(unit2, unit1),
-                    'f.n.': SC.getFalseNegativeFraction(unit1),
-                    'f.p.': SC.getFalsePositiveFraction(unit1),
+                    'unit_id': unit1,
+                    'accuracy': SC.getAgreementFraction(unit2, unit1),
+                    'best_unit': unit2,
+                    'matched_unit': SC.getMappedSorting2().getMappedUnitIds(unit1),
+                    'num_matches': SC.getMatchingEventCount(unit2, unit1),
+                    'f_n': SC.getFalseNegativeFraction(unit1),
+                    'f_p': SC.getFalsePositiveFraction(unit1),
                 }
                 for prop in self._unit_properties:
                     pname = prop['name']
@@ -49,16 +49,16 @@ class SortingComparisonTable():
                 rows.append(row0)
 
         df = pd.DataFrame(rows)
-        fields = ['Unit ID']
-        fields = fields + ['Accuracy', 'Best unit', 'Matched unit', 'f.n.', 'f.p.', '# matches']
+        fields = ['unit_id']
+        fields = fields + ['accuracy', 'best_unit', 'matched_unit', 'f_n', 'f_p', 'num_matches']
         for prop in self._unit_properties:
             pname = prop['name']
             fields.append(pname)
         df = df[fields]
-        df['Accuracy'] = df['Accuracy'].map('{:,.2f}'.format)
+        df['accuracy'] = df['accuracy'].map('{:,.2f}'.format)
         # df['Best match'] = df['Accuracy'].map('{:,.2f}'.format)
-        df['f.n.'] = df['f.n.'].map('{:,.2f}'.format)
-        df['f.p.'] = df['f.p.'].map('{:,.2f}'.format)
+        df['f_n'] = df['f_n'].map('{:,.2f}'.format)
+        df['f_p'] = df['f_p'].map('{:,.2f}'.format)
         return df
 
     def display(self):
