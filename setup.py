@@ -18,8 +18,8 @@ setuptools.setup(
         'ipywidgets',
         'matplotlib',
         'spikeextractors',
-        'ml_ms4alg',
-        'pandas'
+        'pandas',
+        'pillow'
     ],
     classifiers=(
         "Programming Language :: Python :: 3",
