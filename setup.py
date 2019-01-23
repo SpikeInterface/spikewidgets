@@ -18,7 +18,7 @@ setuptools.setup(
         'ipywidgets',
         'matplotlib',
         'spikeextractors',
-        'ml_ms4alg',
+        #'ml_ms4alg',
         'pandas'
     ],
     classifiers=(
