@@ -6,6 +6,7 @@ services:
 python:
 - '3.6'
 install:
+- pip install h5py
 - pip install .
 - pip install pytest
 script: pytest
