@@ -61,9 +61,8 @@ class UnitWaveformsWidget:
         else:
             event_indices = range(num_events)
 
-        spikes = self._IX.getSnippets(reference_frames=st[event_indices].astype(int), snippet_len=self._snippet_len,
-                                      channel_ids=channels)
-        if spikes:
+        spikes = self._IX.getSnippets(reference_frames=st[event_indices].astype(int), snippet_len=self._snippet_len, channel_ids=channels)
+        if spikes.size != 0:
             spikes = np.dstack(tuple(spikes))
         else:
             spikes = np.zeros((self._IX.getNumChannels(), self._snippet_len, 0))
