@@ -19,10 +19,10 @@ class CrossCorrelogramsWidget:
     def _do_plot(self):
         units = self._unit_ids
         if units is None:
-            units = self._SX.getUnitIds()
+            units = self._SX.get_unit_ids()
         list = []
         for unit in units:
-            times = self._SX.getUnitSpikeTrain(unit_id=unit)
+            times = self._SX.get_unit_spike_train(unit_id=unit)
             max_dt_msec = 50
             bin_size_msec = 2
             max_dt_tp = max_dt_msec * self._samplerate / 1000

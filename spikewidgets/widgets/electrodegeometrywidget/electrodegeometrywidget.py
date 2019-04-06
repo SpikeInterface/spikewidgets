@@ -10,7 +10,7 @@ class ElectrodeGeometryWidget:
 
   def _get_geom(self):
     RX=self._recording
-    return np.stack([RX.getChannelProperty(channel_id=ch,property_name='location') for ch in RX.getChannelIds()])
+    return np.stack([RX.get_channel_property(channel_id=ch,property_name='location') for ch in RX.get_channel_ids()])
     
   def _do_plot(self,width,height):
     R=self._recording

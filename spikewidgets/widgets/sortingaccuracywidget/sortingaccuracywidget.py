@@ -12,10 +12,10 @@ class SortingAccuracyWidget:
 
     def _do_plot(self):
         SC = self._SC
-        units = SC.getSorting1().getUnitIds()
-        agreements = [SC.getAgreementFraction(unit) for unit in units]
+        units = SC.get_sorting1().get_unit_ids()
+        agreements = [SC.get_agreement_fraction(unit) for unit in units]
         if self._property_name:
-            xvals = SC.getSorting1().getUnitsProperty(unit_ids=units, property_name=self._property_name)
+            xvals = SC.get_sorting1().get_units_property(unit_ids=units, property_name=self._property_name)
             plt.plot(xvals, agreements, '.')
             plt.xlabel(self._property_name)
         else:
