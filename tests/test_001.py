@@ -20,7 +20,7 @@ class Test001(unittest.TestCase):
         pass
 
     def test_toy_example1(self):
-        IX, OX = sw.example_datasets.toy_example1()
+        pass
 
 
 if __name__ == '__main__':
