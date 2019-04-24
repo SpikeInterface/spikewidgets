@@ -12,40 +12,40 @@ class SortingComparisonTable():
             if type(prop) != dict:
                 self._unit_properties[i] = {'name': prop}
 
-    def getDataframe(self):
+    def get_dataframe(self):
         SC = self._comparison
         rows = []
         if self._reference == 1:
-            for u_1, unit1 in enumerate(SC.getSorting1().get_unit_ids()):
-                unit2 = SC.getBestUnitMatch1(unit1)
+            for u_1, unit1 in enumerate(SC.get_sorting1().get_unit_ids()):
+                unit2 = SC.get_best_unit_match1(unit1)
                 row0 = {
                     'unit_id': unit1,
-                    'accuracy': SC.getAgreementFraction(unit1, unit2),
+                    'accuracy': SC.get_agreement_fraction(unit1, unit2),
                     'best_unit': unit2,
-                    'matched_unit': SC.getMappedSorting1().getMappedUnitIds(unit1),
-                    'num_matches': SC.getMatchingEventCount(unit1, unit2),
-                    'f_n': SC.getFalseNegativeFraction(unit1),
-                    'f_p': SC.getFalsePositiveFraction(unit1),
+                    'matched_unit': SC.get_mapped_sorting1().get_mapped_unit_ids(unit1),
+                    'num_matches': SC.get_matching_event_count(unit1, unit2),
+                    'f_n': SC.get_false_negative_fraction(unit1),
+                    'f_p': SC.get_false_positive_fraction(unit1),
                 }
                 for prop in self._unit_properties:
                     pname = prop['name']
-                    row0[pname] = SC.getSorting1().get_unit_property(unit_id=int(unit1), property_name=pname)
+                    row0[pname] = SC.get_sorting1().get_unit_property(unit_id=int(unit1), property_name=pname)
                 rows.append(row0)
         elif self._reference == 2:
-            for u_1, unit1 in enumerate(SC.getSorting2().get_unit_ids()):
-                unit2 = SC.getBestUnitMatch2(unit1)
+            for u_1, unit1 in enumerate(SC.get_sorting2().get_unit_ids()):
+                unit2 = SC.get_best_unit_match2(unit1)
                 row0 = {
                     'unit_id': unit1,
-                    'accuracy': SC.getAgreementFraction(unit2, unit1),
+                    'accuracy': SC.get_agreement_fraction(unit2, unit1),
                     'best_unit': unit2,
-                    'matched_unit': SC.getMappedSorting2().getMappedUnitIds(unit1),
-                    'num_matches': SC.getMatchingEventCount(unit2, unit1),
-                    'f_n': SC.getFalseNegativeFraction(unit1),
-                    'f_p': SC.getFalsePositiveFraction(unit1),
+                    'matched_unit': SC.get_mapped_sorting2().get_mapped_unit_ids(unit1),
+                    'num_matches': SC.get_matching_event_count(unit2, unit1),
+                    'f_n': SC.get_false_negative_fraction(unit1),
+                    'f_p': SC.get_false_positive_fraction(unit1),
                 }
                 for prop in self._unit_properties:
                     pname = prop['name']
-                    row0[pname] = SC.getSorting2().get_unit_property(unit_id=int(unit1), property_name=pname)
+                    row0[pname] = SC.get_sorting2().get_unit_property(unit_id=int(unit1), property_name=pname)
                 rows.append(row0)
 
         df = pd.DataFrame(rows)
@@ -62,5 +62,5 @@ class SortingComparisonTable():
         return df
 
     def display(self):
-        df = self.getDataframe()
+        df = self.get_dataframe()
         display(HTML(df.to_html(index=False)))
