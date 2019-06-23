@@ -1,6 +1,21 @@
-from matplotlib import pyplot as plt
 import numpy as np
-import ipywidgets as widgets
+from matplotlib import pyplot as plt
+
+
+def plot_unit_waveforms(sorting=None, recording=None, channels=None, unit_ids=None, width=14, height=7, snippet_len=100,
+                        title='', max_num_spikes_per_unit=100):
+    W = UnitWaveformsWidget(
+        recording=recording,
+        sorting=sorting,
+        channels=channels,
+        unit_ids=unit_ids,
+        width=width,
+        snippet_len=snippet_len,
+        height=height,
+        title=title,
+        max_num_spikes_per_unit=max_num_spikes_per_unit
+    )
+    W.plot()
 
 
 class UnitWaveformsWidget:
@@ -61,7 +76,8 @@ class UnitWaveformsWidget:
         else:
             event_indices = range(num_events)
 
-        spikes = self._IX.get_snippets(reference_frames=st[event_indices].astype(int), snippet_len=self._snippet_len, channel_ids=channels)
+        spikes = self._IX.get_snippets(reference_frames=st[event_indices].astype(int),
+                                       snippet_len=self._snippet_len, channel_ids=channels)
         if spikes.size != 0:
             spikes = np.dstack(tuple(spikes))
         else:

@@ -1,14 +1,32 @@
-from matplotlib import pyplot as plt
 import numpy as np
-import ipywidgets as widgets
+from matplotlib import pyplot as plt
+
+
+def plot_crosscorrelograms(sorting, sample_rate=None, unit_ids=None, bin_size=2, window=50):
+    if sample_rate is None:
+        if sorting.get_sampling_frequency() is None:
+            raise Exception("Sampling rate information is not in the SortingExtractor. "
+                            "Provide the 'sample_rate' argument")
+        else:
+            sample_rate = sorting.get_sampling_frequency()
+    W = CrossCorrelogramsWidget(
+        sorting=sorting,
+        samplerate=sample_rate,
+        unit_ids=unit_ids,
+        binsize=bin_size,
+        window=window
+    )
+    W.plot()
 
 
 class CrossCorrelogramsWidget:
-    def __init__(self, *, sorting, samplerate, unit_ids=None):
+    def __init__(self, *, sorting, samplerate, unit_ids=None, binsize=2, window=50):
         self._SX = sorting
         self._unit_ids = unit_ids
         self._figure = None
         self._samplerate = samplerate
+        self._binsize = binsize
+        self._window = window
 
     def plot(self):
         self._do_plot()
@@ -23,8 +41,8 @@ class CrossCorrelogramsWidget:
         list = []
         for unit in units:
             times = self._SX.get_unit_spike_train(unit_id=unit)
-            max_dt_msec = 50
-            bin_size_msec = 2
+            max_dt_msec = self._window
+            bin_size_msec = self._binsize
             max_dt_tp = max_dt_msec * self._samplerate / 1000
             bin_size_tp = bin_size_msec * self._samplerate / 1000
             (bin_counts, bin_edges) = compute_autocorrelogram(times, max_dt_tp=max_dt_tp, bin_size_tp=bin_size_tp)

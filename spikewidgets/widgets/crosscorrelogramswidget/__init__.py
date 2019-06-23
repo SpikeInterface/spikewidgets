@@ -1,1 +1,1 @@
-from .crosscorrelogramswidget import CrossCorrelogramsWidget
+from .crosscorrelogramswidget import CrossCorrelogramsWidget, plot_crosscorrelograms
