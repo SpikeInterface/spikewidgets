@@ -10,7 +10,7 @@ install:
 - pip install spiketoolkit
 - pip install networkx
 - pip install matplotlib
-- pip install ipytidgets
+- pip install ipywidgets
 - pip install .
 - pip install pytest
 script: pytest
