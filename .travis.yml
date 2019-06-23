@@ -6,7 +6,11 @@ services:
 python:
 - '3.6'
 install:
-- pip install h5py
+- pip install spikeextractors
+- pip install spiketoolkit
+- pip install networkx
+- pip install matplotlib
+- pip install ipywidgets
 - pip install .
 - pip install pytest
 script: pytest

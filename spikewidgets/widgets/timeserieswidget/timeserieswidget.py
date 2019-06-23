@@ -1,10 +1,10 @@
-from matplotlib import pyplot as plt
-import numpy as np
 import ipywidgets as widgets
+import numpy as np
+from matplotlib import pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
 
-def plot_timeseries(*, recording, sorting=None, channels=None, trange=None, width=None, height=None):
+def plot_timeseries(recording, sorting=None, channels=None, trange=None, width=None, height=None):
     W = TimeseriesWidget(
         recording=recording,
         sorting=sorting,
@@ -14,18 +14,6 @@ def plot_timeseries(*, recording, sorting=None, channels=None, trange=None, widt
         height=height
     )
     W.plot()
-
-
-def view_timeseries(*, recording, sorting=None, channels=None, trange=None, width=None, height=None):
-    W = TimeseriesWidget(
-        recording=recording,
-        sorting=sorting,
-        channels=channels,
-        trange=trange,
-        width=width,
-        height=height
-    )
-    W.display()
 
 
 class TimeseriesWidget:
@@ -51,6 +39,7 @@ class TimeseriesWidget:
         self._control_panel = self._create_control_panel()
         self._main_widget = widgets.VBox([self._control_panel, self._widget])
         self._visible_trange = self._fix_trange(self._visible_trange)
+        self._figure = None
         # self._update_plot()
 
     def plot(self):
@@ -77,12 +66,17 @@ class TimeseriesWidget:
             start_frame=self._visible_trange[0],
             end_frame=self._visible_trange[1]
         )
-        plt.xlim(self._visible_trange[0] / self._samplerate, self._visible_trange[1] / self._samplerate)
-        plt.ylim(-self._vspacing, self._vspacing * len(self._visible_channels))
-        plt.gcf().set_size_inches(self._width, self._height)
-        plt.gca().get_xaxis().set_major_locator(MaxNLocator(prune='both'))
-        plt.gca().get_yaxis().set_ticks([])
-        plt.xlabel('Time (sec)')
+        if self._figure is None:
+            fig, ax = plt.subplots()
+        else:
+            fig = self._figure
+            ax = fig.axes[0]
+        ax.set_xlim(self._visible_trange[0] / self._samplerate, self._visible_trange[1] / self._samplerate)
+        ax.set_ylim(-self._vspacing, self._vspacing * len(self._visible_channels))
+        fig.set_size_inches(self._width, self._height)
+        ax.get_xaxis().set_major_locator(MaxNLocator(prune='both'))
+        ax.get_yaxis().set_ticks([])
+        ax.set_xlabel('Time (sec)')
 
         self._plots = {}
         self._plot_offsets = {}
@@ -90,9 +84,9 @@ class TimeseriesWidget:
         tt = np.arange(self._visible_trange[0], self._visible_trange[1]) / self._samplerate
         for im, m in enumerate(self._visible_channels):
             self._plot_offsets[m] = offset0
-            self._plots[m] = plt.plot(tt, self._plot_offsets[m] + chunk0[im, :])
+            self._plots[m] = ax.plot(tt, self._plot_offsets[m] + chunk0[im, :])
             offset0 = offset0 - self._vspacing
-        self._figure = plt.gcf()
+        self._figure = fig
         # plt.show()
 
     def _pan_left(self):
