@@ -84,8 +84,7 @@ def compute_autocorrelogram(times, *, max_dt_tp, bin_size_tp, max_samples=None):
             candidate_inds = np.random.choice(candidate_inds, size=max_samples, replace=False)
     vals_list = []  # A list of all offsets we have accumulated
     while True:
-        candidate_inds = candidate_inds[
-            candidate_inds + step < L]  # we only consider events that are within workable range
+        candidate_inds = candidate_inds[candidate_inds + step < L]  # we only consider events that are within workable range
         candidate_inds = candidate_inds[times2[candidate_inds + step] - times2[
             candidate_inds] <= max_dt_tp]  # we only consider event-pairs that are within max_dt_tp apart
         if len(candidate_inds) > 0:  # if we have some events to consider
@@ -98,9 +97,8 @@ def compute_autocorrelogram(times, *, max_dt_tp, bin_size_tp, max_samples=None):
     if len(vals_list) > 0:  # concatenate all the values
         all_vals = np.concatenate(vals_list)
     else:
-        all_vals = np.array([]);
+        all_vals = np.array([])
     aa = np.arange(-num_bins_left, num_bins_left + 1) * bin_size_tp
-    all_vals = np.sign(all_vals) * (np.abs(
-        all_vals) - bin_size_tp * 0.00001)  # a trick to make the histogram symmetric due to differences in rounding for positive and negative, i suppose
+    all_vals = np.sign(all_vals) * (np.abs(all_vals) - bin_size_tp * 0.00001)  # a trick to make the histogram symmetric due to differences in rounding for positive and negative, i suppose
     bin_counts, bin_edges = np.histogram(all_vals, bins=aa)
     return (bin_counts, bin_edges)

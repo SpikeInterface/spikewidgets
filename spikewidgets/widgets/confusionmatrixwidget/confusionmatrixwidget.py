@@ -25,8 +25,8 @@ class ConfusionMatrixWidget:
     def _do_plot(self):
         confusion_matrix, st1_idx, st2_idx = self._sc.get_confusion_matrix()
 
-        sorting1 = self._sc._sorting1
-        sorting2 = self._sc._sorting2
+        sorting1 = self._sc.sorting1
+        sorting2 = self._sc.sorting2
         unit1_ids = sorting1.get_unit_ids()
         unit2_ids = sorting2.get_unit_ids()
         N1 = len(unit1_ids)
