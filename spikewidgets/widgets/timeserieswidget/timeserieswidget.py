@@ -4,20 +4,21 @@ from matplotlib import pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
 
-def plot_timeseries(recording, sorting=None, channels=None, trange=None, width=None, height=None):
+def plot_timeseries(recording, sorting=None, channels=None, trange=None, width=None, height=None, color_groups=False):
     W = TimeseriesWidget(
         recording=recording,
         sorting=sorting,
         channels=channels,
         trange=trange,
         width=width,
-        height=height
+        height=height,
+        color_groups=color_groups
     )
     W.plot()
 
 
 class TimeseriesWidget:
-    def __init__(self, *, recording, sorting=None, channels=None, trange=None, width=None, height=None):
+    def __init__(self, *, recording, sorting=None, channels=None, trange=None, width=None, height=None, color_groups=False):
         self._recording = recording
         self._sorting = sorting
         self._samplerate = recording.get_sampling_frequency()
@@ -40,8 +41,21 @@ class TimeseriesWidget:
         self._main_widget = widgets.VBox([self._control_panel, self._widget])
         self._visible_trange = self._fix_trange(self._visible_trange)
         self._figure = None
-        # self._update_plot()
-
+        self._color_groups = color_groups
+        if(color_groups):
+            self._colors = []
+            self._group_color_map = {}
+            all_groups = recording.get_channel_groups()
+            groups = np.unique(all_groups)
+            N = len(groups)
+            import colorsys
+            HSV_tuples = [(x*1.0/N, 0.5, 0.5) for x in range(N)]
+            self._colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), HSV_tuples))
+            color_idx = 0
+            for group in groups:
+                self._group_color_map[group] = color_idx
+                color_idx += 1
+            
     def plot(self):
         self._do_plot()
 
@@ -84,7 +98,12 @@ class TimeseriesWidget:
         tt = np.arange(self._visible_trange[0], self._visible_trange[1]) / self._samplerate
         for im, m in enumerate(self._visible_channels):
             self._plot_offsets[m] = offset0
-            self._plots[m] = ax.plot(tt, self._plot_offsets[m] + chunk0[im, :])
+            if(self._color_groups):
+                group = self._recording.get_channel_groups(channel_ids=[m])[0]
+                group_color_idx = self._group_color_map[group]
+                self._plots[m] = ax.plot(tt, self._plot_offsets[m] + chunk0[im, :], color=self._colors[group_color_idx])
+            else:
+                self._plots[m] = ax.plot(tt, self._plot_offsets[m] + chunk0[im, :])
             offset0 = offset0 - self._vspacing
         self._figure = fig
         # plt.show()
