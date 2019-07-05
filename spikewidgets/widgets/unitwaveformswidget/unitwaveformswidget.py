@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 
 
 def plot_unit_waveforms(sorting=None, recording=None, channels=None, unit_ids=None, width=14, height=7, snippet_len=100,
-                        title='', max_num_spikes_per_unit=100):
+                        title='', max_num_spikes_per_unit=100, ax=None):
     W = UnitWaveformsWidget(
         recording=recording,
         sorting=sorting,
@@ -13,21 +13,23 @@ def plot_unit_waveforms(sorting=None, recording=None, channels=None, unit_ids=No
         snippet_len=snippet_len,
         height=height,
         title=title,
-        max_num_spikes_per_unit=max_num_spikes_per_unit
+        max_num_spikes_per_unit=max_num_spikes_per_unit,
+        ax=ax
     )
     W.plot()
+    return W._axes
 
 
 class UnitWaveformsWidget:
     def __init__(self, *, recording, sorting, channels=None, unit_ids=None, width=14, height=7, snippet_len=100,
-                 title='', max_num_spikes_per_unit=50):
+                 title='', max_num_spikes_per_unit=50, ax=None):
         self._IX = recording
         self._OX = sorting
         self._channels = channels
         self._unit_ids = unit_ids
         self._width = width
         self._height = height
-        self._figure = None
+        self._ax = ax
         self._snippet_len = snippet_len
         self._title = title
         self._max_num_spikes_per_unit = max_num_spikes_per_unit
@@ -52,6 +54,14 @@ class UnitWaveformsWidget:
         if channels is None:
             channels = channel_ids
         list = []
+
+        if self._ax is None:
+            fig, ax = plt.subplots()
+            self._ax = ax
+            self._figure = fig
+        else:
+            self._figure = self._ax.get_figure()
+
         for unit in units:
             st = self._OX.get_unit_spike_train(unit_id=unit)
             if st is not None:
@@ -158,7 +168,8 @@ class UnitWaveformsWidget:
         else:
             ylim = self._determine_global_ylim(list)
         nrows = np.ceil(len(list) / ncols)
-        self._figure = plt.figure(figsize=(3 * ncols + 0.1, 3 * nrows + 0.1))
+        self._axes = []
         for i, item in enumerate(list):
-            plt.subplot(nrows, ncols, i + 1)
+            ax = self._figure.add_subplot(nrows, ncols, i + 1)
             self._plot_spike_shapes(**item, **kwargs, ylim=ylim)
+            self._axes.append(ax)

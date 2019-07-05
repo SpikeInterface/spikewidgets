@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 #TODO add autocorrelogram and crosscorrelogram matrix
-def plot_crosscorrelograms(sorting, sample_rate=None, unit_ids=None, bin_size=2, window=50):
+def plot_crosscorrelograms(sorting, sample_rate=None, unit_ids=None, bin_size=2, window=50, ax=None):
     if sample_rate is None:
         if sorting.get_sampling_frequency() is None:
             raise Exception("Sampling rate information is not in the SortingExtractor. "
@@ -14,16 +14,18 @@ def plot_crosscorrelograms(sorting, sample_rate=None, unit_ids=None, bin_size=2,
         samplerate=sample_rate,
         unit_ids=unit_ids,
         binsize=bin_size,
-        window=window
+        window=window,
+        ax=ax
     )
     W.plot()
+    return W._axes
 
 
 class CrossCorrelogramsWidget:
-    def __init__(self, *, sorting, samplerate, unit_ids=None, binsize=2, window=50):
+    def __init__(self, *, sorting, samplerate, unit_ids=None, binsize=2, window=50, ax=None):
         self._SX = sorting
         self._unit_ids = unit_ids
-        self._figure = None
+        self._ax = ax
         self._samplerate = samplerate
         self._binsize = binsize
         self._window = window
@@ -39,6 +41,14 @@ class CrossCorrelogramsWidget:
         if units is None:
             units = self._SX.get_unit_ids()
         list = []
+
+        if self._ax is None:
+            fig, ax = plt.subplots()
+            self._ax = ax
+            self._figure = fig
+        else:
+            self._figure = self._ax.get_figure()
+
         for unit in units:
             times = self._SX.get_unit_spike_train(unit_id=unit)
             max_dt_msec = self._window
@@ -68,9 +78,11 @@ class CrossCorrelogramsWidget:
     def _plot_correlograms_multi(self, list, *, ncols=5, **kwargs):
         nrows = np.ceil(len(list) / ncols)
         plt.figure(figsize=(3 * ncols + 0.1, 3 * nrows + 0.1))
+        self._axes = []
         for i, item in enumerate(list):
-            plt.subplot(nrows, ncols, i + 1)
+            ax = self._figure.add_subplot(nrows, ncols, i + 1)
             self._plot_correlogram(**item, **kwargs)
+            self._axes.append(ax)
 
 
 def compute_autocorrelogram(times, *, max_dt_tp, bin_size_tp, max_samples=None):

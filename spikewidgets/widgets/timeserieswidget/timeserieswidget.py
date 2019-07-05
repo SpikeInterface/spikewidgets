@@ -4,7 +4,8 @@ from matplotlib import pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
 
-def plot_timeseries(recording, sorting=None, channels=None, trange=None, width=None, height=None, color_groups=False):
+def plot_timeseries(recording, sorting=None, channels=None, trange=None, width=None, height=None, color_groups=False,
+                    ax=None):
     W = TimeseriesWidget(
         recording=recording,
         sorting=sorting,
@@ -12,13 +13,16 @@ def plot_timeseries(recording, sorting=None, channels=None, trange=None, width=N
         trange=trange,
         width=width,
         height=height,
-        color_groups=color_groups
+        color_groups=color_groups,
+        ax=ax
     )
     W.plot()
+    return W._ax
 
 
 class TimeseriesWidget:
-    def __init__(self, *, recording, sorting=None, channels=None, trange=None, width=None, height=None, color_groups=False):
+    def __init__(self, *, recording, sorting=None, channels=None, trange=None, width=None, height=None,
+                 color_groups=False, ax=None):
         self._recording = recording
         self._sorting = sorting
         self._samplerate = recording.get_sampling_frequency()
@@ -40,9 +44,9 @@ class TimeseriesWidget:
         self._control_panel = self._create_control_panel()
         self._main_widget = widgets.VBox([self._control_panel, self._widget])
         self._visible_trange = self._fix_trange(self._visible_trange)
-        self._figure = None
+        self._ax = ax
         self._color_groups = color_groups
-        if(color_groups):
+        if color_groups:
             self._colors = []
             self._group_color_map = {}
             all_groups = recording.get_channel_groups()
@@ -80,11 +84,11 @@ class TimeseriesWidget:
             start_frame=self._visible_trange[0],
             end_frame=self._visible_trange[1]
         )
-        if self._figure is None:
+        if self._ax is None:
             fig, ax = plt.subplots()
+            self._ax = ax
         else:
-            fig = self._figure
-            ax = fig.axes[0]
+            fig = self._ax.get_figure()
         ax.set_xlim(self._visible_trange[0] / self._samplerate, self._visible_trange[1] / self._samplerate)
         ax.set_ylim(-self._vspacing, self._vspacing * len(self._visible_channels))
         fig.set_size_inches(self._width, self._height)

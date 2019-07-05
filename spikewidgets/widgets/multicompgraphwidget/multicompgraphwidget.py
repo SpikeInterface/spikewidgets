@@ -23,7 +23,7 @@ def plot_multicomp_graph(multisortingcomparison, sorter_names=None, draw_labels=
 
 class MultiCompGraphWidget:
     def __init__(self, *, multisortingcomparison, sorternames=None, drawlabels=False, node_cmap='viridis',
-                 edge_cmap='hot', title='', ax=ax):
+                 edge_cmap='hot', title='', ax=None):
         self._msc = multisortingcomparison
         self._sorter_names = sorternames
         self._drawlabels = drawlabels

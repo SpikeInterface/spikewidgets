@@ -40,8 +40,9 @@ class ResterWidget:
         if units is None:
             units = self._SX.get_unit_ids()
 
-        if self._ax == None:
+        if self._ax is None:
             fig, ax = plt.subplots()
+            self._ax = ax
         else:
             ax = self._ax
         min_t = 0
