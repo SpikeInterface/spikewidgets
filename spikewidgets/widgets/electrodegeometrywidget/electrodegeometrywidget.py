@@ -2,12 +2,14 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def plot_electrode_geometry(recording, elec_size=5):
+def plot_electrode_geometry(recording, elec_size=5, ax=None):
     W = ElectrodeGeometryWidget(
         recording=recording,
         elec_size=elec_size,
+        ax=ax
     )
     W.plot()
+    return W._ax
 
 
 class ElectrodeGeometryWidget:
@@ -44,4 +46,3 @@ class ElectrodeGeometryWidget:
         self._ax.set_yticks([])
         self._ax.set_xlim(xmin - margin, xmax + margin)
         self._ax.set_ylim(ymin - margin, ymax + margin)
-        # plt.show()

@@ -2,22 +2,25 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def plot_confusion_matrix(sortingcomparison, sorter_names=None, count_text=True, title=''):
+def plot_confusion_matrix(sortingcomparison, sorter_names=None, count_text=True, title='', ax=None):
     W = ConfusionMatrixWidget(
         sortingcomparison=sortingcomparison,
         sorternames=sorter_names,
         title=title,
-        count_text=count_text
+        count_text=count_text,
+        ax=None
     )
     W.plot()
+    return W._ax
 
 
 class ConfusionMatrixWidget:
-    def __init__(self, *, sortingcomparison, sorternames=None, count_text=True, title=''):
+    def __init__(self, *, sortingcomparison, sorternames=None, count_text=True, title='', ax=None):
         self._sc = sortingcomparison
         self._sorter_names = sorternames
         self._count_text = count_text
         self._title = title
+        self._ax = ax
 
     def plot(self):
         self._do_plot()
@@ -32,7 +35,10 @@ class ConfusionMatrixWidget:
         N1 = len(unit1_ids)
         N2 = len(unit2_ids)
 
-        fig, ax = plt.subplots()
+        if self._ax is None:
+            fig, ax = plt.subplots()
+        else:
+            ax = self._ax
 
         # Using matshow here just because it sets the ticks up nicely. imshow is faster.
         ax.matshow(confusion_matrix, cmap='Greens')

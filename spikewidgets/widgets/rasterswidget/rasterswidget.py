@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def plot_rasters(sorting, sample_rate=None, unit_ids=None, color='k'):
+def plot_rasters(sorting, sample_rate=None, unit_ids=None, color='k', ax=None):
     if sample_rate is None:
         if sorting.get_sampling_frequency() is None:
             raise Exception("Sampling rate information is not in the SortingExtractor. "
@@ -14,17 +14,20 @@ def plot_rasters(sorting, sample_rate=None, unit_ids=None, color='k'):
         samplerate=sample_rate,
         unit_ids=unit_ids,
         color=color,
+        ax=ax
     )
     W.plot()
+    return W._ax
 
 
 class ResterWidget:
-    def __init__(self, *, sorting, samplerate, unit_ids=None, color='k'):
+    def __init__(self, *, sorting, samplerate, unit_ids=None, color='k', ax=None):
         self._SX = sorting
         self._unit_ids = unit_ids
         self._figure = None
         self._samplerate = samplerate
         self._color = color
+        self._ax = ax
 
     def plot(self):
         self._do_plot()
@@ -37,7 +40,10 @@ class ResterWidget:
         if units is None:
             units = self._SX.get_unit_ids()
 
-        fig, ax = plt.subplots()
+        if self._ax == None:
+            fig, ax = plt.subplots()
+        else:
+            ax = self._ax
         min_t = 0
         max_t = 0
         for u_i, unit in enumerate(units):

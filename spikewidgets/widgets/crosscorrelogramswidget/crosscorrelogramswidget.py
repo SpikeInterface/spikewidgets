@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-
+#TODO add autocorrelogram and crosscorrelogram matrix
 def plot_crosscorrelograms(sorting, sample_rate=None, unit_ids=None, bin_size=2, window=50):
     if sample_rate is None:
         if sorting.get_sampling_frequency() is None:
