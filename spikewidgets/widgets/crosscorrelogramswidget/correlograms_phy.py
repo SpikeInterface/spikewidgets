@@ -129,7 +129,6 @@ def compute_correlograms(spike_times, spike_clusters, cluster_ids=None, sample_r
     mask = np.ones_like(spike_samples, dtype=np.bool)
 
     correlograms = _create_correlograms_array(n_clusters, winsize_bins)
-    print(correlograms.shape)
 
     # The loop continues as long as there is at least one spike with
     # a matching spike.
