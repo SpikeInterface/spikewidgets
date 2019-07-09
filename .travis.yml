@@ -6,8 +6,8 @@ services:
 python:
 - '3.6'
 install:
-- pip install pip install https://github.com/SpikeInterface/spikeextractors/archive/master.zip
-- pip install pip install https://github.com/SpikeInterface/spiketoolkit/archive/master.zip
+- pip install https://github.com/SpikeInterface/spikeextractors/archive/master.zip
+- pip install https://github.com/SpikeInterface/spiketoolkit/archive/master.zip
 - pip install requests
 - pip install networkx
 - pip install matplotlib
