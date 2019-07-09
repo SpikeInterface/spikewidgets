@@ -8,6 +8,7 @@ python:
 install:
 - pip install spikeextractors
 - pip install spiketoolkit
+- pip install requests
 - pip install networkx
 - pip install matplotlib
 - pip install ipywidgets
