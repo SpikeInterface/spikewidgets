@@ -15,16 +15,8 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'numpy',
-        'matplotlib',
-        'ipywidgets'
-        # 'scipy',
-        # 'ipython',
-        # 'vdom',
-        # 'ipywidgets',
-        # 'matplotlib',
-        # 'spikeextractors',
-        # 'pandas',
-        # 'pillow'
+        'spiketoolkit',
+        'matplotlib'
     ],
     classifiers=(
         "Programming Language :: Python :: 3",

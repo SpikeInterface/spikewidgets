@@ -1,8 +1,30 @@
 import numpy as np
 from matplotlib import pyplot as plt
+from spikewidgets.widgets.basewidget import BaseMultiWidget
+from .correlograms_phy import compute_correlograms
 
-#TODO add autocorrelogram and crosscorrelogram matrix
-def plot_crosscorrelograms(sorting, sample_rate=None, unit_ids=None, bin_size=2, window=50, ax=None):
+
+def plot_autocorrelograms(sorting, sample_rate=None, unit_ids=None, bin_size=2, window=50, figure=None, ax=None):
+    if sample_rate is None:
+        if sorting.get_sampling_frequency() is None:
+            raise Exception("Sampling rate information is not in the SortingExtractor. "
+                            "Provide the 'sample_rate' argument")
+        else:
+            sample_rate = sorting.get_sampling_frequency()
+    W = AutoCorrelogramsWidget(
+        sorting=sorting,
+        samplerate=sample_rate,
+        unit_ids=unit_ids,
+        binsize=bin_size,
+        window=window,
+        figure=figure,
+        ax=ax
+    )
+    W.plot()
+    return W
+
+
+def plot_crosscorrelograms(sorting, sample_rate=None, unit_ids=None, bin_size=1, window=10, figure=None, ax=None):
     if sample_rate is None:
         if sorting.get_sampling_frequency() is None:
             raise Exception("Sampling rate information is not in the SortingExtractor. "
@@ -15,17 +37,18 @@ def plot_crosscorrelograms(sorting, sample_rate=None, unit_ids=None, bin_size=2,
         unit_ids=unit_ids,
         binsize=bin_size,
         window=window,
+        figure=figure,
         ax=ax
     )
     W.plot()
-    return W._axes
+    return W
 
 
-class CrossCorrelogramsWidget:
-    def __init__(self, *, sorting, samplerate, unit_ids=None, binsize=2, window=50, ax=None):
-        self._SX = sorting
+class AutoCorrelogramsWidget(BaseMultiWidget):
+    def __init__(self, *, sorting, samplerate, unit_ids=None, binsize=2, window=50, figure=None, ax=None):
+        BaseMultiWidget.__init__(self, figure, ax)
+        self._sorting = sorting
         self._unit_ids = unit_ids
-        self._ax = ax
         self._samplerate = samplerate
         self._binsize = binsize
         self._window = window
@@ -33,84 +56,178 @@ class CrossCorrelogramsWidget:
     def plot(self):
         self._do_plot()
 
-    def figure(self):
-        return self._figure
+    def _do_plot(self):
+        units = self._unit_ids
+        if units is None:
+            units = self._sorting.get_unit_ids()
+        list_corr = []
+
+        spike_times, spike_clusters = _prepare_spike_times_and_clusters(self._sorting, units, self._samplerate)
+        ccg = compute_correlograms(spike_times, spike_clusters, cluster_ids=units, sample_rate=self._samplerate,
+                                   bin_size=self._binsize, window_size=self._window, symmetrize=True)
+
+        for i_u, unit in enumerate(units):
+            bin_counts = ccg[i_u, i_u]
+            bins = np.linspace(- self._window / 2, self._window / 2, len(bin_counts))
+            wid = self._binsize
+            item = dict(
+                title=str(unit),
+                bin_counts=bin_counts,
+                bins=bins,
+                wid=wid
+            )
+            list_corr.append(item)
+
+        with plt.rc_context({'axes.edgecolor': 'gray'}):
+            self._plot_autocorrelograms_multi(list_corr)
+
+    def _plot_autocorrelograms_multi(self, list_corr, *, ncols=5, **kwargs):
+        if len(list_corr) < ncols:
+            ncols = len(list_corr)
+        nrows = np.ceil(len(list_corr) / ncols)
+        for i, item in enumerate(list_corr):
+            ax = self.get_tiled_ax(i, nrows, ncols)
+            _plot_correlogram(**item, **kwargs, ax=ax, color='gray')
+            
+
+class CrossCorrelogramsWidget(BaseMultiWidget):
+    def __init__(self, *, sorting, samplerate, unit_ids=None, binsize=2, window=50, figure=None, ax=None):
+        BaseMultiWidget.__init__(self, figure, ax)
+        self._sorting = sorting
+        self._unit_ids = unit_ids
+        self._samplerate = samplerate
+        self._binsize = binsize
+        self._window = window
+
+    def plot(self):
+        self._do_plot()
 
     def _do_plot(self):
         units = self._unit_ids
         if units is None:
-            units = self._SX.get_unit_ids()
-        list = []
+            units = self._sorting.get_unit_ids()
+        list_corr = []
 
-        if self._ax is None:
-            fig, ax = plt.subplots()
-            self._ax = ax
-            self._figure = fig
-        else:
-            self._figure = self._ax.get_figure()
+        spike_times, spike_clusters = _prepare_spike_times_and_clusters(self._sorting, units, self._samplerate)
+        ccg = compute_correlograms(spike_times, spike_clusters, cluster_ids=units, sample_rate=self._samplerate,
+                                   bin_size=self._binsize, window_size=self._window, symmetrize=True)
 
-        for unit in units:
-            times = self._SX.get_unit_spike_train(unit_id=unit)
-            max_dt_msec = self._window
-            bin_size_msec = self._binsize
-            max_dt_tp = max_dt_msec * self._samplerate / 1000
-            bin_size_tp = bin_size_msec * self._samplerate / 1000
-            (bin_counts, bin_edges) = compute_autocorrelogram(times, max_dt_tp=max_dt_tp, bin_size_tp=bin_size_tp)
-            item = dict(
-                title=str(unit),
-                bin_counts=bin_counts,
-                bin_edges=bin_edges
-            )
-            list.append(item)
+        for u1, unit1 in enumerate(units):
+            for u2, unit2 in enumerate(units):
+                bin_counts = ccg[u1, u2]
+                bins = np.linspace(- self._window / 2, self._window / 2, len(bin_counts))
+                wid = self._binsize
+                item = dict(
+                    title=str(unit1) + '-' + str(unit2),
+                    bin_counts=bin_counts,
+                    bins=bins,
+                    wid=wid
+                )
+                list_corr.append(item)
         with plt.rc_context({'axes.edgecolor': 'gray'}):
-            self._plot_correlograms_multi(list)
+            self._plot_crosscorrelograms_multi(list_corr)
 
-    def _plot_correlogram(self, *, bin_counts, bin_edges, title=''):
-        wid = (bin_edges[1] - bin_edges[0]) * 1000
-        plt.bar(x=bin_edges[0:-1] * 1000, height=bin_counts, width=wid, color='gray', align='edge')
-        plt.xlabel('dt (msec)')
-        plt.gca().get_yaxis().set_ticks([])
-        plt.gca().get_xaxis().set_ticks([])
-        plt.gca().get_yaxis().set_ticks([])
-        if title:
-            plt.title(title, color='gray')
-
-    def _plot_correlograms_multi(self, list, *, ncols=5, **kwargs):
-        nrows = np.ceil(len(list) / ncols)
-        plt.figure(figsize=(3 * ncols + 0.1, 3 * nrows + 0.1))
-        self._axes = []
-        for i, item in enumerate(list):
-            ax = self._figure.add_subplot(nrows, ncols, i + 1)
-            self._plot_correlogram(**item, **kwargs)
-            self._axes.append(ax)
+    def _plot_crosscorrelograms_multi(self, list_corr, **kwargs):
+        units = self._unit_ids
+        if units is None:
+            units = self._sorting.get_unit_ids()
+        ncols = len(units)
+        nrows = np.ceil(len(list_corr) / ncols)
+        self.figure.set_size_inches((3*ncols, 2*nrows))
+        for i, item in enumerate(list_corr):
+            ax, diag = self.get_tiled_ax(i, nrows, ncols, hspace=1.5, wspace=0.2, is_diag=True)
+            if diag:
+                _plot_correlogram(**item, **kwargs, ax=ax, color='blue')
+            else:
+                _plot_correlogram(**item, **kwargs, ax=ax, color='gray')
 
 
-def compute_autocorrelogram(times, *, max_dt_tp, bin_size_tp, max_samples=None):
-    num_bins_left = int(max_dt_tp / bin_size_tp)  # number of bins to the left of the origin
-    L = len(times)  # number of events
-    times2 = np.sort(times)  # the sorted times
-    step = 1  # This is the index step between an event and the next one to compare
-    candidate_inds = np.arange(L)  # These are the events we are going to consider
-    if max_samples is not None:
-        if len(candidate_inds) > max_samples:
-            candidate_inds = np.random.choice(candidate_inds, size=max_samples, replace=False)
-    vals_list = []  # A list of all offsets we have accumulated
-    while True:
-        candidate_inds = candidate_inds[candidate_inds + step < L]  # we only consider events that are within workable range
-        candidate_inds = candidate_inds[times2[candidate_inds + step] - times2[
-            candidate_inds] <= max_dt_tp]  # we only consider event-pairs that are within max_dt_tp apart
-        if len(candidate_inds) > 0:  # if we have some events to consider
-            vals = times2[candidate_inds + step] - times2[candidate_inds]
-            vals_list.append(vals)  # add to the autocorrelogram
-            vals_list.append(-vals)  # keep it symmetric
-        else:
-            break  # no more to consider
-        step += 1
-    if len(vals_list) > 0:  # concatenate all the values
-        all_vals = np.concatenate(vals_list)
-    else:
-        all_vals = np.array([])
-    aa = np.arange(-num_bins_left, num_bins_left + 1) * bin_size_tp
-    all_vals = np.sign(all_vals) * (np.abs(all_vals) - bin_size_tp * 0.00001)  # a trick to make the histogram symmetric due to differences in rounding for positive and negative, i suppose
-    bin_counts, bin_edges = np.histogram(all_vals, bins=aa)
-    return (bin_counts, bin_edges)
+def _plot_correlogram(*, ax, bin_counts, bins, wid, title='', color=None):
+    ax.bar(x=bins, height=bin_counts, width=wid, color=color, align='edge')
+    ax.set_xlabel('dt (s)')
+    ax.set_xticks([bins[0], bins[len(bins)//2], bins[-1]])
+    ax.set_yticks([])
+    if title:
+        ax.set_title(title, color='gray')
+
+
+def _prepare_spike_times_and_clusters(sorting, unit_ids, samplerate):
+    spike_times = np.array([])
+    spike_clusters = np.array([], dtype=int)
+
+    for u in sorting.get_unit_ids():
+        if u in unit_ids:
+            spike_times = np.concatenate((spike_times, sorting.get_unit_spike_train(u) / samplerate))
+            spike_clusters = np.concatenate((spike_clusters, np.array([u]*len(sorting.get_unit_spike_train(u)))))
+
+    order = np.argsort(spike_times)
+    spike_times = spike_times[order]
+    spike_clusters = spike_clusters[order]
+
+    return spike_times, spike_clusters
+
+
+
+# #TODO fix this - non symmetric - steps form -max_dt_tp to max_dt_tp
+# def compute_autocorrelogram(times, *, max_dt_tp, bin_size_tp, max_samples=None):
+#     num_bins_left = int(max_dt_tp / bin_size_tp)  # number of bins to the left of the origin
+#     L = len(times)  # number of events
+#     times2 = np.sort(times)  # the sorted times
+#     step = 1  # This is the index step between an event and the next one to compare
+#     candidate_inds = np.arange(L)  # These are the events we are going to consider
+#     if max_samples is not None:
+#         if len(candidate_inds) > max_samples:
+#             candidate_inds = np.random.choice(candidate_inds, size=max_samples, replace=False)
+#     vals_list = []  # A list of all offsets we have accumulated
+#     while True:
+#         candidate_inds = candidate_inds[candidate_inds + step < L]  # we only consider events that are within workable range
+#         candidate_inds = candidate_inds[times2[candidate_inds + step] - times2[
+#             candidate_inds] <= max_dt_tp]  # we only consider event-pairs that are within max_dt_tp apart
+#         if len(candidate_inds) > 0:  # if we have some events to consider
+#             vals = times2[candidate_inds + step] - times2[candidate_inds]
+#             vals_list.append(vals)  # add to the autocorrelogram
+#             vals_list.append(-vals)  # keep it symmetric
+#         else:
+#             break  # no more to consider
+#         step += 1
+#     if len(vals_list) > 0:  # concatenate all the values
+#         all_vals = np.concatenate(vals_list)
+#     else:
+#         all_vals = np.array([])
+#     aa = np.arange(-num_bins_left, num_bins_left + 1) * bin_size_tp
+#     all_vals = np.sign(all_vals) * (np.abs(all_vals) - bin_size_tp * 0.00001)  # a trick to make the histogram symmetric due to differences in rounding for positive and negative, i suppose
+#     bin_counts, bin_edges = np.histogram(all_vals, bins=aa)
+#     return bin_counts, bin_edges
+#
+#
+# def compute_crosscorrelogram(times1, times2, *, max_dt_tp, bin_size_tp, max_samples=None):
+#     num_bins_left = int(max_dt_tp / bin_size_tp)  # number of bins to the left of the origin
+#     L = np.min([len(times1), len(times2)])  # number of events
+#     times1 = np.sort(times1)
+#     times2 = np.sort(times2)  # the sorted times
+#     step = 0  # This is the index step between an event and the next one to compare
+#     candidate_inds = np.arange(L)  # These are the events we are going to consider
+#     if max_samples is not None:
+#         if len(candidate_inds) > max_samples:
+#             candidate_inds = np.random.choice(candidate_inds, size=max_samples, replace=False)
+#     vals_list = []  # A list of all offsets we have accumulated
+#     while True:
+#         candidate_inds = candidate_inds[candidate_inds + step < L]  # we only consider events that are within workable range
+#         candidate_inds = candidate_inds[times2[candidate_inds + step] - times1[
+#             candidate_inds] <= max_dt_tp]  # we only consider event-pairs that are within max_dt_tp apart
+#         if len(candidate_inds) > 0:  # if we have some events to consider
+#             vals = times2[candidate_inds + step] - times1[candidate_inds]
+#             vals_list.append(vals)  # add to the autocorrelogram
+#             vals_list.append(-vals)  # keep it symmetric
+#         else:
+#             break  # no more to consider
+#         step += 1
+#     if len(vals_list) > 0:  # concatenate all the values
+#         all_vals = np.concatenate(vals_list)
+#     else:
+#         all_vals = np.array([])
+#     aa = np.arange(-num_bins_left, num_bins_left + 1) * bin_size_tp
+#     all_vals = np.sign(all_vals) * (np.abs(all_vals) - bin_size_tp * 0.00001)  # a trick to make the histogram symmetric due to differences in rounding for positive and negative, i suppose
+#     bin_counts, bin_edges = np.histogram(all_vals, bins=aa)
+#     return bin_counts, bin_edges
+

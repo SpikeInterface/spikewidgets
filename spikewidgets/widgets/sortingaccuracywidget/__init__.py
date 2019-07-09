@@ -1,1 +1,1 @@
-from .sortingaccuracywidget import SortingAccuracyWidget
+from .sortingaccuracywidget import SortingAccuracyWidget, plot_sorting_accuracy

@@ -1,1 +1,0 @@
-from .sortingcomparisontable import SortingComparisonTable

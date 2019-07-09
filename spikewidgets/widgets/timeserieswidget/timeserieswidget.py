@@ -2,47 +2,42 @@ import ipywidgets as widgets
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MaxNLocator
+from spikewidgets.widgets.basewidget import BaseWidget
 
 
-def plot_timeseries(recording, sorting=None, channels=None, trange=None, width=None, height=None, color_groups=False,
-                    ax=None):
+def plot_timeseries(recording, sorting=None, channels=None, trange=None, color_groups=False,
+                    figure=None, ax=None):
     W = TimeseriesWidget(
         recording=recording,
         sorting=sorting,
         channels=channels,
         trange=trange,
-        width=width,
-        height=height,
         color_groups=color_groups,
+        figure=figure,
         ax=ax
     )
     W.plot()
-    return W._ax
+    return W
 
 
-class TimeseriesWidget:
-    def __init__(self, *, recording, sorting=None, channels=None, trange=None, width=None, height=None,
-                 color_groups=False, ax=None):
+class TimeseriesWidget(BaseWidget):
+    def __init__(self, *, recording, sorting=None, channels=None, trange=None,
+                 color_groups=False, figure=None,  ax=None):
+        BaseWidget.__init__(self, figure, ax)
         self._recording = recording
         self._sorting = sorting
         self._samplerate = recording.get_sampling_frequency()
-        self._width = width
-        self._height = height
         self._visible_channels = channels
-        if self._width is None:
-            self._width = 12
-        if self._height is None:
-            self._height = 6
         if self._visible_channels is None:
             self._visible_channels = recording.get_channel_ids()
         self._visible_trange = trange
         if self._visible_trange is None:
             self._visible_trange = [0, np.minimum(10000, recording.get_num_frames())]
+        else:
+            assert len(trange) == 2, "'trange' should be a list with start and end time in seconds"
+            self._visible_trange = [int(t * recording.get_sampling_frequency()) for t in trange]
         self._initialize_stats()
         self._vspacing = self._mean_channel_std * 15
-        self._widget = widgets.Output()
-        self._control_panel = self._create_control_panel()
-        self._main_widget = widgets.VBox([self._control_panel, self._widget])
         self._visible_trange = self._fix_trange(self._visible_trange)
         self._ax = ax
         self._color_groups = color_groups
@@ -63,38 +58,18 @@ class TimeseriesWidget:
     def plot(self):
         self._do_plot()
 
-    def display(self):
-        self._update_plot()
-        display(self._main_widget)
-
-    def widget(self):
-        return self._widget
-
-    def figure(self):
-        return self._figure
-
-    def _update_plot(self):
-        self._widget.clear_output(wait=True)
-        with self._widget:
-            self._do_plot()
-
     def _do_plot(self):
         chunk0 = self._recording.get_traces(
             channel_ids=self._visible_channels,
             start_frame=self._visible_trange[0],
             end_frame=self._visible_trange[1]
         )
-        if self._ax is None:
-            fig, ax = plt.subplots()
-            self._ax = ax
-        else:
-            fig = self._ax.get_figure()
-        ax.set_xlim(self._visible_trange[0] / self._samplerate, self._visible_trange[1] / self._samplerate)
-        ax.set_ylim(-self._vspacing, self._vspacing * len(self._visible_channels))
-        fig.set_size_inches(self._width, self._height)
-        ax.get_xaxis().set_major_locator(MaxNLocator(prune='both'))
-        ax.get_yaxis().set_ticks([])
-        ax.set_xlabel('Time (sec)')
+
+        self.ax.set_xlim(self._visible_trange[0] / self._samplerate, self._visible_trange[1] / self._samplerate)
+        self.ax.set_ylim(-self._vspacing, self._vspacing * len(self._visible_channels))
+        self.ax.get_xaxis().set_major_locator(MaxNLocator(prune='both'))
+        self.ax.get_yaxis().set_ticks([])
+        self.ax.set_xlabel('Time (sec)')
 
         self._plots = {}
         self._plot_offsets = {}
@@ -102,29 +77,14 @@ class TimeseriesWidget:
         tt = np.arange(self._visible_trange[0], self._visible_trange[1]) / self._samplerate
         for im, m in enumerate(self._visible_channels):
             self._plot_offsets[m] = offset0
-            if(self._color_groups):
+            if self._color_groups:
                 group = self._recording.get_channel_groups(channel_ids=[m])[0]
                 group_color_idx = self._group_color_map[group]
-                self._plots[m] = ax.plot(tt, self._plot_offsets[m] + chunk0[im, :], color=self._colors[group_color_idx])
+                self._plots[m] = self.ax.plot(tt, self._plot_offsets[m] + chunk0[im, :],
+                                              color=self._colors[group_color_idx])
             else:
-                self._plots[m] = ax.plot(tt, self._plot_offsets[m] + chunk0[im, :])
+                self._plots[m] = self.ax.plot(tt, self._plot_offsets[m] + chunk0[im, :])
             offset0 = offset0 - self._vspacing
-        self._figure = fig
-        # plt.show()
-
-    def _pan_left(self):
-        self._pan(-0.1)
-
-    def _pan_right(self):
-        self._pan(0.1)
-
-    def _pan(self, factor):
-        span = self._visible_trange[1] - self._visible_trange[0]
-        delta = int(span * factor)
-        new_trange = [self._visible_trange[0] + delta, self._visible_trange[1] + delta]
-        new_trange = self._fix_trange(new_trange)
-        self._visible_trange = new_trange
-        self._update_plot()
 
     def _fix_trange(self, trange):
         N = self._recording.get_num_frames()
@@ -137,31 +97,6 @@ class TimeseriesWidget:
         trange[0] = np.maximum(0, trange[0])
         trange[1] = np.minimum(N, trange[1])
         return trange
-
-    def _scale_up(self):
-        self._scale(1.2)
-
-    def _scale_down(self):
-        self._scale(1 / 1.2)
-
-    def _scale(self, factor):
-        self._vspacing /= factor
-        self._update_plot()
-
-    def _zoom_in(self):
-        self._zoom(1.2)
-
-    def _zoom_out(self):
-        self._zoom(1 / 1.2)
-
-    def _zoom(self, factor):
-        span = self._visible_trange[1] - self._visible_trange[0]
-        new_span = int(np.maximum(30, span / factor))
-        tcenter = int((self._visible_trange[0] + self._visible_trange[1]) / 2)
-        new_trange = [int(tcenter - new_span / 2), int(tcenter - new_span / 2 + new_span - 1)]
-        new_trange = self._fix_trange(new_trange)
-        self._visible_trange = new_trange
-        self._update_plot()
 
     def _initialize_stats(self):
         self._channel_stats = {}
@@ -176,45 +111,12 @@ class TimeseriesWidget:
         M0 = chunk0.shape[0]
         N0 = chunk0.shape[1]
         for ii in range(M0):
-            self._channel_stats[self._visible_channels[ii]] = self._compute_channel_stats_from_data(chunk0[ii, :])
+            self._channel_stats[self._visible_channels[ii]] = _compute_channel_stats_from_data(chunk0[ii, :])
         self._mean_channel_std = np.mean([self._channel_stats[m]['std'] for m in self._visible_channels])
 
-    def _compute_channel_stats_from_data(self, X):
-        return dict(
-            mean=np.mean(X),
-            std=np.std(X)
-        )
 
-    def _create_control_panel(self):
-        def on_zoom_in(b):
-            self._zoom_in()
-
-        def on_zoom_out(b):
-            self._zoom_out()
-
-        def on_pan_left(b):
-            self._pan_left()
-
-        def on_pan_right(b):
-            self._pan_right()
-
-        def on_scale_up(b):
-            self._scale_up()
-
-        def on_scale_down(b):
-            self._scale_down()
-
-        zoom_in = widgets.Button(icon='plus-square', tooltip="Zoom In", layout=dict(width='40px'))
-        zoom_in.on_click(on_zoom_in)
-        zoom_out = widgets.Button(icon='minus-square', tooltip="Zoom Out", layout=dict(width='40px'))
-        zoom_out.on_click(on_zoom_out)
-        pan_left = widgets.Button(icon='arrow-left', tooltip="Pan left", layout=dict(width='40px'))
-        pan_left.on_click(on_pan_left)
-        pan_right = widgets.Button(icon='arrow-right', tooltip="Pan right", layout=dict(width='40px'))
-        pan_right.on_click(on_pan_right)
-        scale_up = widgets.Button(icon='arrow-up', tooltip="Scale up", layout=dict(width='40px'))
-        scale_up.on_click(on_scale_up)
-        scale_down = widgets.Button(icon='arrow-down', tooltip="Scale down", layout=dict(width='40px'))
-        scale_down.on_click(on_scale_down)
-        self._debug = widgets.Output()
-        return widgets.HBox([zoom_in, zoom_out, pan_left, pan_right, scale_up, scale_down, self._debug])
+def _compute_channel_stats_from_data(X):
+    return dict(
+        mean=np.mean(X),
+        std=np.std(X)
+    )

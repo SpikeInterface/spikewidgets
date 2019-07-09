@@ -1,8 +1,9 @@
 import numpy as np
 from matplotlib import pyplot as plt
+from spikewidgets.widgets.basewidget import BaseMultiWidget
 
 
-def plot_isi_distribution(sorting, sample_rate=None, unit_ids=None, bin_size=2, max_isi=100):
+def plot_isi_distribution(sorting, sample_rate=None, unit_ids=None, bin_size=2, max_isi=100, figure=None, ax=None):
     if sample_rate is None:
         if sorting.get_sampling_frequency() is None:
             raise Exception("Sampling rate information is not in the SortingExtractor. "
@@ -14,16 +15,19 @@ def plot_isi_distribution(sorting, sample_rate=None, unit_ids=None, bin_size=2, 
         samplerate=sample_rate,
         unit_ids=unit_ids,
         bin_size=bin_size,
-        max_isi=max_isi
+        max_isi=max_isi,
+        figure=figure,
+        ax=ax
     )
     W.plot()
+    return W
 
 
-class ISIDistributionWidget:
-    def __init__(self, *, sorting, samplerate, unit_ids=None, bin_size=2, max_isi=100):
-        self._SX = sorting
+class ISIDistributionWidget(BaseMultiWidget):
+    def __init__(self, *, sorting, samplerate, unit_ids=None, bin_size=2, max_isi=100, figure=None, ax=None):
+        BaseMultiWidget.__init__(self, figure, ax)
+        self._sorting = sorting
         self._unit_ids = unit_ids
-        self._figure = None
         self._samplerate = samplerate
         self._binsize = bin_size
         self._maxisi = max_isi
@@ -31,42 +35,40 @@ class ISIDistributionWidget:
     def plot(self):
         self._do_plot()
 
-    def figure(self):
-        return self._figure
-
     def _do_plot(self):
         units = self._unit_ids
         if units is None:
-            units = self._SX.get_unit_ids()
-        list = []
+            units = self._sorting.get_unit_ids()
+        list_isi = []
         for unit in units:
-            times = self._SX.get_unit_spike_train(unit_id=unit) / float(self._samplerate) * 1000
-            (bin_counts, bin_edges) = compute_isi_dist(times, binsize=self._binsize, maxisi=self._maxisi)
+            times = self._sorting.get_unit_spike_train(unit_id=unit) / float(self._samplerate)
+            bin_counts, bin_edges = compute_isi_dist(times, binsize=self._binsize, maxisi=self._maxisi)
             item = dict(
                 title=str(unit),
                 bin_counts=bin_counts,
                 bin_edges=bin_edges
             )
-            list.append(item)
+            list_isi.append(item)
         with plt.rc_context({'axes.edgecolor': 'gray'}):
-            self._plot_isi_multi(list)
+            self._plot_isi_multi(list_isi)
 
-    def _plot_isi(self, *, bin_counts, bin_edges, title=''):
-        wid = (bin_edges[1] - bin_edges[0]) * 1000
-        plt.bar(x=bin_edges[0:-1] * 1000, height=bin_counts, width=wid, color='gray', align='edge')
-        plt.xlabel('dt (msec)')
-        plt.gca().get_yaxis().set_ticks([])
-        plt.gca().get_xaxis().set_ticks([])
-        plt.gca().get_yaxis().set_ticks([])
-        if title:
-            plt.title(title, color='gray')
+    def _plot_isi_multi(self, list_isi, *, ncols=5, **kwargs):
+        if len(list_isi) < ncols:
+            ncols = len(list_isi)
+        nrows = np.ceil(len(list_isi) / ncols)
+        for i, item in enumerate(list_isi):
+            ax = self.get_tiled_ax(i, nrows, ncols)
+            _plot_isi(**item, **kwargs, ax=ax)
 
-    def _plot_isi_multi(self, list, *, ncols=5, **kwargs):
-        nrows = np.ceil(len(list) / ncols)
-        plt.figure(figsize=(3 * ncols + 0.1, 3 * nrows + 0.1))
-        for i, item in enumerate(list):
-            plt.subplot(nrows, ncols, i + 1)
-            self._plot_isi(**item, **kwargs)
+
+def _plot_isi( *, bin_counts, bin_edges, ax, title=''):
+    wid = (bin_edges[1] - bin_edges[0]) * 1000
+    ax.bar(x=bin_edges[0:-1] * 1000, height=bin_counts, width=wid, color='gray', align='edge')
+    ax.set_xlabel('dt (sec)')
+    ax.set_xticks([])
+    ax.set_yticks([])
+    if title:
+        ax.set_title(title, color='gray')
 
 
 def compute_isi_dist(times, *, binsize, maxisi=100):

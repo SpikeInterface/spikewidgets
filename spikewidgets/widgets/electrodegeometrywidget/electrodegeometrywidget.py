@@ -1,22 +1,24 @@
 import numpy as np
 from matplotlib import pyplot as plt
+from spikewidgets.widgets.basewidget import BaseWidget
 
 
-def plot_electrode_geometry(recording, elec_size=5, ax=None):
+def plot_electrode_geometry(recording, elec_size=5, figure=None, ax=None):
     W = ElectrodeGeometryWidget(
         recording=recording,
         elec_size=elec_size,
+        figure=figure,
         ax=ax
     )
     W.plot()
-    return W._ax
+    return W
 
 
-class ElectrodeGeometryWidget:
-    def __init__(self, *, recording, elec_size=5, ax=None):
+class ElectrodeGeometryWidget(BaseWidget):
+    def __init__(self, *, recording, elec_size=5, figure=None, ax=None):
+        BaseWidget.__init__(self, figure, ax)
         self._recording = recording
         self._elec_size = elec_size
-        self._ax = ax
 
     def plot(self, width=4, height=4):
         self._do_plot(width=width, height=height)
@@ -25,10 +27,8 @@ class ElectrodeGeometryWidget:
         R = self._recording
         geom = np.array(R.get_channel_locations())
 
-        if self._ax is None:
-            fig = plt.figure(figsize=(width, height))
-            self._ax = fig.add_axes([0, 0, 1, 1])
-        self._ax.axis('off')
+
+        self.ax.axis('off')
 
         x = geom[:, 0]
         y = geom[:, 1]
@@ -40,9 +40,9 @@ class ElectrodeGeometryWidget:
         marker_size = self._elec_size
         margin = np.maximum(xmax - xmin, ymax - ymin) * 0.2
 
-        self._ax.scatter(x, y, marker='o', s=int(marker_size ** 2))
-        self._ax.axis('equal')
-        self._ax.set_xticks([])
-        self._ax.set_yticks([])
-        self._ax.set_xlim(xmin - margin, xmax + margin)
-        self._ax.set_ylim(ymin - margin, ymax + margin)
+        self.ax.scatter(x, y, marker='o', s=int(marker_size ** 2))
+        self.ax.axis('equal')
+        self.ax.set_xticks([])
+        self.ax.set_yticks([])
+        self.ax.set_xlim(xmin - margin, xmax + margin)
+        self.ax.set_ylim(ymin - margin, ymax + margin)
