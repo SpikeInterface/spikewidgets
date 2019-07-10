@@ -37,7 +37,8 @@ class TimeseriesWidget(BaseWidget):
             assert len(trange) == 2, "'trange' should be a list with start and end time in seconds"
             self._visible_trange = [int(t * recording.get_sampling_frequency()) for t in trange]
         self._initialize_stats()
-        self._vspacing = self._mean_channel_std * 15
+        # self._vspacing = self._mean_channel_std * 20
+        self._vspacing = self._max_channel_amp * 1.5
         self._visible_trange = self._fix_trange(self._visible_trange)
         self._ax = ax
         self._color_groups = color_groups
@@ -54,6 +55,7 @@ class TimeseriesWidget(BaseWidget):
             for group in groups:
                 self._group_color_map[group] = color_idx
                 color_idx += 1
+        self.name = 'TimeSeries'
             
     def plot(self):
         self._do_plot()
@@ -69,7 +71,7 @@ class TimeseriesWidget(BaseWidget):
         self.ax.set_ylim(-self._vspacing, self._vspacing * len(self._visible_channels))
         self.ax.get_xaxis().set_major_locator(MaxNLocator(prune='both'))
         self.ax.get_yaxis().set_ticks([])
-        self.ax.set_xlabel('Time (sec)')
+        self.ax.set_xlabel('time (sec)')
 
         self._plots = {}
         self._plot_offsets = {}
@@ -113,10 +115,12 @@ class TimeseriesWidget(BaseWidget):
         for ii in range(M0):
             self._channel_stats[self._visible_channels[ii]] = _compute_channel_stats_from_data(chunk0[ii, :])
         self._mean_channel_std = np.mean([self._channel_stats[m]['std'] for m in self._visible_channels])
+        self._max_channel_amp = np.max([self._channel_stats[m]['max_amp'] for m in self._visible_channels])
 
 
 def _compute_channel_stats_from_data(X):
     return dict(
         mean=np.mean(X),
-        std=np.std(X)
+        std=np.std(X),
+        max_amp=np.max(np.abs(X))
     )

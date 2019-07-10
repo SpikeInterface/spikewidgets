@@ -3,8 +3,27 @@ from matplotlib import pyplot as plt
 from spikewidgets.widgets.basewidget import BaseMultiWidget
 
 
-def plot_unit_waveforms(sorting=None, recording=None, channels=None, unit_ids=None, ms_before=1., ms_after=2.,
+def plot_unit_waveforms(recording, sorting, channels=None, unit_ids=None, ms_before=1., ms_after=2.,
                         max_num_waveforms=100, title='', figure=None, ax=None):
+    """
+
+    Parameters
+    ----------
+    recording
+    sorting
+    channels
+    unit_ids
+    ms_before
+    ms_after
+    max_num_waveforms
+    title
+    figure
+    ax
+
+    Returns
+    -------
+
+    """
     W = UnitWaveformsWidget(
         recording=recording,
         sorting=sorting,
@@ -33,6 +52,7 @@ class UnitWaveformsWidget(BaseMultiWidget):
         self._ms_after = ms_after
         self._title = title
         self._max_num_waveforms = max_num_waveforms
+        self.name = 'UnitWaveforms'
 
     def plot(self):
         self._do_plot()
@@ -44,10 +64,13 @@ class UnitWaveformsWidget(BaseMultiWidget):
             units = self._sorting.get_unit_ids()
         channel_ids = self._recording.get_channel_ids()
         M = len(channel_ids)
-        channel_locations = np.zeros((M, 2))
-        for ii, ch in enumerate(channel_ids):
-            loc = self._recording.get_channel_property(ch, 'location')
-            channel_locations[ii, :] = loc[-2:]
+        # for ii, ch in enumerate(channel_ids):
+        #     loc = self._recording.get_channel_locations(ch)
+        #     channel_locations[ii, :] = loc[-2:]
+        if 'location' in self._recording.get_channel_property_names():
+            channel_locations = np.array(self._recording.get_channel_locations())
+        else:
+            channel_locations = np.zeros((M, 2))
         if channels is None:
             channels = channel_ids
         list_spikes = []
@@ -117,6 +140,8 @@ def _plot_spike_shapes(*, ax, representative_waveforms=None, average_waveform=No
             channel_locations[m, :] = [0, -m]
 
     spacing = 1 / 0.8  # TODO: auto-determine this from the channel_locations
+    # pitch = [np.max(np.diff(channel_locations[:, 0])), np.max(np.diff(channel_locations[:, 1]))]
+    # spacing = 0.1 * np.max(pitch) / M
 
     xvals = np.linspace(-yrange / 2, yrange / 2, T)
     if representative_waveforms is not None:

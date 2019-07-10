@@ -19,6 +19,7 @@ class ElectrodeGeometryWidget(BaseWidget):
         BaseWidget.__init__(self, figure, ax)
         self._recording = recording
         self._elec_size = elec_size
+        self.name = 'ElectrodeGeometry'
 
     def plot(self, width=4, height=4):
         self._do_plot(width=width, height=height)

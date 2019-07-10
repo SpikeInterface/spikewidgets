@@ -23,6 +23,7 @@ class ConfusionMatrixWidget(BaseWidget):
         self._sorter_names = sorternames
         self._count_text = count_text
         self._title = title
+        self.name = 'ConfusionMatrix'
 
     def plot(self):
         self._do_plot()
@@ -43,7 +44,7 @@ class ConfusionMatrixWidget(BaseWidget):
         if self._count_text:
             for (i, j), z in np.ndenumerate(confusion_matrix):
                 if z != 0:
-                    if z > np.mself.ax(confusion_matrix) / 2.:
+                    if z > np.max(confusion_matrix) / 2.:
                         self.ax.text(j, i, '{:d}'.format(z), ha='center', va='center', color='white')
                     else:
                         self.ax.text(j, i, '{:d}'.format(z), ha='center', va='center', color='black')
@@ -56,8 +57,8 @@ class ConfusionMatrixWidget(BaseWidget):
         self.ax.set_yticks(np.arange(0, N1 + 1))
         self.ax.xaxis.tick_bottom()
         # Labels for major ticks
-        self.ax.set_xticklabels(np.append(st1_idx, 'FN'), fontsize=12)
-        self.ax.set_yticklabels(np.append(st2_idx, 'FP'), fontsize=12)
+        self.ax.set_xticklabels(np.append(st2_idx, 'FN'), fontsize=12)
+        self.ax.set_yticklabels(np.append(st1_idx, 'FP'), fontsize=12)
 
         if self._sorter_names is None:
             self.ax.set_xlabel(self._sc.sorting2_name, fontsize=20)

@@ -33,6 +33,7 @@ class MultiCompGraphWidget(BaseWidget):
         self._node_cmap = node_cmap
         self._edge_cmap = edge_cmap
         self._title = title
+        self.name = 'MultiCompGraph'
 
     def plot(self):
         self._do_plot()

@@ -31,6 +31,7 @@ class FeatureWidget(BaseMultiWidget):
         self._max_num_waveforms = max_num_waveforms
         self._pca_scores = None
         self._colormap = colormap
+        self.name = 'Feature'
 
     def _compute_pca(self):
         self._pca_scores = st.postprocessing.compute_unit_pca_scores(recording=self._recording,

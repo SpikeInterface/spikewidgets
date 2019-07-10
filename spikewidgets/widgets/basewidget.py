@@ -14,6 +14,7 @@ class BaseWidget:
         else:
             self.figure = ax.get_figure()
             self.ax = ax
+        self.name = None
 
 
 class BaseMultiWidget:
@@ -30,6 +31,7 @@ class BaseMultiWidget:
         self.axes = []
         self._gs = None
         self.ax.axis('off')
+        self.name = None
 
     def get_tiled_ax(self, i, nrows, ncols, hspace=0.3, wspace=0.3, is_diag=False):
         if self._gs is None:

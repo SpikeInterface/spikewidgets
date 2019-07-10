@@ -52,6 +52,7 @@ class AutoCorrelogramsWidget(BaseMultiWidget):
         self._samplerate = samplerate
         self._binsize = binsize
         self._window = window
+        self.name = 'AutoCorrelograms'
 
     def plot(self):
         self._do_plot()
@@ -71,7 +72,7 @@ class AutoCorrelogramsWidget(BaseMultiWidget):
             bins = np.linspace(- self._window / 2, self._window / 2, len(bin_counts))
             wid = self._binsize
             item = dict(
-                title=str(unit),
+                title='Unit {}'.format(int(unit)),
                 bin_counts=bin_counts,
                 bins=bins,
                 wid=wid
@@ -98,6 +99,7 @@ class CrossCorrelogramsWidget(BaseMultiWidget):
         self._samplerate = samplerate
         self._binsize = binsize
         self._window = window
+        self.name = 'CrossCorrelograms'
 
     def plot(self):
         self._do_plot()
@@ -118,7 +120,7 @@ class CrossCorrelogramsWidget(BaseMultiWidget):
                 bins = np.linspace(- self._window / 2, self._window / 2, len(bin_counts))
                 wid = self._binsize
                 item = dict(
-                    title=str(unit1) + '-' + str(unit2),
+                    title='Unit {} - Unit {}'.format(int(unit1), int(unit2)),
                     bin_counts=bin_counts,
                     bins=bins,
                     wid=wid
