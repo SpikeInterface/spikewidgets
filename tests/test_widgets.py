@@ -18,13 +18,25 @@ class TestWidgets(unittest.TestCase):
         sw.plot_electrode_geometry(self._RX)
 
     def test_unitwaveforms(self):
-        sw.plot_unit_waveforms(self._SX, self._RX)
+        sw.plot_unit_waveforms(self._RX, self._SX)
+
+    def test_ampdist(self):
+        sw.plot_amplitudes_distribution(self._RX, self._SX)
+
+    def test_amptime(self):
+        sw.plot_amplitudes_timeseres(self._RX, self._SX)
+
+    def test_features(self):
+        sw.plot_features(self._RX, self._SX)
+
+    def test_ach(self):
+        sw.plot_autocorrelograms(self._SX, bin_size=1, window=10)
 
     def test_cch(self):
         sw.plot_crosscorrelograms(self._SX, bin_size=1, window=10)
 
     def test_isi(self):
-        sw.plot_isi_distribution(self._SX, bin_size=3, max_isi=100)
+        sw.plot_isi_distribution(self._SX, bins=10, window=1)
 
     def test_rasters(self):
         sw.plot_rasters(self._SX)

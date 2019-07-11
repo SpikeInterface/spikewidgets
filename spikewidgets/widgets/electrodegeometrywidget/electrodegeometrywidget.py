@@ -1,46 +1,70 @@
 import numpy as np
-from matplotlib import pyplot as plt
+from spikewidgets.widgets.basewidget import BaseWidget
 
 
-def plot_electrode_geometry(recording, elec_size=5):
+def plot_electrode_geometry(recording, markersize=20, marker='o', figure=None, ax=None):
+    """
+    Plots electrode geometry.
+
+    Parameters
+    ----------
+    recording: RecordingExtractor
+        The recordng extractor object
+    markersize: int
+        The size of the marker for the electrodes
+    marker: str
+        The matplotlib marker to use (default 'o')
+    figure: matplotlib figure
+        The figure to be used. If not given a figure is created
+    ax: matplotlib axis
+        The axis to be used. If not given an axis is created
+
+    Returns
+    -------
+    W: UnitWaveformsWidget
+        The output widget
+    """
     W = ElectrodeGeometryWidget(
         recording=recording,
-        elec_size=elec_size
+        markersize=markersize,
+        marker=marker,
+        figure=figure,
+        ax=ax
     )
     W.plot()
+    return W
 
 
-class ElectrodeGeometryWidget:
-    def __init__(self, *, recording, elec_size=5):
+class ElectrodeGeometryWidget(BaseWidget):
+    def __init__(self, *, recording, markersize=10, marker='o', figure=None, ax=None):
+        BaseWidget.__init__(self, figure, ax)
         self._recording = recording
-        self._elec_size = elec_size
+        self._ms = markersize
+        self._mark = marker
+        self.name = 'ElectrodeGeometry'
 
-    def plot(self, width=1.5, height=1.5):
+    def plot(self, width=4, height=4):
         self._do_plot(width=width, height=height)
 
     def _do_plot(self, width, height):
         R = self._recording
         geom = np.array(R.get_channel_locations())
 
-        fig = plt.figure(figsize=(width, height))
-        ax = fig.add_axes([0, 0, 1, 1])
-        ax.axis('off')
+
+        self.ax.axis('off')
 
         x = geom[:, 0]
         y = geom[:, 1]
-        xmin = np.min(x);
+        xmin = np.min(x)
         xmax = np.max(x)
-        ymin = np.min(y);
+        ymin = np.min(y)
         ymax = np.max(y)
 
-        # marker_size=width*fig.dpi/6
-        marker_size = self._elec_size
         margin = np.maximum(xmax - xmin, ymax - ymin) * 0.2
 
-        plt.scatter(x, y, marker='o', s=int(marker_size ** 2))
-        plt.axis('equal')
-        plt.xticks([])
-        plt.yticks([])
-        plt.xlim(xmin - margin, xmax + margin)
-        plt.ylim(ymin - margin, ymax + margin)
-        # plt.show()
+        self.ax.scatter(x, y, marker=self._mark, s=int(self._ms))
+        self.ax.axis('equal')
+        self.ax.set_xticks([])
+        self.ax.set_yticks([])
+        self.ax.set_xlim(xmin - margin, xmax + margin)
+        self.ax.set_ylim(ymin - margin, ymax + margin)
