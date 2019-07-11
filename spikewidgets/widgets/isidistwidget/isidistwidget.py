@@ -3,19 +3,44 @@ from matplotlib import pyplot as plt
 from spikewidgets.widgets.basewidget import BaseMultiWidget
 
 
-def plot_isi_distribution(sorting, sample_rate=None, unit_ids=None, bins=10, max_window=1, figure=None, ax=None):
-    if sample_rate is None:
+def plot_isi_distribution(sorting, sampling_frequency=None, unit_ids=None, bins=10, window=1, figure=None, ax=None):
+    """
+    Plots spike train ISI distribution.
+
+    Parameters
+    ----------
+    sorting: SortingExtractor
+        The sorting extractor object
+    sampling_frequency: float
+        The sampling frequency (if not in the sorting extractor)
+    unit_ids: list
+        List of unit ids
+    bins: int
+        Number of bins
+    window: float
+        Window size in s
+    figure: matplotlib figure
+        The figure to be used. If not given a figure is created
+    ax: matplotlib axis
+        The axis to be used. If not given an axis is created
+
+    Returns
+    -------
+    W: ISIDistributionWidget
+        The output widget
+    """
+    if sampling_frequency is None:
         if sorting.get_sampling_frequency() is None:
             raise Exception("Sampling rate information is not in the SortingExtractor. "
-                            "Provide the 'sample_rate' argument")
+                            "Provide the 'sampling_frequency' argument")
         else:
-            sample_rate = sorting.get_sampling_frequency()
+            sampling_frequency = sorting.get_sampling_frequency()
     W = ISIDistributionWidget(
         sorting=sorting,
-        samplerate=sample_rate,
+        samplerate=sampling_frequency,
         unit_ids=unit_ids,
         bins=bins,
-        max_window=max_window,
+        window=window,
         figure=figure,
         ax=ax
     )
@@ -24,13 +49,13 @@ def plot_isi_distribution(sorting, sample_rate=None, unit_ids=None, bins=10, max
 
 
 class ISIDistributionWidget(BaseMultiWidget):
-    def __init__(self, *, sorting, samplerate, unit_ids=None, bins=10, max_window=1, figure=None, ax=None):
+    def __init__(self, *, sorting, samplerate, unit_ids=None, bins=10, window=1, figure=None, ax=None):
         BaseMultiWidget.__init__(self, figure, ax)
         self._sorting = sorting
         self._unit_ids = unit_ids
         self._samplerate = samplerate
         self._bins = bins
-        self._maxw = max_window
+        self._maxw = window
         self.name = 'ISIDistribution'
 
     def plot(self):

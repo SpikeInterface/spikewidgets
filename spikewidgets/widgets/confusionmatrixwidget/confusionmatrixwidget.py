@@ -3,11 +3,31 @@ from matplotlib import pyplot as plt
 from spikewidgets.widgets.basewidget import BaseWidget
 
 
-def plot_confusion_matrix(sortingcomparison, sorter_names=None, count_text=True, title='', ax=None, figure=None):
+def plot_confusion_matrix(sorting_comparison, sorter_names=None, count_text=True, ax=None, figure=None):
+    """
+    Plots sorting comparison confusion matrix.
+
+    Parameters
+    ----------
+    sorting_comparison: BaseComparison
+        The sorting comparison object
+    sorter_names: list
+        The names of the sorters
+    count_text: bool
+        If True counts are displayed as text
+    figure: matplotlib figure
+        The figure to be used. If not given a figure is created
+    ax: matplotlib axis
+        The axis to be used. If not given an axis is created
+
+    Returns
+    -------
+    W: ConfusionMatrixWidget
+        The output widget
+    """
     W = ConfusionMatrixWidget(
-        sortingcomparison=sortingcomparison,
+        sorting_comparison=sorting_comparison,
         sorternames=sorter_names,
-        title=title,
         count_text=count_text,
         figure=figure,
         ax=ax,
@@ -17,12 +37,11 @@ def plot_confusion_matrix(sortingcomparison, sorter_names=None, count_text=True,
 
 
 class ConfusionMatrixWidget(BaseWidget):
-    def __init__(self, *, sortingcomparison, sorternames=None, count_text=True, title='', figure=None, ax=None):
+    def __init__(self, *, sorting_comparison, sorternames=None, count_text=True, figure=None, ax=None):
         BaseWidget.__init__(self, figure, ax)
-        self._sc = sortingcomparison
+        self._sc = sorting_comparison
         self._sorter_names = sorternames
         self._count_text = count_text
-        self._title = title
         self.name = 'ConfusionMatrix'
 
     def plot(self):

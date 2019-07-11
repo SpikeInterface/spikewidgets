@@ -5,6 +5,29 @@ from spikewidgets.widgets.basewidget import BaseMultiWidget
 
 def plot_amplitudes_distribution(recording, sorting, unit_ids=None, max_num_waveforms=100,
                                  figure=None, ax=None):
+    """
+    Plots waveform amplitudes distribution.
+
+    Parameters
+    ----------
+    recording: RecordingExtractor
+        The recording extractor object
+    sorting: SortingExtractor
+        The sorting extractor object
+    unit_ids: list
+        List of unit ids
+    max_num_waveforms: int
+        Maximum number of waveforms to display
+    figure: matplotlib figure
+        The figure to be used. If not given a figure is created
+    ax: matplotlib axis
+        The axis to be used. If not given an axis is created
+
+    Returns
+    -------
+    W: AmplitudeDistributionWidget
+        The output widget
+    """
     W = AmplitudeDistributionWidget(
         sorting=sorting,
         recording=recording,
@@ -19,6 +42,29 @@ def plot_amplitudes_distribution(recording, sorting, unit_ids=None, max_num_wave
 
 def plot_amplitudes_timeseres(recording, sorting, unit_ids=None, max_num_waveforms=100,
                               figure=None, ax=None):
+    """
+    Plots waveform amplitudes timeseries.
+
+    Parameters
+    ----------
+    recording: RecordingExtractor
+        The recording extractor object
+    sorting: SortingExtractor
+        The sorting extractor object
+    unit_ids: list
+        List of unit ids
+    max_num_waveforms: int
+        Maximum number of waveforms to display
+    figure: matplotlib figure
+        The figure to be used. If not given a figure is created
+    ax: matplotlib axis
+        The axis to be used. If not given an axis is created
+
+    Returns
+    -------
+    W: AmplitudeTimeseriesWidget
+        The output widget
+    """
     W = AmplitudeTimeseriesWidget(
         sorting=sorting,
         recording=recording,

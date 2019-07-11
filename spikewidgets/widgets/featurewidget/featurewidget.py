@@ -6,6 +6,33 @@ import spiketoolkit as st
 
 def plot_features(recording, sorting, unit_ids=None, max_num_waveforms=100, nproj=4, colormap=None,
                   figure=None, ax=None):
+    """
+    Plots unit PCA features on best projections.
+
+    Parameters
+    ----------
+    recording: RecordingExtractor
+        The recordng extractor object
+    sorting: SortingExtractor
+        The sorting extractor object
+    unit_ids: list
+        List of unit ids
+    max_num_waveforms: int
+        Maximum number of waveforms to display
+    nproj: int
+        Number of best projections to display
+    colormap: matplotlib colormap
+        The colormap to be used. If not given default is used
+    figure: matplotlib figure
+        The figure to be used. If not given a figure is created
+    ax: matplotlib axis
+        The axis to be used. If not given an axis is created
+
+    Returns
+    -------
+    W: FeatureWidget
+        The output widget
+    """
     W = FeatureWidget(
         sorting=sorting,
         recording=recording,

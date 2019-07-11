@@ -2,16 +2,40 @@ import numpy as np
 from matplotlib import pyplot as plt
 from spikewidgets.widgets.basewidget import BaseWidget
 
-def plot_rasters(sorting, sample_rate=None, unit_ids=None, color='k', figure=None, ax=None):
-    if sample_rate is None:
+
+def plot_rasters(sorting, sampling_frequency=None, unit_ids=None, color='k', figure=None, ax=None):
+    """
+    Plots spike train rasters.
+
+    Parameters
+    ----------
+    sorting: SortingExtractor
+        The sorting extractor object
+    sampling_frequency: float
+        The sampling frequency (if not in the sorting extractor)
+    unit_ids: list
+        List of unit ids
+    color: matplotlib color
+        The color to be used
+    figure: matplotlib figure
+        The figure to be used. If not given a figure is created
+    ax: matplotlib axis
+        The axis to be used. If not given an axis is created
+
+    Returns
+    -------
+    W: ResterWidget
+        The output widget
+    """
+    if sampling_frequency is None:
         if sorting.get_sampling_frequency() is None:
             raise Exception("Sampling rate information is not in the SortingExtractor. "
-                            "Provide the 'sample_rate' argument")
+                            "Provide the 'sampling_frequency' argument")
         else:
-            sample_rate = sorting.get_sampling_frequency()
+            sampling_frequency = sorting.get_sampling_frequency()
     W = ResterWidget(
         sorting=sorting,
-        samplerate=sample_rate,
+        samplerate=sampling_frequency,
         unit_ids=unit_ids,
         color=color,
         figure=figure,

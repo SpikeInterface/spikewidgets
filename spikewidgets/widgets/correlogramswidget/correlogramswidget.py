@@ -4,16 +4,42 @@ from spikewidgets.widgets.basewidget import BaseMultiWidget
 from .correlograms_phy import compute_correlograms
 
 
-def plot_autocorrelograms(sorting, sample_rate=None, unit_ids=None, bin_size=2, window=50, figure=None, ax=None):
-    if sample_rate is None:
+def plot_autocorrelograms(sorting, sampling_frequency=None, unit_ids=None, bin_size=2, window=50,
+                          figure=None, ax=None):
+    """
+    Plots spike train auto-correlograms.
+
+    Parameters
+    ----------
+    sorting: SortingExtractor
+        The sorting extractor object
+    sampling_frequency: float
+        The sampling frequency (if not in the sorting extractor)
+    unit_ids: list
+        List of unit ids
+    bin_size: float
+        Bin size in s
+    window: float
+        Window size in s
+    figure: matplotlib figure
+        The figure to be used. If not given a figure is created
+    ax: matplotlib axis
+        The axis to be used. If not given an axis is created
+
+    Returns
+    -------
+    W: AutoCorrelogramsWidget
+        The output widget
+    """
+    if sampling_frequency is None:
         if sorting.get_sampling_frequency() is None:
             raise Exception("Sampling rate information is not in the SortingExtractor. "
-                            "Provide the 'sample_rate' argument")
+                            "Provide the 'sampling_frequency' argument")
         else:
-            sample_rate = sorting.get_sampling_frequency()
+            sampling_frequency = sorting.get_sampling_frequency()
     W = AutoCorrelogramsWidget(
         sorting=sorting,
-        samplerate=sample_rate,
+        samplerate=sampling_frequency,
         unit_ids=unit_ids,
         binsize=bin_size,
         window=window,
@@ -24,16 +50,42 @@ def plot_autocorrelograms(sorting, sample_rate=None, unit_ids=None, bin_size=2, 
     return W
 
 
-def plot_crosscorrelograms(sorting, sample_rate=None, unit_ids=None, bin_size=1, window=10, figure=None, ax=None):
-    if sample_rate is None:
+def plot_crosscorrelograms(sorting, sampling_frequency=None, unit_ids=None, bin_size=1, window=10,
+                           figure=None, ax=None):
+    """
+    Plots spike train cross-correlograms.
+
+    Parameters
+    ----------
+    sorting: SortingExtractor
+        The sorting extractor object
+    sampling_frequency: float
+        The sampling frequency (if not in the sorting extractor)
+    unit_ids: list
+        List of unit ids
+    bin_size: float
+        Bin size in s
+    window: float
+        Window size in s
+    figure: matplotlib figure
+        The figure to be used. If not given a figure is created
+    ax: matplotlib axis
+        The axis to be used. If not given an axis is created
+
+    Returns
+    -------
+    W: CrossCorrelogramsWidget
+        The output widget
+    """
+    if sampling_frequency is None:
         if sorting.get_sampling_frequency() is None:
             raise Exception("Sampling rate information is not in the SortingExtractor. "
-                            "Provide the 'sample_rate' argument")
+                            "Provide the 'sampling_frequency' argument")
         else:
-            sample_rate = sorting.get_sampling_frequency()
+            sampling_frequency = sorting.get_sampling_frequency()
     W = CrossCorrelogramsWidget(
         sorting=sorting,
-        samplerate=sample_rate,
+        samplerate=sampling_frequency,
         unit_ids=unit_ids,
         binsize=bin_size,
         window=window,

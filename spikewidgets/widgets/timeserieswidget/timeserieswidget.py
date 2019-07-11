@@ -5,11 +5,33 @@ from matplotlib.ticker import MaxNLocator
 from spikewidgets.widgets.basewidget import BaseWidget
 
 
-def plot_timeseries(recording, sorting=None, channels=None, trange=None, color_groups=False,
+def plot_timeseries(recording, channels=None, trange=None, color_groups=False,
                     figure=None, ax=None):
+    """
+    Plots electrode geometry.
+
+    Parameters
+    ----------
+    recording: RecordingExtractor
+        The recordng extractor object
+    channels: list
+        The channels to show
+    trange: list
+        List with start time and end time
+    color_groups: bool
+        If True groups are plotted with different colors
+    figure: matplotlib figure
+        The figure to be used. If not given a figure is created
+    ax: matplotlib axis
+        The axis to be used. If not given an axis is created
+
+    Returns
+    -------
+    W: TimeseriesWidget
+        The output widget
+    """
     W = TimeseriesWidget(
         recording=recording,
-        sorting=sorting,
         channels=channels,
         trange=trange,
         color_groups=color_groups,
@@ -21,11 +43,10 @@ def plot_timeseries(recording, sorting=None, channels=None, trange=None, color_g
 
 
 class TimeseriesWidget(BaseWidget):
-    def __init__(self, *, recording, sorting=None, channels=None, trange=None,
+    def __init__(self, *, recording,channels=None, trange=None,
                  color_groups=False, figure=None,  ax=None):
         BaseWidget.__init__(self, figure, ax)
         self._recording = recording
-        self._sorting = sorting
         self._samplerate = recording.get_sampling_frequency()
         self._visible_channels = channels
         if self._visible_channels is None:
