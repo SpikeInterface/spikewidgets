@@ -36,7 +36,7 @@ class TestWidgets(unittest.TestCase):
         sw.plot_crosscorrelograms(self._SX, bin_size=1, window=10)
 
     def test_isi(self):
-        sw.plot_isi_distribution(self._SX, bins=10, max_window=1)
+        sw.plot_isi_distribution(self._SX, bins=10, window=1)
 
     def test_rasters(self):
         sw.plot_rasters(self._SX)

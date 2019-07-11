@@ -84,7 +84,7 @@ class ISIDistributionWidget(BaseMultiWidget):
             ncols = len(list_isi)
         nrows = np.ceil(len(list_isi) / ncols)
         for i, item in enumerate(list_isi):
-            ax = self.get_tiled_ax(i, nrows, ncols)
+            ax = self.get_tiled_ax(i, nrows, ncols, hspace=0.7)
             _plot_isi(**item, **kwargs, ax=ax)
 
 
@@ -94,7 +94,7 @@ def _plot_isi( *, bin_counts, bin_edges, ax, xticks=None, title=''):
     ax.bar(x=bins, height=bin_counts, width=wid, color='gray', align='edge')
     if xticks is not None:
         ax.set_xticks(xticks)
-    ax.set_xlabel('dt (sec)')
+    ax.set_xlabel('dt (s)')
     ax.set_yticks([])
     if title:
         ax.set_title(title, color='gray')

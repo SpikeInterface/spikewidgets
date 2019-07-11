@@ -92,8 +92,6 @@ class UnitWaveformsWidget(BaseMultiWidget):
         for unit in units:
             spiketrain = self._sorting.get_unit_spike_train(unit_id=unit)
             if spiketrain is not None:
-                # spikes = self._get_random_spike_waveforms(unit=unit, max_num=self._max_num_waveforms,
-                #                                           channels=channels)
                 random_wf = st.postprocessing.get_unit_waveforms(recording=self._recording, sorting=self._sorting,
                                                                  unit_ids=[unit], channels=channels,
                                                                  ms_before=self._ms_before, ms_after=self._ms_after,
@@ -115,25 +113,6 @@ class UnitWaveformsWidget(BaseMultiWidget):
                                               all_locations=all_locations)
             else:
                 self._plot_spike_shapes_multi(list_spikes, channel_locations=None)
-
-    def _get_random_spike_waveforms(self, *, unit, max_num, channels):
-        st = self._sorting.get_unit_spike_train(unit_id=unit)
-        num_events = len(st)
-        if num_events > max_num:
-            event_indices = np.random.choice(range(num_events), size=max_num, replace=False)
-        else:
-            event_indices = range(num_events)
-
-        snippet_len = [int(self._ms_before * self._recording.get_sampling_frequency() / 1000),
-                       int(self._ms_after * self._recording.get_sampling_frequency() / 1000)]
-
-        spikes = self._recording.get_snippets(reference_frames=st[event_indices].astype(int),
-                                              snippet_len=snippet_len, channel_ids=channels)
-        if spikes.size != 0:
-            spikes = np.dstack(tuple(spikes))
-        else:
-            spikes = np.zeros((self._recording.get_num_channels(), np.sum(snippet_len), 0))
-        return spikes
 
     def _plot_spike_shapes_multi(self, list_spikes, *, ncols=5, **kwargs):
         if 'ylim' in kwargs:
@@ -182,9 +161,7 @@ def _plot_spike_shapes(*, ax, representative_waveforms=None, average_waveform=No
 
         clocs = channel_locations / ch_range * m_dim
 
-    spacing = 1 / 0.8  # TODO: auto-determine this from the channel_locations
-    # pitch = [np.max(np.diff(channel_locations[:, 0])), np.max(np.diff(channel_locations[:, 1]))]
-    # spacing = 0.1 * np.max(pitch) / M
+    spacing = 1 / 0.8
 
     xvals = np.linspace(-yrange / 2, yrange / 2, T)
     if representative_waveforms is not None:

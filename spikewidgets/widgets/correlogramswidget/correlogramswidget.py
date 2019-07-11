@@ -139,7 +139,7 @@ class AutoCorrelogramsWidget(BaseMultiWidget):
             ncols = len(list_corr)
         nrows = np.ceil(len(list_corr) / ncols)
         for i, item in enumerate(list_corr):
-            ax = self.get_tiled_ax(i, nrows, ncols)
+            ax = self.get_tiled_ax(i, nrows, ncols, hspace=0.7)
             _plot_correlogram(**item, **kwargs, ax=ax, color='gray')
             
 
@@ -171,8 +171,12 @@ class CrossCorrelogramsWidget(BaseMultiWidget):
                 bin_counts = ccg[u1, u2]
                 bins = np.linspace(- self._window / 2, self._window / 2, len(bin_counts))
                 wid = self._binsize
+                if u1 == u2:
+                    title = 'Unit {}'.format(int(unit1))
+                else:
+                    title = 'Units {}-{}'.format(int(unit1), int(unit2))
                 item = dict(
-                    title='Unit {} - Unit {}'.format(int(unit1), int(unit2)),
+                    title=title,
                     bin_counts=bin_counts,
                     bins=bins,
                     wid=wid

@@ -92,7 +92,7 @@ class TimeseriesWidget(BaseWidget):
         self.ax.set_ylim(-self._vspacing, self._vspacing * len(self._visible_channels))
         self.ax.get_xaxis().set_major_locator(MaxNLocator(prune='both'))
         self.ax.get_yaxis().set_ticks([])
-        self.ax.set_xlabel('time (sec)')
+        self.ax.set_xlabel('time (s)')
 
         self._plots = {}
         self._plot_offsets = {}

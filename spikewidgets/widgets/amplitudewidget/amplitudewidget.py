@@ -118,7 +118,7 @@ class AmplitudeTimeseriesWidget(AmplitudeBaseWidget):
                 times = times[np.random.permutation(len(times))[:self._max_num_waveforms]]
             amps = self.compute_amps(times=times)
             item = dict(
-                title=str(unit),
+                title='Unit {}'.format(int(unit)),
                 times=times,
                 amps=amps
             )
