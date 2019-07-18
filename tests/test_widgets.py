@@ -1,6 +1,7 @@
 import spikeextractors as se
 import spiketoolkit as st
 import spikewidgets as sw
+import spikecomparison
 import unittest
 
 
@@ -42,11 +43,11 @@ class TestWidgets(unittest.TestCase):
         sw.plot_rasters(self._SX)
 
     def test_confusion(self):
-        sc = st.comparison.compare_two_sorters(self._SX, self._SX)
+        sc = spikecomparison.compare_two_sorters(self._SX, self._SX)
         sw.plot_confusion_matrix(sc, count_text=False)
 
     def test_multicomp_graph(self):
-        msc = st.comparison.compare_multiple_sorters([self._SX, self._SX, self._SX])
+        msc = spikecomparison.compare_multiple_sorters([self._SX, self._SX, self._SX])
         sw.plot_multicomp_graph(msc, edge_cmap='viridis', node_cmap='rainbow', draw_labels=False)
 
 
