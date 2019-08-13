@@ -1,4 +1,3 @@
-import ipywidgets as widgets
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MaxNLocator
