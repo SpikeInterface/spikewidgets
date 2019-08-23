@@ -81,7 +81,7 @@ class UnitWaveformsWidget(BaseMultiWidget):
 
         if channels is None:
             channels = channel_ids
-        if 'location' in self._recording.get_channel_property_names():
+        if 'location' in self._recording.get_shared_channel_property_names():
             all_locations = np.array(self._recording.get_channel_locations())
             channel_locations = np.array(self._recording.get_channel_locations(channel_ids=channels))
         else:
