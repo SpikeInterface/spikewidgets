@@ -25,7 +25,7 @@ class TestWidgets(unittest.TestCase):
         sw.plot_amplitudes_distribution(self._RX, self._SX)
 
     def test_amptime(self):
-        sw.plot_amplitudes_timeseres(self._RX, self._SX)
+        sw.plot_amplitudes_timeseries(self._RX, self._SX)
 
     def test_features(self):
         sw.plot_features(self._RX, self._SX)
