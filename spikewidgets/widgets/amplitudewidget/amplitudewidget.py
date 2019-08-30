@@ -40,8 +40,8 @@ def plot_amplitudes_distribution(recording, sorting, unit_ids=None, max_num_wave
     return W
 
 
-def plot_amplitudes_timeseres(recording, sorting, unit_ids=None, max_num_waveforms=100,
-                              figure=None, ax=None):
+def plot_amplitudes_timeseries(recording, sorting, unit_ids=None, max_num_waveforms=100,
+                               figure=None, ax=None):
     """
     Plots waveform amplitudes timeseries.
 
