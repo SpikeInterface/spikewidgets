@@ -5,7 +5,7 @@ from spikewidgets.widgets.basewidget import BaseWidget
 
 
 def plot_multicomp_graph(multi_sorting_comparison, sorter_names=None, draw_labels=False, node_cmap='viridis',
-                         edge_cmap='hot', colorbar=False, figure=None, ax=None):
+                         edge_cmap='hot_r', alpha_edges=0.7, colorbar=False, figure=None, ax=None):
     """
     Plots multi sorting comparison graph.
 
@@ -21,6 +21,8 @@ def plot_multicomp_graph(multi_sorting_comparison, sorter_names=None, draw_label
         The colormap to be used for the nodes (default 'viridis')
     edge_cmap: matplotlib colormap
         The colormap to be used for the edges (default 'hot')
+    alpha_edges: float
+        Alpha value for edges
     colorbar: bool
         If True a colorbar for the edges is plotted
     figure: matplotlib figure
@@ -43,6 +45,7 @@ def plot_multicomp_graph(multi_sorting_comparison, sorter_names=None, draw_label
         node_cmap=node_cmap,
         edge_cmap=edge_cmap,
         drawlabels=draw_labels,
+        alpha_edges=alpha_edges,
         colorbar=colorbar,
         figure=figure,
         ax=ax
@@ -53,7 +56,7 @@ def plot_multicomp_graph(multi_sorting_comparison, sorter_names=None, draw_label
 
 class MultiCompGraphWidget(BaseWidget):
     def __init__(self, *, multi_sorting_comparison, sorternames=None, drawlabels=False, node_cmap='viridis',
-                 edge_cmap='hot', colorbar=False, figure=None, ax=None):
+                 edge_cmap='hot', alpha_edges=0.5, colorbar=False, figure=None, ax=None):
         BaseWidget.__init__(self, figure, ax)
         self._msc = multi_sorting_comparison
         self._sorter_names = sorternames
@@ -61,6 +64,7 @@ class MultiCompGraphWidget(BaseWidget):
         self._node_cmap = node_cmap
         self._edge_cmap = edge_cmap
         self._colorbar = colorbar
+        self._alpha_edges = alpha_edges
         self.name = 'MultiCompGraph'
 
     def plot(self):
@@ -81,9 +85,9 @@ class MultiCompGraphWidget(BaseWidget):
 
         _ = plt.set_cmap(self._node_cmap)
         _ = nx.draw_networkx_nodes(g, pos=nx.circular_layout(sorted(g)), nodelist=sorted(g.nodes),
-                                   node_color=nodes_col, ax=self.ax)
+                                   node_color=nodes_col, node_size=20, ax=self.ax)
         _ = nx.draw_networkx_edges(g, pos=nx.circular_layout((sorted(g))), nodelist=sorted(g.nodes),
-                                   edge_color=edge_col,
+                                   edge_color=edge_col, alpha=self._alpha_edges,
                                    edge_cmap=plt.cm.get_cmap(self._edge_cmap), edge_vmin=self._msc._min_accuracy,
                                    edge_vmax=1, ax=self.ax)
         if self._drawlabels:

@@ -1,4 +1,4 @@
-from .widgets.timeserieswidget import *
+from .widgets.timeserieswidget import TimeseriesWidget, plot_timeseries
 from .widgets.unitwaveformswidget import *
 from .widgets.correlogramswidget import *
 from .widgets.sortingperformancewidget import *

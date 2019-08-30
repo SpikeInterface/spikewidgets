@@ -1,5 +1,5 @@
 from spikewidgets.widgets.basewidget import BaseWidget
-import spiketoolkit as st
+import spikecomparison as sc
 
 
 def plot_sorting_performance(gt_sorting_comparison, property_name=None, metric='accuracy', markersize=10, marker='.',
@@ -46,7 +46,7 @@ def plot_sorting_performance(gt_sorting_comparison, property_name=None, metric='
 class SortingPerformanceWidget(BaseWidget):
     def __init__(self, *, sorting_comparison, property_name=None, metric='accuracy', markersize=10,
                  marker='.', figure=None, ax=None):
-        assert isinstance(sorting_comparison, st.comparison.groundtruthcomparison.GroundTruthComparison), \
+        assert isinstance(sorting_comparison, sc.GroundTruthComparison), \
             "The 'sorting_comparison' object should be a GroundTruthComparison instance"
         BaseWidget.__init__(self, figure, ax)
         self._SC = sorting_comparison

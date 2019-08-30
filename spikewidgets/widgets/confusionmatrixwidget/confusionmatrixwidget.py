@@ -3,7 +3,8 @@ from matplotlib import pyplot as plt
 from spikewidgets.widgets.basewidget import BaseWidget
 
 
-def plot_confusion_matrix(sorting_comparison, sorter_names=None, count_text=True, ax=None, figure=None):
+def plot_confusion_matrix(sorting_comparison, sorter_names=None, count_text=True, unit_ticks=True,
+                          ax=None, figure=None):
     """
     Plots sorting comparison confusion matrix.
 
@@ -15,6 +16,8 @@ def plot_confusion_matrix(sorting_comparison, sorter_names=None, count_text=True
         The names of the sorters
     count_text: bool
         If True counts are displayed as text
+    unit_ticks: bool
+        If True unit tick labels are displayed
     figure: matplotlib figure
         The figure to be used. If not given a figure is created
     ax: matplotlib axis
@@ -29,6 +32,7 @@ def plot_confusion_matrix(sorting_comparison, sorter_names=None, count_text=True
         sorting_comparison=sorting_comparison,
         sorternames=sorter_names,
         count_text=count_text,
+        unit_ticks=unit_ticks,
         figure=figure,
         ax=ax,
     )
@@ -37,11 +41,13 @@ def plot_confusion_matrix(sorting_comparison, sorter_names=None, count_text=True
 
 
 class ConfusionMatrixWidget(BaseWidget):
-    def __init__(self, *, sorting_comparison, sorternames=None, count_text=True, figure=None, ax=None):
+    def __init__(self, *, sorting_comparison, sorternames=None, count_text=True, unit_ticks=True,
+                 figure=None, ax=None):
         BaseWidget.__init__(self, figure, ax)
         self._sc = sorting_comparison
         self._sorter_names = sorternames
         self._count_text = count_text
+        self._unit_ticks = unit_ticks
         self.name = 'ConfusionMatrix'
 
     def plot(self):
@@ -76,8 +82,12 @@ class ConfusionMatrixWidget(BaseWidget):
         self.ax.set_yticks(np.arange(0, N1 + 1))
         self.ax.xaxis.tick_bottom()
         # Labels for major ticks
-        self.ax.set_xticklabels(np.append(st2_idx, 'FN'), fontsize=12)
-        self.ax.set_yticklabels(np.append(st1_idx, 'FP'), fontsize=12)
+        if self._unit_ticks:
+            self.ax.set_xticklabels(np.append(st2_idx, 'FN'), fontsize=12)
+            self.ax.set_yticklabels(np.append(st1_idx, 'FP'), fontsize=12)
+        else:
+            self.ax.set_xticklabels(np.append([''] * len(st2_idx), 'FN'), fontsize=12)
+            self.ax.set_yticklabels(np.append([''] * len(st1_idx), 'FP'), fontsize=12)
 
         if self._sorter_names is None:
             self.ax.set_xlabel(self._sc.sorting2_name, fontsize=20)
