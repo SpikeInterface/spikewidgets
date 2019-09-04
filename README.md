@@ -1,7 +1,5 @@
 [![Build Status](https://travis-ci.org/SpikeInterface/spikewidgets.svg?branch=master)](https://travis-ci.org/SpikeInterface/spikewidgets) [![PyPI version](https://badge.fury.io/py/spikewidgets.svg)](https://badge.fury.io/py/spikewidgets)
 
-Alpha Development
-
 # SpikeWidgets
 
 SpikeWidgets is a package of the SpikeInterface project that was designed for visualization of the SpikeInterface framework.
