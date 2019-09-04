@@ -22,7 +22,6 @@ You can also install SpikeWidgets locally by cloning the repo into your code bas
 
 ```shell
 git clone https://github.com/SpikeInterface/spikewidgets.git
-
 cd spikewidgets
 python setup.py install
 ```
