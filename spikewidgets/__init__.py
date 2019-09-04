@@ -9,5 +9,6 @@ from .widgets.isidistwidget import *
 from .widgets.multicompgraphwidget import *
 from .widgets.amplitudewidget import *
 from .widgets.featurewidget import *
+from .widgets.spectrumwidget import *
 
 from .version import version as __version__
