@@ -2,7 +2,7 @@
 
 # SpikeWidgets
 
-SpikeWidgets is a package of the SpikeInterface project that was designed for visualization of the SpikeInterface framework.
+SpikeWidgets is a package of the SpikeInterface project that was designed for visualization of various aspects of the spike sorting pipeline. The widgets include: raster plots, autocorrelograms, crosscorrelograms, isi distributions, and more.
 
 ## Getting Started
 
