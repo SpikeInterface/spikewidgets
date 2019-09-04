@@ -12,7 +12,6 @@ install:
 - pip install requests
 - pip install networkx
 - pip install matplotlib
-- pip install ipywidgets
 - pip install .
 - pip install pytest
 script: pytest
