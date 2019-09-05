@@ -15,6 +15,12 @@ class TestWidgets(unittest.TestCase):
     def test_timeseries(self):
         sw.plot_timeseries(self._RX)
 
+    def test_spectrum(self):
+        sw.plot_spectrum(self._RX)
+
+    def test_spectrogram(self):
+        sw.plot_spectrogram(self._RX, channel=0)
+
     def test_geometry(self):
         sw.plot_electrode_geometry(self._RX)
 
