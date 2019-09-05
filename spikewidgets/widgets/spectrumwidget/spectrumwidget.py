@@ -55,8 +55,8 @@ def plot_spectrogram(recording, channel, trange=None, freqrange=None, cmap='viri
     ----------
     recording: RecordingExtractor
         The recordng extractor object
-    channels: list
-        The channels to show
+    channel: int
+        The channel to plot spectrogram of
     trange: list
         List with start time and end time
     freqrange: list

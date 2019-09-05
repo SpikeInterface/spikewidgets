@@ -1,5 +1,4 @@
 import spikeextractors as se
-import spiketoolkit as st
 import spikewidgets as sw
 import spikecomparison
 import unittest
