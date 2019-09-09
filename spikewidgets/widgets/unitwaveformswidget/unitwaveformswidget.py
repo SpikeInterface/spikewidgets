@@ -90,7 +90,7 @@ class UnitWaveformsWidget(BaseMultiWidget):
             spiketrain = self._sorting.get_unit_spike_train(unit_id=unit_id)
             if spiketrain is not None:
                 random_wf = st.postprocessing.get_unit_waveforms(recording=self._recording, sorting=self._sorting,
-                                                                 unit_ids=[unit_id], channels=channel_ids,
+                                                                 unit_ids=[unit_id], channel_ids=channel_ids,
                                                                  ms_before=self._ms_before, ms_after=self._ms_after,
                                                                  max_num_waveforms=self._max_num_waveforms,
                                                                  save_as_features=False)
