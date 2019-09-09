@@ -4,7 +4,7 @@ from matplotlib.ticker import MaxNLocator
 from spikewidgets.widgets.basewidget import BaseWidget
 
 
-def plot_timeseries(recording, channels=None, trange=None, color_groups=False,
+def plot_timeseries(recording, channel_ids=None, trange=None, color_groups=False,
                     figure=None, ax=None):
     """
     Plots electrode geometry.
@@ -13,8 +13,8 @@ def plot_timeseries(recording, channels=None, trange=None, color_groups=False,
     ----------
     recording: RecordingExtractor
         The recordng extractor object
-    channels: list
-        The channels to show
+    channel_ids: list
+        The channel ids to display.
     trange: list
         List with start time and end time
     color_groups: bool
@@ -31,7 +31,7 @@ def plot_timeseries(recording, channels=None, trange=None, color_groups=False,
     """
     W = TimeseriesWidget(
         recording=recording,
-        channels=channels,
+        channel_ids=channel_ids,
         trange=trange,
         color_groups=color_groups,
         figure=figure,
@@ -42,12 +42,12 @@ def plot_timeseries(recording, channels=None, trange=None, color_groups=False,
 
 
 class TimeseriesWidget(BaseWidget):
-    def __init__(self, *, recording,channels=None, trange=None,
+    def __init__(self, *, recording, channel_ids=None, trange=None,
                  color_groups=False, figure=None,  ax=None):
         BaseWidget.__init__(self, figure, ax)
         self._recording = recording
         self._samplerate = recording.get_sampling_frequency()
-        self._visible_channels = channels
+        self._visible_channels = channel_ids
         if self._visible_channels is None:
             self._visible_channels = recording.get_channel_ids()
         self._visible_trange = trange
@@ -131,7 +131,6 @@ class TimeseriesWidget(BaseWidget):
         )
         # chunk0=self._reader.getChunk(channels=self._visible_channels,trange=self._visible_trange)
         M0 = chunk0.shape[0]
-        N0 = chunk0.shape[1]
         for ii in range(M0):
             self._channel_stats[self._visible_channels[ii]] = _compute_channel_stats_from_data(chunk0[ii, :])
         self._mean_channel_std = np.mean([self._channel_stats[m]['std'] for m in self._visible_channels])
