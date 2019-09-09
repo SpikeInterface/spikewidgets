@@ -4,7 +4,7 @@ import spiketoolkit as st
 from spikewidgets.widgets.basewidget import BaseMultiWidget
 
 
-def plot_unit_waveforms(recording, sorting, channels=None, unit_ids=None, ms_before=1., ms_after=2.,
+def plot_unit_waveforms(recording, sorting, channel_ids=None, unit_ids=None, ms_before=1., ms_after=2.,
                         max_num_waveforms=100, channel_locs=False, figure=None, ax=None):
     """
     Plots unit waveforms.
@@ -15,10 +15,10 @@ def plot_unit_waveforms(recording, sorting, channels=None, unit_ids=None, ms_bef
         The recordng extractor object
     sorting: SortingExtractor
         The sorting extractor object
-    channels: list
-        The channels to show
+    channel_ids: list
+        The channel ids to display.
     unit_ids: list
-        List of unit ids
+        List of unit ids.
     ms_before: float
         Time before peak (ms)
     ms_after: float
@@ -41,7 +41,7 @@ def plot_unit_waveforms(recording, sorting, channels=None, unit_ids=None, ms_bef
     W = UnitWaveformsWidget(
         recording=recording,
         sorting=sorting,
-        channels=channels,
+        channel_ids=channel_ids,
         unit_ids=unit_ids,
         max_num_waveforms=max_num_waveforms,
         ms_before=ms_before,
@@ -55,12 +55,12 @@ def plot_unit_waveforms(recording, sorting, channels=None, unit_ids=None, ms_bef
 
 
 class UnitWaveformsWidget(BaseMultiWidget):
-    def __init__(self, *, recording, sorting, channels=None, unit_ids=None, max_num_waveforms=50,
+    def __init__(self, *, recording, sorting, channel_ids=None, unit_ids=None, max_num_waveforms=50,
                  ms_before=1., ms_after=2., channel_locs=False, figure=None, ax=None):
         BaseMultiWidget.__init__(self, figure, ax)
         self._recording = recording
         self._sorting = sorting
-        self._channels = channels
+        self._channel_ids = channel_ids
         self._unit_ids = unit_ids
         self._ms_before = ms_before
         self._ms_after = ms_after
@@ -72,28 +72,25 @@ class UnitWaveformsWidget(BaseMultiWidget):
         self._do_plot()
 
     def _do_plot(self):
-        units = self._unit_ids
-        channels = self._channels
-        if units is None:
-            units = self._sorting.get_unit_ids()
-        channel_ids = self._recording.get_channel_ids()
-        M = len(channel_ids)
-
-        if channels is None:
-            channels = channel_ids
+        unit_ids = self._unit_ids
+        channel_ids = self._channel_ids
+        if unit_ids is None:
+            unit_ids = self._sorting.get_unit_ids()
+        if channel_ids is None:
+            channel_ids = self._recording.get_channel_ids()
         if 'location' in self._recording.get_shared_channel_property_names():
             all_locations = np.array(self._recording.get_channel_locations())
-            channel_locations = np.array(self._recording.get_channel_locations(channel_ids=channels))
+            channel_locations = np.array(self._recording.get_channel_locations(channel_ids=channel_ids))
         else:
             all_locations = None
             channel_locations = None
         list_spikes = []
 
-        for unit in units:
-            spiketrain = self._sorting.get_unit_spike_train(unit_id=unit)
+        for unit_id in unit_ids:
+            spiketrain = self._sorting.get_unit_spike_train(unit_id=unit_id)
             if spiketrain is not None:
                 random_wf = st.postprocessing.get_unit_waveforms(recording=self._recording, sorting=self._sorting,
-                                                                 unit_ids=[unit], channels=channels,
+                                                                 unit_ids=[unit_id], channels=channel_ids,
                                                                  ms_before=self._ms_before, ms_after=self._ms_after,
                                                                  max_num_waveforms=self._max_num_waveforms,
                                                                  save_as_features=False)
@@ -102,11 +99,11 @@ class UnitWaveformsWidget(BaseMultiWidget):
                 spikes = random_wf
                 item = dict(
                     representative_waveforms=spikes,
-                    title='Unit {}'.format(int(unit))
+                    title='Unit {}'.format(int(unit_id))
                 )
                 list_spikes.append(item)
             else:
-                print(unit, ' spike train is None')
+                print(unit_id, ' spike train is None')
         with plt.rc_context({'axes.edgecolor': 'gray'}):
             if self._ch_locs:
                 self._plot_spike_shapes_multi(list_spikes, channel_locations=channel_locations,
