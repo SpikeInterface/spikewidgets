@@ -28,7 +28,7 @@ class TestWidgets(unittest.TestCase):
         sw.plot_amplitudes_timeseries(self._RX, self._SX)
 
     def test_features(self):
-        sw.plot_features(self._RX, self._SX)
+        sw.plot_pca_features(self._RX, self._SX)
 
     def test_ach(self):
         sw.plot_autocorrelograms(self._SX, bin_size=1, window=10)
