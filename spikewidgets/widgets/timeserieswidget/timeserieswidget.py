@@ -46,7 +46,7 @@ class TimeseriesWidget(BaseWidget):
                  color_groups=False, figure=None,  ax=None):
         BaseWidget.__init__(self, figure, ax)
         self._recording = recording
-        self._samplerate = recording.get_sampling_frequency()
+        self._sampling_frequency = recording.get_sampling_frequency()
         self._visible_channels = channel_ids
         if self._visible_channels is None:
             self._visible_channels = recording.get_channel_ids()
@@ -87,7 +87,7 @@ class TimeseriesWidget(BaseWidget):
             end_frame=self._visible_trange[1]
         )
 
-        self.ax.set_xlim(self._visible_trange[0] / self._samplerate, self._visible_trange[1] / self._samplerate)
+        self.ax.set_xlim(self._visible_trange[0] / self._sampling_frequency, self._visible_trange[1] / self._sampling_frequency)
         self.ax.set_ylim(-self._vspacing, self._vspacing * len(self._visible_channels))
         self.ax.get_xaxis().set_major_locator(MaxNLocator(prune='both'))
         self.ax.get_yaxis().set_ticks([])
@@ -96,7 +96,7 @@ class TimeseriesWidget(BaseWidget):
         self._plots = {}
         self._plot_offsets = {}
         offset0 = self._vspacing * (len(self._visible_channels) - 1)
-        tt = np.arange(self._visible_trange[0], self._visible_trange[1]) / self._samplerate
+        tt = np.arange(self._visible_trange[0], self._visible_trange[1]) / self._sampling_frequency
         for im, m in enumerate(self._visible_channels):
             self._plot_offsets[m] = offset0
             if self._color_groups:
@@ -111,13 +111,14 @@ class TimeseriesWidget(BaseWidget):
     def _fix_trange(self, trange):
         N = self._recording.get_num_frames()
         if trange[1] > N:
-            trange[0] += N - trange[1]
-            trange[1] += N - trange[1]
+            # trange[0] += N - trange[1]
+            # trange[1] = N - trange[1]
+            trange[1] = N
         if trange[0] < 0:
-            trange[1] += -trange[0]
+            # trange[1] += -trange[0]
             trange[0] = 0
-        trange[0] = np.maximum(0, trange[0])
-        trange[1] = np.minimum(N, trange[1])
+        # trange[0] = np.maximum(0, trange[0])
+        # trange[1] = np.minimum(N, trange[1])
         return trange
 
     def _initialize_stats(self):

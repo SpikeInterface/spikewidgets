@@ -4,8 +4,8 @@ from spikewidgets.widgets.basewidget import BaseMultiWidget
 import spiketoolkit as st
 
 
-def plot_features(recording, sorting, unit_ids=None, max_num_waveforms=100, nproj=4, colormap=None,
-                  figure=None, ax=None):
+def plot_pca_features(recording, sorting, unit_ids=None, max_num_waveforms=100, nproj=4, colormap=None,
+                      figure=None, ax=None):
     """
     Plots unit PCA features on best projections.
 
@@ -30,10 +30,10 @@ def plot_features(recording, sorting, unit_ids=None, max_num_waveforms=100, npro
 
     Returns
     -------
-    W: FeatureWidget
+    W: PCAWidget
         The output widget
     """
-    W = FeatureWidget(
+    W = PCAWidget(
         sorting=sorting,
         recording=recording,
         unit_ids=unit_ids,
@@ -47,9 +47,9 @@ def plot_features(recording, sorting, unit_ids=None, max_num_waveforms=100, npro
     return W
 
 
-class FeatureWidget(BaseMultiWidget):
+class PCAWidget(BaseMultiWidget):
     def __init__(self, *, recording, sorting, unit_ids=None, max_num_waveforms=100, nproj=4, colormap=None,
-                 figure=None, ax=None):
+                 figure=None, ax=None, save_as_features=False, save_waveforms_as_features=False):
         BaseMultiWidget.__init__(self, figure, ax)
         self._sorting = sorting
         self._recording = recording
@@ -58,6 +58,8 @@ class FeatureWidget(BaseMultiWidget):
         self._max_num_waveforms = max_num_waveforms
         self._pca_scores = None
         self._colormap = colormap
+        self._save_as_features = save_as_features
+        self._save_waveforms_as_features = save_waveforms_as_features
         self.name = 'Feature'
 
     def _compute_pca(self):
@@ -65,8 +67,8 @@ class FeatureWidget(BaseMultiWidget):
                                                                      sorting=self._sorting,
                                                                      by_electrode=True,
                                                                      max_num_waveforms=self._max_num_waveforms,
-                                                                     save_as_features=False,
-                                                                     save_waveforms_as_features=False)
+                                                                     save_as_features=self._save_as_features,
+                                                                     save_waveforms_as_features=self._save_waveforms_as_features)
 
     def plot(self):
         self._do_plot()
@@ -91,12 +93,15 @@ class FeatureWidget(BaseMultiWidget):
                 for ch2 in range(n_ch):
                     for pc2 in range(n_pc):
                         if ch1 != ch2 or pc1 != pc2:
-                            dist = self.compute_cluster_average_distance(pc1, ch1, pc2, ch2)
-                            if [ch1, pc1, ch2, pc2] not in proj and [ch2, pc2, ch1, pc1] not in proj:
+                            dist = self.compute_cluster_average_distance(
+                                pc1, ch1, pc2, ch2)
+                            if [ch1, pc1, ch2, pc2] not in proj and [
+                                    ch2, pc2, ch1, pc1] not in proj:
                                 distances.append(dist)
                                 proj.append([ch1, pc1, ch2, pc2])
 
-        list_best_proj = np.array(proj)[np.argsort(distances)[::-1][:self._nproj]]
+        list_best_proj = np.array(
+            proj)[np.argsort(distances)[::-1][:self._nproj]]
         self._plot_proj_multi(list_best_proj)
 
     def compute_cluster_average_distance(self, pc1, ch1, pc2, ch2):
@@ -125,12 +130,14 @@ class FeatureWidget(BaseMultiWidget):
         ch1, pc1, ch2, pc2 = proj
         if self._colormap is not None:
             cm = plt.get_cmap(self._colormap)
-            colors = [cm(i / len(self._pca_scores)) for i in np.arange(len(self._pca_scores))]
+            colors = [cm(i / len(self._pca_scores))
+                      for i in np.arange(len(self._pca_scores))]
         else:
             colors = [None] * len(self._pca_scores)
         for i, pc in enumerate(self._pca_scores):
             if self._sorting.get_unit_ids()[i] in self._units:
-                ax.plot(pc[:, ch1, pc1], pc[:, ch2, pc2], '*', color=colors[i], alpha=0.3)
+                ax.plot(pc[:, ch1, pc1], pc[:, ch2, pc2],
+                        '*', color=colors[i], alpha=0.3)
         ax.set_yticks([])
         ax.set_xticks([])
         ax.set_xlabel('ch {} - pc {}'.format(ch1, pc1))
