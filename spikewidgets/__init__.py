@@ -8,6 +8,6 @@ from .widgets.rasterswidget import *
 from .widgets.isidistwidget import *
 from .widgets.multicompgraphwidget import *
 from .widgets.amplitudewidget import *
-from .widgets.featurewidget import *
+from .widgets.featurewidgets import *
 
 from .version import version as __version__
