@@ -82,11 +82,11 @@ class ConfusionMatrixWidget(BaseWidget):
             self.ax.set_xticklabels(np.append([''] * len(st2_idx), 'FN'), fontsize=10)
             self.ax.set_yticklabels(np.append([''] * len(st1_idx), 'FP'), fontsize=10)
 
-        self.ax.set_xlabel(self._gtcomp.name_list[0], fontsize=20)
-        self.ax.set_ylabel(self._gtcomp.name_list[1], fontsize=20)
+        self.ax.set_xlabel(self._gtcomp.name_list[1], fontsize=20)
+        self.ax.set_ylabel(self._gtcomp.name_list[0], fontsize=20)
         
-        self.ax.set_xlim(-0.5, N1+0.5)
-        self.ax.set_ylim(N2+0.5, -0.5, )
+        self.ax.set_xlim(-0.5, N2+0.5)
+        self.ax.set_ylim(N1+0.5, -0.5, )
         
         
 
