@@ -5,6 +5,9 @@ import spikecomparison
 import unittest
 
 
+
+
+
 class TestWidgets(unittest.TestCase):
     def setUp(self):
         self._RX, self._SX = se.example_datasets.toy_example(num_channels=4, duration=10)
@@ -43,7 +46,7 @@ class TestWidgets(unittest.TestCase):
         sw.plot_rasters(self._SX)
 
     def test_confusion(self):
-        sc = spikecomparison.compare_two_sorters(self._SX, self._SX)
+        sc = spikecomparison.compare_sorter_to_ground_truth(self._SX, self._SX)
         sw.plot_confusion_matrix(sc, count_text=False)
 
     def test_multicomp_graph(self):
