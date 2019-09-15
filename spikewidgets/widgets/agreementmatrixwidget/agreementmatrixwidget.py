@@ -66,7 +66,7 @@ class AgreementMatrixWidget(BaseWidget):
         if self._count_text:
             for i, u1 in enumerate(unit_ids1):
                 u2 = self._sc.best_match_12[u1]
-                if u2 != 0:
+                if u2 != -1:
                     j = np.where(unit_ids2==u2)[0][0]
                     
                     self.ax.text(j, i, '{:0.2f}'.format(scores.at[u1, u2]),
@@ -78,14 +78,14 @@ class AgreementMatrixWidget(BaseWidget):
         self.ax.xaxis.tick_bottom()
         # Labels for major ticks
         if self._unit_ticks:
-            self.ax.set_xticklabels(scores.index, fontsize=12)
-            self.ax.set_yticklabels(scores.columns, fontsize=12)
+            self.ax.set_yticklabels(scores.index, fontsize=12)
+            self.ax.set_xticklabels(scores.columns, fontsize=12)
 
         self.ax.set_xlabel(self._sc.name_list[1], fontsize=20)
         self.ax.set_ylabel(self._sc.name_list[0], fontsize=20)
         
-        self.ax.set_xlim(-0.5, N1-0.5)
-        self.ax.set_ylim(N2-0.5, -0.5, )
+        self.ax.set_ylim(-0.5, N1-0.5)
+        self.ax.set_xlim(N2-0.5, -0.5, )
         
         
 
