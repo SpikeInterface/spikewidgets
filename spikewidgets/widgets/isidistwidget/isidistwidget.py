@@ -37,7 +37,7 @@ def plot_isi_distribution(sorting, sampling_frequency=None, unit_ids=None, bins=
             sampling_frequency = sorting.get_sampling_frequency()
     W = ISIDistributionWidget(
         sorting=sorting,
-        samplerate=sampling_frequency,
+        sampling_frequency=sampling_frequency,
         unit_ids=unit_ids,
         bins=bins,
         window=window,
@@ -49,11 +49,11 @@ def plot_isi_distribution(sorting, sampling_frequency=None, unit_ids=None, bins=
 
 
 class ISIDistributionWidget(BaseMultiWidget):
-    def __init__(self, *, sorting, samplerate, unit_ids=None, bins=10, window=1, figure=None, ax=None):
+    def __init__(self, *, sorting, sampling_frequency, unit_ids=None, bins=10, window=1, figure=None, ax=None):
         BaseMultiWidget.__init__(self, figure, ax)
         self._sorting = sorting
         self._unit_ids = unit_ids
-        self._samplerate = samplerate
+        self._sampling_frequency = sampling_frequency
         self._bins = bins
         self._maxw = window
         self.name = 'ISIDistribution'
@@ -67,7 +67,7 @@ class ISIDistributionWidget(BaseMultiWidget):
             units = self._sorting.get_unit_ids()
         list_isi = []
         for unit in units:
-            times = self._sorting.get_unit_spike_train(unit_id=unit) / float(self._samplerate)
+            times = self._sorting.get_unit_spike_train(unit_id=unit) / float(self._sampling_frequency)
             bin_counts, bin_edges = compute_isi_dist(times, bins=self._bins, maxwindow=self._maxw)
             item = dict(
                 title='Unit {}'.format(int(unit)),

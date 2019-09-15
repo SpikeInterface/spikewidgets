@@ -39,7 +39,7 @@ def plot_autocorrelograms(sorting, sampling_frequency=None, unit_ids=None, bin_s
             sampling_frequency = sorting.get_sampling_frequency()
     W = AutoCorrelogramsWidget(
         sorting=sorting,
-        samplerate=sampling_frequency,
+        sampling_frequency=sampling_frequency,
         unit_ids=unit_ids,
         binsize=bin_size,
         window=window,
@@ -85,7 +85,7 @@ def plot_crosscorrelograms(sorting, sampling_frequency=None, unit_ids=None, bin_
             sampling_frequency = sorting.get_sampling_frequency()
     W = CrossCorrelogramsWidget(
         sorting=sorting,
-        samplerate=sampling_frequency,
+        sampling_frequency=sampling_frequency,
         unit_ids=unit_ids,
         binsize=bin_size,
         window=window,
@@ -97,11 +97,11 @@ def plot_crosscorrelograms(sorting, sampling_frequency=None, unit_ids=None, bin_
 
 
 class AutoCorrelogramsWidget(BaseMultiWidget):
-    def __init__(self, *, sorting, samplerate, unit_ids=None, binsize=2, window=50, figure=None, ax=None):
+    def __init__(self, *, sorting, sampling_frequency, unit_ids=None, binsize=2, window=50, figure=None, ax=None):
         BaseMultiWidget.__init__(self, figure, ax)
         self._sorting = sorting
         self._unit_ids = unit_ids
-        self._samplerate = samplerate
+        self._sampling_frequency = sampling_frequency
         self._binsize = binsize
         self._window = window
         self.name = 'AutoCorrelograms'
@@ -115,8 +115,8 @@ class AutoCorrelogramsWidget(BaseMultiWidget):
             units = self._sorting.get_unit_ids()
         list_corr = []
 
-        spike_times, spike_clusters = _prepare_spike_times_and_clusters(self._sorting, units, self._samplerate)
-        ccg = compute_correlograms(spike_times, spike_clusters, cluster_ids=units, sample_rate=self._samplerate,
+        spike_times, spike_clusters = _prepare_spike_times_and_clusters(self._sorting, units, self._sampling_frequency)
+        ccg = compute_correlograms(spike_times, spike_clusters, cluster_ids=units, sample_rate=self._sampling_frequency,
                                    bin_size=self._binsize, window_size=self._window, symmetrize=True)
 
         for i_u, unit in enumerate(units):
@@ -144,11 +144,11 @@ class AutoCorrelogramsWidget(BaseMultiWidget):
             
 
 class CrossCorrelogramsWidget(BaseMultiWidget):
-    def __init__(self, *, sorting, samplerate, unit_ids=None, binsize=2, window=50, figure=None, ax=None):
+    def __init__(self, *, sorting, sampling_frequency, unit_ids=None, binsize=2, window=50, figure=None, ax=None):
         BaseMultiWidget.__init__(self, figure, ax)
         self._sorting = sorting
         self._unit_ids = unit_ids
-        self._samplerate = samplerate
+        self._sampling_frequency = sampling_frequency
         self._binsize = binsize
         self._window = window
         self.name = 'CrossCorrelograms'
@@ -162,8 +162,8 @@ class CrossCorrelogramsWidget(BaseMultiWidget):
             units = self._sorting.get_unit_ids()
         list_corr = []
 
-        spike_times, spike_clusters = _prepare_spike_times_and_clusters(self._sorting, units, self._samplerate)
-        ccg = compute_correlograms(spike_times, spike_clusters, cluster_ids=units, sample_rate=self._samplerate,
+        spike_times, spike_clusters = _prepare_spike_times_and_clusters(self._sorting, units, self._sampling_frequency)
+        ccg = compute_correlograms(spike_times, spike_clusters, cluster_ids=units, sample_rate=self._sampling_frequency,
                                    bin_size=self._binsize, window_size=self._window, symmetrize=True)
 
         for u1, unit1 in enumerate(units):
@@ -209,13 +209,13 @@ def _plot_correlogram(*, ax, bin_counts, bins, wid, title='', color=None):
         ax.set_title(title, color='gray')
 
 
-def _prepare_spike_times_and_clusters(sorting, unit_ids, samplerate):
+def _prepare_spike_times_and_clusters(sorting, unit_ids, sampling_frequency):
     spike_times = np.array([])
     spike_clusters = np.array([], dtype=int)
 
     for u in sorting.get_unit_ids():
         if u in unit_ids:
-            spike_times = np.concatenate((spike_times, sorting.get_unit_spike_train(u) / samplerate))
+            spike_times = np.concatenate((spike_times, sorting.get_unit_spike_train(u) / sampling_frequency))
             spike_clusters = np.concatenate((spike_clusters, np.array([u]*len(sorting.get_unit_spike_train(u)))))
 
     order = np.argsort(spike_times)
