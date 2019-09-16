@@ -4,9 +4,6 @@ import spikecomparison as sc
 import unittest
 
 
-
-
-
 class TestWidgets(unittest.TestCase):
     def setUp(self):
         self._RX, self._SX = se.example_datasets.toy_example(num_channels=4, duration=10)
@@ -60,7 +57,6 @@ class TestWidgets(unittest.TestCase):
         
         gt_comp = sc.compare_sorter_to_ground_truth(self._SX, self._SX)
         sw.plot_agreement_matrix(gt_comp, count_text=True)
-        
 
     def test_multicomp_graph(self):
         msc = sc.compare_multiple_sorters([self._SX, self._SX, self._SX])
