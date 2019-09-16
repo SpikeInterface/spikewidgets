@@ -3,7 +3,7 @@ from spikewidgets.widgets.basewidget import BaseWidget
 
 
 def plot_spectrum(recording, channels=None, trange=None, freqrange=None, color_groups=False, color='steelblue',
-                  figure=None, ax=None):
+                  nfft=256, figure=None, ax=None):
     """
     Plots electrode geometry.
 
@@ -38,6 +38,7 @@ def plot_spectrum(recording, channels=None, trange=None, freqrange=None, color_g
         freqrange=freqrange,
         color_groups=color_groups,
         color=color,
+        nfft=nfft,
         figure=figure,
         ax=ax
     )
@@ -46,7 +47,7 @@ def plot_spectrum(recording, channels=None, trange=None, freqrange=None, color_g
 
 
 def plot_spectrogram(recording, channel, trange=None, freqrange=None, cmap='viridis',
-                     figure=None, ax=None):
+                     nfft=256, figure=None, ax=None):
     """
     Plots electrode geometry.
 
@@ -54,8 +55,8 @@ def plot_spectrogram(recording, channel, trange=None, freqrange=None, cmap='viri
     ----------
     recording: RecordingExtractor
         The recordng extractor object
-    channels: list
-        The channels to show
+    channel: int
+        The channel to plot spectrogram of
     trange: list
         List with start time and end time
     freqrange: list
@@ -78,6 +79,7 @@ def plot_spectrogram(recording, channel, trange=None, freqrange=None, cmap='viri
         trange=trange,
         freqrange=freqrange,
         cmap=cmap,
+        nfft=nfft,
         figure=figure,
         ax=ax
     )
@@ -87,7 +89,7 @@ def plot_spectrogram(recording, channel, trange=None, freqrange=None, cmap='viri
 
 class SpectrumWidget(BaseWidget):
     def __init__(self, *, recording, channels=None, trange=None, freqrange=None,
-                 color_groups=False, color=None, figure=None, ax=None):
+                 color_groups=False, color=None, nfft=256, figure=None, ax=None):
         BaseWidget.__init__(self, figure, ax)
         self._recording = recording
         self._samplerate = recording.get_sampling_frequency()
@@ -96,6 +98,7 @@ class SpectrumWidget(BaseWidget):
         self._trange = trange
         self._frange = freqrange
         self._color = color
+        self._nfft = nfft
 
         if channels is None:
             self._channels = self._recording.get_channel_ids()
@@ -131,9 +134,9 @@ class SpectrumWidget(BaseWidget):
             if self._color_groups:
                 group = self._recording.get_channel_groups(channel_ids=[ch])[0]
                 group_color_idx = self._group_color_map[group]
-                s, f = self.ax.psd(t, Fs=self._samplerate, color=self._colors[group_color_idx])
+                self.ax.psd(t, Fs=self._samplerate, color=self._colors[group_color_idx], NFFT=self._nfft)
             else:
-                s, f = self.ax.psd(t, Fs=self._samplerate)
+                self.ax.psd(t, Fs=self._samplerate, NFFT=self._nfft)
 
         if self._frange is not None:
             self.ax.set_xlim(self._frange)
@@ -141,7 +144,7 @@ class SpectrumWidget(BaseWidget):
 
 class SpectrogramWidget(BaseWidget):
     def __init__(self, *, recording, channel, trange=None, freqrange=None,
-                 cmap=None, figure=None, ax=None):
+                 cmap=None, nfft=256, figure=None, ax=None):
         BaseWidget.__init__(self, figure, ax)
         self._recording = recording
         self._samplerate = recording.get_sampling_frequency()
@@ -149,6 +152,7 @@ class SpectrogramWidget(BaseWidget):
         self._trange = trange
         self._frange = freqrange
         self._cmap = cmap
+        self._nfft = nfft
 
         assert channel is not None, "Specify which 'channel' to use"
         self._channel = channel
@@ -164,7 +168,8 @@ class SpectrogramWidget(BaseWidget):
 
         traces = self._recording.get_traces(channel_ids=[self._channel], start_frame=start_frame, end_frame=end_frame)
 
-        self.ax.specgram(traces[0], Fs=self._recording.get_sampling_frequency(), scale='dB', cmap=self._cmap)
+        self.ax.specgram(traces[0], Fs=self._recording.get_sampling_frequency(), scale='dB', cmap=self._cmap,
+                         NFFT=self._nfft)
 
         if self._frange is not None:
             self.ax.set_ylim(self._frange)
