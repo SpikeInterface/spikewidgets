@@ -15,7 +15,15 @@ class BaseWidget:
             self.figure = ax.get_figure()
             self.ax = ax
         self.name = None
-
+    
+    def get_figure(self):
+        return self.figure
+    
+    def get_ax(self):
+        return self.ax
+    
+    def get_name(self):
+        return self.name
 
 class BaseMultiWidget:
     def __init__(self, figure=None, ax=None):

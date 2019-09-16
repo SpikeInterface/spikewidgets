@@ -2,7 +2,7 @@
 
 # SpikeWidgets
 
-SpikeWidgets is a package of the SpikeInterface project that was designed for visualization of the SpikeInterface framework.
+SpikeWidgets is a package of the SpikeInterface project that was designed for visualization of various aspects of the spike sorting pipeline. The widgets include: raster plots, autocorrelograms, crosscorrelograms, isi distributions, and more.
 
 ## Getting Started
 
@@ -26,9 +26,13 @@ cd spikewidgets
 python setup.py install
 ```
 
+## Examples
+
+For more information about how to use SpikeWidgets, please checkout these [examples](https://github.com/SpikeInterface/spikeinterface/tree/master/examples/modules/widgets).
+
 ## Documentation
 
-The documentation page for the SpikeInterface project can be found here: https://spikeinterface.readthedocs.io/en/latest/
+All documentation for SpikeInterface can be found here: https://spikeinterface.readthedocs.io/en/latest/.
 
 ### Authors
 

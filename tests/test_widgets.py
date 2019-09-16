@@ -1,8 +1,11 @@
 import spikeextractors as se
 import spiketoolkit as st
 import spikewidgets as sw
-import spikecomparison
+import spikecomparison as sc
 import unittest
+
+
+
 
 
 class TestWidgets(unittest.TestCase):
@@ -28,7 +31,7 @@ class TestWidgets(unittest.TestCase):
         sw.plot_amplitudes_timeseries(self._RX, self._SX)
 
     def test_features(self):
-        sw.plot_features(self._RX, self._SX)
+        sw.plot_pca_features(self._RX, self._SX)
 
     def test_ach(self):
         sw.plot_autocorrelograms(self._SX, bin_size=1, window=10)
@@ -43,11 +46,19 @@ class TestWidgets(unittest.TestCase):
         sw.plot_rasters(self._SX)
 
     def test_confusion(self):
-        sc = spikecomparison.compare_two_sorters(self._SX, self._SX)
-        sw.plot_confusion_matrix(sc, count_text=False)
+        gt_comp = sc.compare_sorter_to_ground_truth(self._SX, self._SX)
+        sw.plot_confusion_matrix(gt_comp, count_text=True)
+
+    def test_agreement(self):
+        comp = sc.compare_sorter_to_ground_truth(self._SX, self._SX)
+        sw.plot_agreement_matrix(comp, count_text=True)
+        
+        gt_comp = sc.compare_sorter_to_ground_truth(self._SX, self._SX)
+        sw.plot_agreement_matrix(gt_comp, count_text=True)
+        
 
     def test_multicomp_graph(self):
-        msc = spikecomparison.compare_multiple_sorters([self._SX, self._SX, self._SX])
+        msc = sc.compare_multiple_sorters([self._SX, self._SX, self._SX])
         sw.plot_multicomp_graph(msc, edge_cmap='viridis', node_cmap='rainbow', draw_labels=False)
 
 

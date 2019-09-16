@@ -1,1 +1,0 @@
-from .featurewidget import FeatureWidget, plot_features

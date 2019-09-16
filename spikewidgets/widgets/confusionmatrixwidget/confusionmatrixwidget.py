@@ -3,17 +3,15 @@ from matplotlib import pyplot as plt
 from spikewidgets.widgets.basewidget import BaseWidget
 
 
-def plot_confusion_matrix(sorting_comparison, sorter_names=None, count_text=True, unit_ticks=True,
+def plot_confusion_matrix(gt_comparison, count_text=True, unit_ticks=True,
                           ax=None, figure=None):
     """
     Plots sorting comparison confusion matrix.
 
     Parameters
     ----------
-    sorting_comparison: BaseComparison
-        The sorting comparison object
-    sorter_names: list
-        The names of the sorters
+    gt_comparison: GroundTruthComparison
+        The ground truth sorting comparison object
     count_text: bool
         If True counts are displayed as text
     unit_ticks: bool
@@ -29,8 +27,7 @@ def plot_confusion_matrix(sorting_comparison, sorter_names=None, count_text=True
         The output widget
     """
     W = ConfusionMatrixWidget(
-        sorting_comparison=sorting_comparison,
-        sorternames=sorter_names,
+        gt_comparison=gt_comparison,
         count_text=count_text,
         unit_ticks=unit_ticks,
         figure=figure,
@@ -41,11 +38,10 @@ def plot_confusion_matrix(sorting_comparison, sorter_names=None, count_text=True
 
 
 class ConfusionMatrixWidget(BaseWidget):
-    def __init__(self, *, sorting_comparison, sorternames=None, count_text=True, unit_ticks=True,
+    def __init__(self, *, gt_comparison, count_text=True, unit_ticks=True,
                  figure=None, ax=None):
         BaseWidget.__init__(self, figure, ax)
-        self._sc = sorting_comparison
-        self._sorter_names = sorternames
+        self._gtcomp = gt_comparison
         self._count_text = count_text
         self._unit_ticks = unit_ticks
         self.name = 'ConfusionMatrix'
@@ -54,22 +50,19 @@ class ConfusionMatrixWidget(BaseWidget):
         self._do_plot()
 
     def _do_plot(self):
-        confusion_matrix, st1_idx, st2_idx = self._sc.get_confusion_matrix()
+        # a dataframe
+        confusion_matrix = self._gtcomp.get_confusion_matrix()
 
-        sorting1 = self._sc.sorting1
-        sorting2 = self._sc.sorting2
-        unit1_ids = sorting1.get_unit_ids()
-        unit2_ids = sorting2.get_unit_ids()
-        N1 = len(unit1_ids)
-        N2 = len(unit2_ids)
+        N1 = confusion_matrix.shape[0] - 1
+        N2 = confusion_matrix.shape[1] - 1
 
         # Using matshow here just because it sets the ticks up nicely. imshow is faster.
-        self.ax.matshow(confusion_matrix, cmap='Greens')
+        self.ax.matshow(confusion_matrix.values, cmap='Greens')
 
         if self._count_text:
-            for (i, j), z in np.ndenumerate(confusion_matrix):
+            for (i, j), z in np.ndenumerate(confusion_matrix.values):
                 if z != 0:
-                    if z > np.max(confusion_matrix) / 2.:
+                    if z > np.max(confusion_matrix.values) / 2.:
                         self.ax.text(j, i, '{:d}'.format(z), ha='center', va='center', color='white')
                     else:
                         self.ax.text(j, i, '{:d}'.format(z), ha='center', va='center', color='black')
@@ -83,20 +76,17 @@ class ConfusionMatrixWidget(BaseWidget):
         self.ax.xaxis.tick_bottom()
         # Labels for major ticks
         if self._unit_ticks:
-            self.ax.set_xticklabels(np.append(st2_idx, 'FN'), fontsize=12)
-            self.ax.set_yticklabels(np.append(st1_idx, 'FP'), fontsize=12)
+            self.ax.set_yticklabels(confusion_matrix.index, fontsize=12)
+            self.ax.set_xticklabels(confusion_matrix.columns, fontsize=12)
         else:
-            self.ax.set_xticklabels(np.append([''] * len(st2_idx), 'FN'), fontsize=12)
-            self.ax.set_yticklabels(np.append([''] * len(st1_idx), 'FP'), fontsize=12)
+            self.ax.set_xticklabels(np.append([''] * N2, 'FN'), fontsize=10)
+            self.ax.set_yticklabels(np.append([''] * N1, 'FP'), fontsize=10)
 
-        if self._sorter_names is None:
-            self.ax.set_xlabel(self._sc.sorting2_name, fontsize=20)
-        else:
-            assert len(self._sorter_names) == 2
-            self.ax.set_xlabel(self._sorter_names[0], fontsize=20)
+        self.ax.set_xlabel(self._gtcomp.name_list[1], fontsize=20)
+        self.ax.set_ylabel(self._gtcomp.name_list[0], fontsize=20)
+        
+        self.ax.set_xlim(-0.5, N2+0.5)
+        self.ax.set_ylim(N1+0.5, -0.5, )
+        
+        
 
-        if self._sorter_names is None:
-            self.ax.set_ylabel(self._sc.sorting1_name, fontsize=20)
-        else:
-            assert len(self._sorter_names) == 2
-            self.ax.set_xlabel(self._sorter_names[0], fontsize=20)

@@ -64,7 +64,7 @@ class SortingPerformanceWidget(BaseWidget):
         units = SC.sorting1.get_unit_ids()
         perf = SC.get_performance()[self._metric]
         if self._property_name is not None:
-            assert self._property_name in SC.sorting1.get_unit_property_names(), "%s should be " \
+            assert self._property_name in SC.sorting1.get_shared_unit_property_names(), "%s should be " \
                                                                                  "a property of the ground truth " \
                                                                                  "sorting extractor"
             xvals = SC.sorting1.get_units_property(unit_ids=units, property_name=self._property_name)

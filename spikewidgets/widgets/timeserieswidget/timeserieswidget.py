@@ -4,7 +4,7 @@ from matplotlib.ticker import MaxNLocator
 from spikewidgets.widgets.basewidget import BaseWidget
 
 
-def plot_timeseries(recording, channels=None, trange=None, color_groups=False,
+def plot_timeseries(recording, channel_ids=None, trange=None, color_groups=False,
                     figure=None, ax=None):
     """
     Plots electrode geometry.
@@ -13,8 +13,8 @@ def plot_timeseries(recording, channels=None, trange=None, color_groups=False,
     ----------
     recording: RecordingExtractor
         The recordng extractor object
-    channels: list
-        The channels to show
+    channel_ids: list
+        The channel ids to display.
     trange: list
         List with start time and end time
     color_groups: bool
@@ -31,7 +31,7 @@ def plot_timeseries(recording, channels=None, trange=None, color_groups=False,
     """
     W = TimeseriesWidget(
         recording=recording,
-        channels=channels,
+        channel_ids=channel_ids,
         trange=trange,
         color_groups=color_groups,
         figure=figure,
@@ -42,12 +42,12 @@ def plot_timeseries(recording, channels=None, trange=None, color_groups=False,
 
 
 class TimeseriesWidget(BaseWidget):
-    def __init__(self, *, recording,channels=None, trange=None,
+    def __init__(self, *, recording, channel_ids=None, trange=None,
                  color_groups=False, figure=None,  ax=None):
         BaseWidget.__init__(self, figure, ax)
         self._recording = recording
-        self._samplerate = recording.get_sampling_frequency()
-        self._visible_channels = channels
+        self._sampling_frequency = recording.get_sampling_frequency()
+        self._visible_channels = channel_ids
         if self._visible_channels is None:
             self._visible_channels = recording.get_channel_ids()
         self._visible_trange = trange
@@ -87,7 +87,7 @@ class TimeseriesWidget(BaseWidget):
             end_frame=self._visible_trange[1]
         )
 
-        self.ax.set_xlim(self._visible_trange[0] / self._samplerate, self._visible_trange[1] / self._samplerate)
+        self.ax.set_xlim(self._visible_trange[0] / self._sampling_frequency, self._visible_trange[1] / self._sampling_frequency)
         self.ax.set_ylim(-self._vspacing, self._vspacing * len(self._visible_channels))
         self.ax.get_xaxis().set_major_locator(MaxNLocator(prune='both'))
         self.ax.get_yaxis().set_ticks([])
@@ -96,7 +96,7 @@ class TimeseriesWidget(BaseWidget):
         self._plots = {}
         self._plot_offsets = {}
         offset0 = self._vspacing * (len(self._visible_channels) - 1)
-        tt = np.arange(self._visible_trange[0], self._visible_trange[1]) / self._samplerate
+        tt = np.arange(self._visible_trange[0], self._visible_trange[1]) / self._sampling_frequency
         for im, m in enumerate(self._visible_channels):
             self._plot_offsets[m] = offset0
             if self._color_groups:
@@ -111,13 +111,14 @@ class TimeseriesWidget(BaseWidget):
     def _fix_trange(self, trange):
         N = self._recording.get_num_frames()
         if trange[1] > N:
-            trange[0] += N - trange[1]
-            trange[1] += N - trange[1]
+            # trange[0] += N - trange[1]
+            # trange[1] = N - trange[1]
+            trange[1] = N
         if trange[0] < 0:
-            trange[1] += -trange[0]
+            # trange[1] += -trange[0]
             trange[0] = 0
-        trange[0] = np.maximum(0, trange[0])
-        trange[1] = np.minimum(N, trange[1])
+        # trange[0] = np.maximum(0, trange[0])
+        # trange[1] = np.minimum(N, trange[1])
         return trange
 
     def _initialize_stats(self):
@@ -131,7 +132,6 @@ class TimeseriesWidget(BaseWidget):
         )
         # chunk0=self._reader.getChunk(channels=self._visible_channels,trange=self._visible_trange)
         M0 = chunk0.shape[0]
-        N0 = chunk0.shape[1]
         for ii in range(M0):
             self._channel_stats[self._visible_channels[ii]] = _compute_channel_stats_from_data(chunk0[ii, :])
         self._mean_channel_std = np.mean([self._channel_stats[m]['std'] for m in self._visible_channels])
