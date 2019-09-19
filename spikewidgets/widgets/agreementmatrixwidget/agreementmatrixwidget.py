@@ -84,6 +84,7 @@ class AgreementMatrixWidget(BaseWidget):
         self.ax.set_xticks(np.arange(0, N2))
         self.ax.set_yticks(np.arange(0, N1))
         self.ax.xaxis.tick_bottom()
+        
         # Labels for major ticks
         if self._unit_ticks:
             self.ax.set_yticklabels(scores.index, fontsize=12)
@@ -92,8 +93,11 @@ class AgreementMatrixWidget(BaseWidget):
         self.ax.set_xlabel(self._sc.name_list[1], fontsize=20)
         self.ax.set_ylabel(self._sc.name_list[0], fontsize=20)
         
-        self.ax.set_ylim(-0.5, N1-0.5)
-        self.ax.set_xlim(N2-0.5, -0.5, )
+        #~ self.ax.set_ylim(-0.5, N1-0.5)
+        #~ self.ax.set_xlim(N2-0.5, -0.5, )
+
+        self.ax.set_xlim(-0.5, N2-0.5)
+        self.ax.set_ylim(N1-0.5, -0.5, )
         
         
 
