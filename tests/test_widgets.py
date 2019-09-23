@@ -56,7 +56,8 @@ class TestWidgets(unittest.TestCase):
         sw.plot_agreement_matrix(comp, count_text=True)
         
         gt_comp = sc.compare_sorter_to_ground_truth(self._SX, self._SX)
-        sw.plot_agreement_matrix(gt_comp, count_text=True)
+        sw.plot_agreement_matrix(gt_comp, ordered=True, count_text=True, )
+        sw.plot_agreement_matrix(gt_comp, ordered=False, count_text=True, )
 
     def test_multicomp_graph(self):
         msc = sc.compare_multiple_sorters([self._SX, self._SX, self._SX])

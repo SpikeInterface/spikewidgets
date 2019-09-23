@@ -74,6 +74,7 @@ class ConfusionMatrixWidget(BaseWidget):
         self.ax.set_xticks(np.arange(0, N2 + 1))
         self.ax.set_yticks(np.arange(0, N1 + 1))
         self.ax.xaxis.tick_bottom()
+        
         # Labels for major ticks
         if self._unit_ticks:
             self.ax.set_yticklabels(confusion_matrix.index, fontsize=12)
