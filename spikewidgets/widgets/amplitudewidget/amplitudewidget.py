@@ -69,7 +69,7 @@ def plot_amplitudes_timeseries(recording, sorting, unit_ids=None, max_spikes_per
         sorting=sorting,
         recording=recording,
         unit_ids=unit_ids,
-        max_num_waveforms=max_num_waveforms,
+        max_spikes_per_unit=max_spikes_per_unit,
         figure=figure,
         ax=ax
     )
