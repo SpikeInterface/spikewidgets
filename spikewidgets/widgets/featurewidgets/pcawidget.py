@@ -4,7 +4,7 @@ from spikewidgets.widgets.basewidget import BaseMultiWidget
 import spiketoolkit as st
 
 
-def plot_pca_features(recording, sorting, unit_ids=None, max_num_waveforms=100, nproj=4, colormap=None,
+def plot_pca_features(recording, sorting, unit_ids=None, max_spikes_per_unit=100, nproj=4, colormap=None,
                       figure=None, ax=None):
     """
     Plots unit PCA features on best projections.
@@ -17,8 +17,8 @@ def plot_pca_features(recording, sorting, unit_ids=None, max_num_waveforms=100, 
         The sorting extractor object.
     unit_ids: list
         List of unit ids.
-    max_num_waveforms: int
-        Maximum number of waveforms to display.
+    max_spikes_per_unit: int
+        Maximum number of spikes to display per unit.
     nproj: int
         Number of best projections to display.
     colormap: matplotlib colormap
@@ -37,7 +37,7 @@ def plot_pca_features(recording, sorting, unit_ids=None, max_num_waveforms=100, 
         sorting=sorting,
         recording=recording,
         unit_ids=unit_ids,
-        max_num_waveforms=max_num_waveforms,
+        max_spikes_per_unit=max_spikes_per_unit,
         nproj=nproj,
         colormap=colormap,
         figure=figure,
@@ -48,14 +48,14 @@ def plot_pca_features(recording, sorting, unit_ids=None, max_num_waveforms=100, 
 
 
 class PCAWidget(BaseMultiWidget):
-    def __init__(self, *, recording, sorting, unit_ids=None, max_num_waveforms=100, nproj=4, colormap=None,
+    def __init__(self, *, recording, sorting, unit_ids=None, max_spikes_per_unit=100, nproj=4, colormap=None,
                  figure=None, ax=None, save_as_features=False, save_waveforms_as_features=False):
         BaseMultiWidget.__init__(self, figure, ax)
         self._sorting = sorting
         self._recording = recording
         self._unit_ids = unit_ids
         self._nproj = nproj
-        self._max_num_waveforms = max_num_waveforms
+        self._max_spikes_per_unit = max_spikes_per_unit
         self._pca_scores = None
         self._colormap = colormap
         self._save_as_features = save_as_features
@@ -66,7 +66,7 @@ class PCAWidget(BaseMultiWidget):
         self._pca_scores = st.postprocessing.compute_unit_pca_scores(recording=self._recording,
                                                                      sorting=self._sorting,
                                                                      by_electrode=True,
-                                                                     max_num_waveforms=self._max_num_waveforms,
+                                                                     max_spikes_per_unit=self._max_spikes_per_unit,
                                                                      save_as_features=self._save_as_features,
                                                                      save_waveforms_as_features=self._save_waveforms_as_features)
 
