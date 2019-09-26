@@ -5,7 +5,7 @@ from spikewidgets.widgets.basewidget import BaseMultiWidget
 
 
 def plot_unit_waveforms(recording, sorting, channel_ids=None, unit_ids=None, ms_before=1., ms_after=2.,
-                        max_num_waveforms=100, channel_locs=False, figure=None, ax=None):
+                        max_spikes_per_unit=100, channel_locs=False, figure=None, ax=None):
     """
     Plots unit waveforms.
 
@@ -23,8 +23,8 @@ def plot_unit_waveforms(recording, sorting, channel_ids=None, unit_ids=None, ms_
         Time before peak (ms)
     ms_after: float
         Time after peak (ms)
-    max_num_waveforms: int
-        Maximum number of waveforms to display
+    max_spikes_per_unit: int
+        Maximum number of spikes to display per unit.
     channel_locs: bool
         If True, channel locations are used to display the waveforms.
         If False, waveforms are displayed in vertical order. (default)
@@ -43,7 +43,7 @@ def plot_unit_waveforms(recording, sorting, channel_ids=None, unit_ids=None, ms_
         sorting=sorting,
         channel_ids=channel_ids,
         unit_ids=unit_ids,
-        max_num_waveforms=max_num_waveforms,
+        max_spikes_per_unit=max_spikes_per_unit,
         ms_before=ms_before,
         ms_after=ms_after,
         channel_locs=channel_locs,
@@ -55,7 +55,7 @@ def plot_unit_waveforms(recording, sorting, channel_ids=None, unit_ids=None, ms_
 
 
 class UnitWaveformsWidget(BaseMultiWidget):
-    def __init__(self, *, recording, sorting, channel_ids=None, unit_ids=None, max_num_waveforms=50,
+    def __init__(self, *, recording, sorting, channel_ids=None, unit_ids=None, max_spikes_per_unit=50,
                  ms_before=1., ms_after=2., channel_locs=False, figure=None, ax=None):
         BaseMultiWidget.__init__(self, figure, ax)
         self._recording = recording
@@ -64,7 +64,7 @@ class UnitWaveformsWidget(BaseMultiWidget):
         self._unit_ids = unit_ids
         self._ms_before = ms_before
         self._ms_after = ms_after
-        self._max_num_waveforms = max_num_waveforms
+        self._max_spikes_per_unit = max_spikes_per_unit
         self._ch_locs = channel_locs
         self.name = 'UnitWaveforms'
 
@@ -92,7 +92,7 @@ class UnitWaveformsWidget(BaseMultiWidget):
                 random_wf = st.postprocessing.get_unit_waveforms(recording=self._recording, sorting=self._sorting,
                                                                  unit_ids=[unit_id], channel_ids=channel_ids,
                                                                  ms_before=self._ms_before, ms_after=self._ms_after,
-                                                                 max_num_waveforms=self._max_num_waveforms,
+                                                                 max_spikes_per_unit=self._max_spikes_per_unit,
                                                                  save_as_features=False)
                 random_wf = random_wf.swapaxes(0, 1)
                 random_wf = random_wf.swapaxes(1, 2)
