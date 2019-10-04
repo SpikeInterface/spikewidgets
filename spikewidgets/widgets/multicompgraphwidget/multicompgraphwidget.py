@@ -88,7 +88,7 @@ class MultiCompGraphWidget(BaseWidget):
                                    node_color=nodes_col, node_size=20, ax=self.ax)
         _ = nx.draw_networkx_edges(g, pos=nx.circular_layout((sorted(g))), nodelist=sorted(g.nodes),
                                    edge_color=edge_col, alpha=self._alpha_edges,
-                                   edge_cmap=plt.cm.get_cmap(self._edge_cmap), edge_vmin=self._msc.min_accuracy,
+                                   edge_cmap=plt.cm.get_cmap(self._edge_cmap), edge_vmin=self._msc.match_score,
                                    edge_vmax=1, ax=self.ax)
         if self._drawlabels:
             _ = nx.draw_networkx_labels(g, pos=nx.circular_layout((sorted(g))), nodelist=sorted(g.nodes), ax=self.ax)
