@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 from spikewidgets.widgets.basewidget import BaseMultiWidget
 
 
-def plot_amplitudes_distribution(recording, sorting, unit_ids=None, max_num_waveforms=100,
+def plot_amplitudes_distribution(recording, sorting, unit_ids=None, max_spikes_per_unit=100,
                                  figure=None, ax=None):
     """
     Plots waveform amplitudes distribution.
@@ -16,8 +16,8 @@ def plot_amplitudes_distribution(recording, sorting, unit_ids=None, max_num_wave
         The sorting extractor object
     unit_ids: list
         List of unit ids
-    max_num_waveforms: int
-        Maximum number of waveforms to display
+    max_spikes_per_unit: int
+        Maximum number of spikes to display per unit.
     figure: matplotlib figure
         The figure to be used. If not given a figure is created
     ax: matplotlib axis
@@ -32,7 +32,7 @@ def plot_amplitudes_distribution(recording, sorting, unit_ids=None, max_num_wave
         sorting=sorting,
         recording=recording,
         unit_ids=unit_ids,
-        max_num_waveforms=max_num_waveforms,
+        max_spikes_per_unit=max_spikes_per_unit,
         figure=figure,
         ax=ax
     )
@@ -40,7 +40,7 @@ def plot_amplitudes_distribution(recording, sorting, unit_ids=None, max_num_wave
     return W
 
 
-def plot_amplitudes_timeseries(recording, sorting, unit_ids=None, max_num_waveforms=100,
+def plot_amplitudes_timeseries(recording, sorting, unit_ids=None, max_spikes_per_unit=100,
                                figure=None, ax=None):
     """
     Plots waveform amplitudes timeseries.
@@ -53,8 +53,8 @@ def plot_amplitudes_timeseries(recording, sorting, unit_ids=None, max_num_wavefo
         The sorting extractor object
     unit_ids: list
         List of unit ids
-    max_num_waveforms: int
-        Maximum number of waveforms to display
+    max_spikes_per_unit: int
+        Maximum number of spikes to display per unit.
     figure: matplotlib figure
         The figure to be used. If not given a figure is created
     ax: matplotlib axis
@@ -69,7 +69,7 @@ def plot_amplitudes_timeseries(recording, sorting, unit_ids=None, max_num_wavefo
         sorting=sorting,
         recording=recording,
         unit_ids=unit_ids,
-        max_num_waveforms=max_num_waveforms,
+        max_spikes_per_unit=max_spikes_per_unit,
         figure=figure,
         ax=ax
     )
@@ -78,11 +78,11 @@ def plot_amplitudes_timeseries(recording, sorting, unit_ids=None, max_num_wavefo
 
 
 class AmplitudeBaseWidget(BaseMultiWidget):
-    def __init__(self, recording, sorting, max_num_waveforms=100, figure=None, ax=None):
+    def __init__(self, recording, sorting, max_spikes_per_unit=100, figure=None, ax=None):
         BaseMultiWidget.__init__(self, figure, ax)
         self._sorting = sorting
         self._recording = recording
-        self._max_num_waveforms = max_num_waveforms
+        self._max_spikes_per_unit = max_spikes_per_unit
 
     def plot(self):
         self._do_plot()
@@ -100,8 +100,8 @@ class AmplitudeBaseWidget(BaseMultiWidget):
 
 
 class AmplitudeTimeseriesWidget(AmplitudeBaseWidget):
-    def __init__(self, *, recording, sorting, unit_ids=None, max_num_waveforms=100, figure=None, ax=None):
-        AmplitudeBaseWidget.__init__(self, recording, sorting, max_num_waveforms, figure, ax)
+    def __init__(self, *, recording, sorting, unit_ids=None, max_spikes_per_unit=100, figure=None, ax=None):
+        AmplitudeBaseWidget.__init__(self, recording, sorting, max_spikes_per_unit, figure, ax)
         self._unit_ids = unit_ids
         self.name = 'AmplitudeTimeseries'
 
@@ -114,8 +114,8 @@ class AmplitudeTimeseriesWidget(AmplitudeBaseWidget):
         for unit in units:
             times = self._sorting.get_unit_spike_train(unit_id=unit) / \
                     float(self._recording.get_sampling_frequency())
-            if len(times) > self._max_num_waveforms:
-                times = times[np.random.permutation(len(times))[:self._max_num_waveforms]]
+            if len(times) > self._max_spikes_per_unit:
+                times = times[np.random.permutation(len(times))[:self._max_spikes_per_unit]]
             amps = self.compute_amps(times=times)
             item = dict(
                 title='Unit {}'.format(int(unit)),
@@ -142,8 +142,8 @@ class AmplitudeTimeseriesWidget(AmplitudeBaseWidget):
 
 
 class AmplitudeDistributionWidget(AmplitudeBaseWidget):
-    def __init__(self, *, recording, sorting, unit_ids=None, max_num_waveforms=100, figure=None, ax=None):
-        AmplitudeBaseWidget.__init__(self, recording, sorting, max_num_waveforms, figure, ax)
+    def __init__(self, *, recording, sorting, unit_ids=None, max_spikes_per_unit=100, figure=None, ax=None):
+        AmplitudeBaseWidget.__init__(self, recording, sorting, max_spikes_per_unit, figure, ax)
         self._unit_ids = unit_ids
         self.name = 'AmplitudeDistribution'
 
@@ -156,8 +156,8 @@ class AmplitudeDistributionWidget(AmplitudeBaseWidget):
         for unit in units:
             times = self._sorting.get_unit_spike_train(unit_id=unit) / \
                     float(self._recording.get_sampling_frequency())
-            if len(times) > self._max_num_waveforms:
-                times = times[np.random.permutation(len(times))[:self._max_num_waveforms]]
+            if len(times) > self._max_spikes_per_unit:
+                times = times[np.random.permutation(len(times))[:self._max_spikes_per_unit]]
             amps = self.compute_amps(times=times)
             item = dict(
                 title='Unit {}'.format(int(unit)),

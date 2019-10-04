@@ -3,8 +3,8 @@ from matplotlib import pyplot as plt
 from spikewidgets.widgets.basewidget import BaseWidget
 
 
-def plot_agreement_matrix(sorting_comparison, count_text=True, unit_ticks=True,
-                          ax=None, figure=None):
+def plot_agreement_matrix(sorting_comparison, ordered=True, count_text=True,
+                    unit_ticks=True, ax=None, figure=None):
     """
     Plots sorting comparison confusion matrix.
 
@@ -13,6 +13,9 @@ def plot_agreement_matrix(sorting_comparison, count_text=True, unit_ticks=True,
     sorting_comparison: GroundTruthComparison or SymmetricSortingComparison
         The sorting comparison object.
         Symetric or not.
+    ordered: bool
+        Order units with best agreement scores.
+        This enable to see agreement on a diagonal.
     count_text: bool
         If True counts are displayed as text
     unit_ticks: bool
@@ -29,6 +32,7 @@ def plot_agreement_matrix(sorting_comparison, count_text=True, unit_ticks=True,
     """
     W = AgreementMatrixWidget(
         sorting_comparison=sorting_comparison,
+        ordered=ordered,
         count_text=count_text,
         unit_ticks=unit_ticks,
         figure=figure,
@@ -39,10 +43,11 @@ def plot_agreement_matrix(sorting_comparison, count_text=True, unit_ticks=True,
 
 
 class AgreementMatrixWidget(BaseWidget):
-    def __init__(self, *, sorting_comparison, count_text=True, unit_ticks=True,
+    def __init__(self, *, sorting_comparison, ordered=True, count_text=True, unit_ticks=True,
                  figure=None, ax=None):
         BaseWidget.__init__(self, figure, ax)
         self._sc = sorting_comparison
+        self._ordered = ordered
         self._count_text = count_text
         self._unit_ticks = unit_ticks
         self.name = 'ConfusionMatrix'
@@ -52,7 +57,10 @@ class AgreementMatrixWidget(BaseWidget):
 
     def _do_plot(self):
         # a dataframe
-        scores = self._sc.agreement_scores
+        if self._ordered:
+            scores = self._sc.get_ordered_agreement_scores()
+        else:
+            scores = self._sc.agreement_scores
 
         N1 = scores.shape[0]
         N2 = scores.shape[1]
@@ -66,7 +74,7 @@ class AgreementMatrixWidget(BaseWidget):
         if self._count_text:
             for i, u1 in enumerate(unit_ids1):
                 u2 = self._sc.best_match_12[u1]
-                if u2 != 0:
+                if u2 != -1:
                     j = np.where(unit_ids2==u2)[0][0]
                     
                     self.ax.text(j, i, '{:0.2f}'.format(scores.at[u1, u2]),
@@ -76,16 +84,20 @@ class AgreementMatrixWidget(BaseWidget):
         self.ax.set_xticks(np.arange(0, N2))
         self.ax.set_yticks(np.arange(0, N1))
         self.ax.xaxis.tick_bottom()
+        
         # Labels for major ticks
         if self._unit_ticks:
-            self.ax.set_xticklabels(scores.index, fontsize=12)
-            self.ax.set_yticklabels(scores.columns, fontsize=12)
+            self.ax.set_yticklabels(scores.index, fontsize=12)
+            self.ax.set_xticklabels(scores.columns, fontsize=12)
 
         self.ax.set_xlabel(self._sc.name_list[1], fontsize=20)
         self.ax.set_ylabel(self._sc.name_list[0], fontsize=20)
         
-        self.ax.set_xlim(-0.5, N1-0.5)
-        self.ax.set_ylim(N2-0.5, -0.5, )
+        #~ self.ax.set_ylim(-0.5, N1-0.5)
+        #~ self.ax.set_xlim(N2-0.5, -0.5, )
+
+        self.ax.set_xlim(-0.5, N2-0.5)
+        self.ax.set_ylim(N1-0.5, -0.5, )
         
         
 

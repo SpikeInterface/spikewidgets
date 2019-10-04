@@ -74,13 +74,14 @@ class ConfusionMatrixWidget(BaseWidget):
         self.ax.set_xticks(np.arange(0, N2 + 1))
         self.ax.set_yticks(np.arange(0, N1 + 1))
         self.ax.xaxis.tick_bottom()
+        
         # Labels for major ticks
         if self._unit_ticks:
-            self.ax.set_xticklabels(confusion_matrix.index, fontsize=12)
-            self.ax.set_yticklabels(confusion_matrix.columns, fontsize=12)
+            self.ax.set_yticklabels(confusion_matrix.index, fontsize=12)
+            self.ax.set_xticklabels(confusion_matrix.columns, fontsize=12)
         else:
-            self.ax.set_xticklabels(np.append([''] * len(st2_idx), 'FN'), fontsize=10)
-            self.ax.set_yticklabels(np.append([''] * len(st1_idx), 'FP'), fontsize=10)
+            self.ax.set_xticklabels(np.append([''] * N2, 'FN'), fontsize=10)
+            self.ax.set_yticklabels(np.append([''] * N1, 'FP'), fontsize=10)
 
         self.ax.set_xlabel(self._gtcomp.name_list[1], fontsize=20)
         self.ax.set_ylabel(self._gtcomp.name_list[0], fontsize=20)
