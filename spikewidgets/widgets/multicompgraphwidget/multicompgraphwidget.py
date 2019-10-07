@@ -93,7 +93,7 @@ class MultiCompGraphWidget(BaseWidget):
         if self._drawlabels:
             _ = nx.draw_networkx_labels(g, pos=nx.circular_layout((sorted(g))), nodelist=sorted(g.nodes), ax=self.ax)
         if self._colorbar:
-            norm = matplotlib.colors.Normalize(vmin=self._msc.min_accuracy, vmax=1)
+            norm = matplotlib.colors.Normalize(vmin=self._msc.match_score, vmax=1)
             cmap = plt.cm.get_cmap(self._edge_cmap)
             m = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
             self.figure.colorbar(m)
