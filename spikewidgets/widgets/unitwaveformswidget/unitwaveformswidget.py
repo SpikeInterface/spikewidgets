@@ -93,7 +93,7 @@ class UnitWaveformsWidget(BaseMultiWidget):
                                                                  unit_ids=[unit_id], channel_ids=channel_ids,
                                                                  ms_before=self._ms_before, ms_after=self._ms_after,
                                                                  max_spikes_per_unit=self._max_spikes_per_unit,
-                                                                 save_as_features=False)
+                                                                 save_as_features=False)[0]
                 random_wf = random_wf.swapaxes(0, 1)
                 random_wf = random_wf.swapaxes(1, 2)
                 spikes = random_wf
