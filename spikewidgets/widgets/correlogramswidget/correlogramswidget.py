@@ -215,8 +215,8 @@ def _prepare_spike_times_and_clusters(sorting, unit_ids, sampling_frequency):
 
     for u in sorting.get_unit_ids():
         if u in unit_ids:
-            spike_times = np.concatenate((spike_times, sorting.get_unit_spike_train(u) / sampling_frequency))
-            spike_clusters = np.concatenate((spike_clusters, np.array([u]*len(sorting.get_unit_spike_train(u)))))
+            spike_times = np.concatenate((spike_times, sorting.get_unit_spike_train(unit_id=u) / sampling_frequency))
+            spike_clusters = np.concatenate((spike_clusters, np.array([u]*len(sorting.get_unit_spike_train(unit_id=u)))))
 
     order = np.argsort(spike_times)
     spike_times = spike_times[order]

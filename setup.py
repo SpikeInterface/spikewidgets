@@ -16,6 +16,7 @@ setuptools.setup(
     install_requires=[
         'numpy',
         'spiketoolkit',
+        'spikecomparison',
         'matplotlib'
     ],
     classifiers=(
