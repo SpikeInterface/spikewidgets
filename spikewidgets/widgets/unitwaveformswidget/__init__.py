@@ -1,1 +1,1 @@
-from .unitwaveformswidget import UnitWaveformsWidget, plot_unit_waveforms
+from .unitwaveformswidget import plot_unit_waveforms, plot_unit_templates

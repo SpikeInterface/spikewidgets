@@ -1,2 +1,2 @@
-from .agreementmatrixwidget import AgreementMatrixWidget, plot_agreement_matrix
+from .agreementmatrixwidget import plot_agreement_matrix
 

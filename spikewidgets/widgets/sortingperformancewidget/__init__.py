@@ -1,1 +1,1 @@
-from .sortingperformancewidget import SortingPerformanceWidget, plot_sorting_performance
+from .sortingperformancewidget import plot_sorting_performance

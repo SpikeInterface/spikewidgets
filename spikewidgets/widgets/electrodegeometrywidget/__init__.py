@@ -1,1 +1,1 @@
-from .electrodegeometrywidget import ElectrodeGeometryWidget, plot_electrode_geometry
+from .electrodegeometrywidget import plot_electrode_geometry

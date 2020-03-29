@@ -1,1 +1,1 @@
-from .timeserieswidget import plot_timeseries, TimeseriesWidget
+from .timeserieswidget import plot_timeseries

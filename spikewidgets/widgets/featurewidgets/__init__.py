@@ -1,1 +1,1 @@
-from .pcawidget import PCAWidget, plot_pca_features
+from .pcawidget import plot_pca_features
