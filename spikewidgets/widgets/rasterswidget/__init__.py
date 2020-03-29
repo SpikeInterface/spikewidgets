@@ -1,1 +1,1 @@
-from .rasterswidget import RasterWidget, plot_rasters
+from .rasterswidget import plot_rasters

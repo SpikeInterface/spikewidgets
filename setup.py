@@ -20,7 +20,8 @@ setuptools.setup(
         'numpy',
         'spiketoolkit',
         'spikecomparison',
-        'matplotlib'
+        'matplotlib',
+        'MEAutility>=1.4.3'
     ],
     classifiers=(
         "Programming Language :: Python :: 3",

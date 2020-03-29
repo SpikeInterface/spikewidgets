@@ -1,1 +1,1 @@
-from .isidistwidget import ISIDistributionWidget, plot_isi_distribution
+from .isidistwidget import plot_isi_distribution

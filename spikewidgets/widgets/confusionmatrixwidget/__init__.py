@@ -1,1 +1,1 @@
-from .confusionmatrixwidget import ConfusionMatrixWidget, plot_confusion_matrix
+from .confusionmatrixwidget import plot_confusion_matrix
