@@ -187,13 +187,13 @@ class UnitWaveformsWidget(BaseMultiWidget):
                                               plot_templates=self._plot_templates, plot_waveforms=self._plot_waveforms)
 
     def _plot_spike_shapes_multi(self, list_spikes, max_channels_list, *, ncols=5,  **kwargs):
-        vscale = _determine_global_vscale(list_spikes)
+        vscale, ylim = _determine_global_vscale_ylim(list_spikes)
         if len(list_spikes) < ncols:
             ncols = len(list_spikes)
         nrows = np.ceil(len(list_spikes) / ncols)
         for i, item in enumerate(list_spikes):
             ax = self.get_tiled_ax(i, nrows, ncols)
-            _plot_spike_shapes(**item, **kwargs, ax=ax, channels=max_channels_list[i], vscale=vscale)
+            _plot_spike_shapes(**item, **kwargs, ax=ax, channels=max_channels_list[i], vscale=vscale, ylim_wf=ylim)
 
 
 class UnitTemplatesWidget(UnitWaveformsWidget):
@@ -209,7 +209,7 @@ class UnitTemplatesWidget(UnitWaveformsWidget):
 
 def _plot_spike_shapes(*, ax, channels, representative_waveforms=None, channel_locations=None,
                        all_locations=None, color='blue', vscale=None, plot_waveforms=True, plot_templates=True,
-                       title=''):
+                       ylim_wf=None, title=''):
     if representative_waveforms is None:
         raise Exception('You must provide either average_waveform, representative waveforms, or both')
     waveforms = representative_waveforms
@@ -227,10 +227,18 @@ def _plot_spike_shapes(*, ax, channels, representative_waveforms=None, channel_l
                 all_locations = channel_locations
 
     probe = mu.return_mea(info={'pos': all_locations})
-    ylim = np.array([np.min(all_locations[:, 1]), np.max(all_locations[:, 1])])
-    ylim *= 1.05
+
     if vscale is None:
         vscale = 1.5 * np.max(np.abs(average_waveform))
+
+    ylim_g = np.array([np.min(all_locations[:, 1]), np.max(all_locations[:, 1])])
+    ylim_g *= 1.05
+
+    # fix for linear horizontal layout
+    if ylim_g[0] == ylim_g[1]:
+        ylim = ylim_wf / vscale
+    else:
+        ylim = ylim_g
 
     if plot_waveforms:
         ax = mu.plot_mea_recording(waveforms, probe, colors=(0.5, 0.5, 0.5), alpha=0.3, lw=0.3, ax=ax, vscale=vscale,
@@ -245,22 +253,28 @@ def _plot_spike_shapes(*, ax, channels, representative_waveforms=None, channel_l
         ax.set_title(title, color='gray')
 
 
-def _get_vscale_for_item(average_waveform=None, representative_waveforms=None):
+def _get_vscale_ylim_for_item(average_waveform=None, representative_waveforms=None):
     if average_waveform is None:
         if representative_waveforms is None:
             raise Exception('You must provide either average_waveform, representative waveforms, or both')
         average_waveform = np.mean(representative_waveforms, axis=0)
     vscale = np.max(np.abs(average_waveform))
-    return vscale
+    ylim = [np.min(average_waveform), np.max(average_waveform)]
+    return vscale, ylim
 
 
-def _determine_global_vscale(list_spikes):
+def _determine_global_vscale_ylim(list_spikes):
     vscales = []
+    ylims = []
     for item in list_spikes:
-        vscale = _get_vscale_for_item(
+        vscale, ylim = _get_vscale_ylim_for_item(
             average_waveform=item.get('average_waveform', None),
             representative_waveforms=item.get('representative_waveforms', None)
         )
         vscales.append(vscale)
-    vscale_global = np.median(vscale) * 1.1
-    return vscale_global
+        ylims.append(ylim)
+    vscale_global = np.median(vscales) * 1.1
+    ylims = np.array(ylims)
+    ylim_global = [np.min(ylims[:, 0]), np.max(ylims[:, 1])]
+    ylim_global = [ylim_global[0] - 0.1*np.ptp(ylim_global), ylim_global[1] + 0.1*np.ptp(ylim_global)]
+    return vscale_global, ylim_global
