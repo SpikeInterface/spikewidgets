@@ -1,0 +1,1 @@
+from .activitymapwidget import plot_activity_map

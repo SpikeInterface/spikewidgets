@@ -7,7 +7,7 @@ from spikewidgets.widgets.basewidget import BaseWidget
 def plot_timeseries(recording, channel_ids=None, trange=None, color_groups=False,
                     figure=None, ax=None):
     """
-    Plots electrode geometry.
+    Plots recording timeseries.
 
     Parameters
     ----------

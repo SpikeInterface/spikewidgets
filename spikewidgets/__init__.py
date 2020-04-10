@@ -11,5 +11,6 @@ from .widgets.amplitudewidget import *
 from .widgets.featurewidgets import *
 from .widgets.spectrumwidget import *
 from .widgets.agreementmatrixwidget import *
+from .widgets.activitymapwidget import *
 
 from .version import version as __version__
