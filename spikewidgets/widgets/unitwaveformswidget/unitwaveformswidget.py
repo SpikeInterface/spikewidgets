@@ -186,7 +186,7 @@ class UnitWaveformsWidget(BaseMultiWidget):
                 self._plot_spike_shapes_multi(list_spikes, channel_locations=None, max_channels_list=max_channels_list,
                                               plot_templates=self._plot_templates, plot_waveforms=self._plot_waveforms)
 
-    def _plot_spike_shapes_multi(self, list_spikes, max_channels_list, *, ncols=5,  **kwargs):
+    def _plot_spike_shapes_multi(self, list_spikes, max_channels_list, *, ncols=5, **kwargs):
         vscale, ylim = _determine_global_vscale_ylim(list_spikes)
         if len(list_spikes) < ncols:
             ncols = len(list_spikes)
@@ -226,19 +226,19 @@ def _plot_spike_shapes(*, ax, channels, representative_waveforms=None, channel_l
             if all_locations.shape == channel_locations.shape:
                 all_locations = channel_locations
 
-    probe = mu.return_mea(info={'pos': all_locations})
+    probe = mu.return_mea(info={'pos': all_locations, 'center': False})
 
     if vscale is None:
         vscale = 1.5 * np.max(np.abs(average_waveform))
 
     ylim_g = np.array([np.min(all_locations[:, 1]), np.max(all_locations[:, 1])])
-    ylim_g *= 1.05
+    ptp = ylim_g[1] - ylim_g[0]
 
     # fix for linear horizontal layout
-    if ylim_g[0] == ylim_g[1]:
+    if ptp == 0:
         ylim = ylim_wf / vscale
     else:
-        ylim = ylim_g
+        ylim = [ylim_g[0] - 0.1 * ptp, ylim_g[1] + 0.1 * ptp]
 
     if plot_waveforms:
         ax = mu.plot_mea_recording(waveforms, probe, colors=(0.5, 0.5, 0.5), alpha=0.3, lw=0.3, ax=ax, vscale=vscale,
@@ -276,5 +276,5 @@ def _determine_global_vscale_ylim(list_spikes):
     vscale_global = np.median(vscales) * 1.1
     ylims = np.array(ylims)
     ylim_global = [np.min(ylims[:, 0]), np.max(ylims[:, 1])]
-    ylim_global = [ylim_global[0] - 0.1*np.ptp(ylim_global), ylim_global[1] + 0.1*np.ptp(ylim_global)]
+    ylim_global = [ylim_global[0] - 0.1 * np.ptp(ylim_global), ylim_global[1] + 0.1 * np.ptp(ylim_global)]
     return vscale_global, ylim_global
