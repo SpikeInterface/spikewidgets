@@ -68,7 +68,8 @@ class PCAWidget(BaseMultiWidget):
                                                                      by_electrode=True,
                                                                      max_spikes_per_unit=self._max_spikes_per_unit,
                                                                      save_as_features=self._save_as_features,
-                                                                     save_waveforms_as_features=self._save_waveforms_as_features)
+                                                                     save_waveforms_as_features=
+                                                                     self._save_waveforms_as_features)
 
     def plot(self):
         self._do_plot()

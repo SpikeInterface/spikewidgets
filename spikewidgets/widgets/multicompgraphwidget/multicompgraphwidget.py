@@ -1,10 +1,10 @@
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
-from spikewidgets.widgets.basewidget import BaseWidget
+from spikewidgets.widgets.basewidget import BaseWidget, BaseMultiWidget
 
 
-def plot_multicomp_graph(multi_sorting_comparison, sorter_names=None, draw_labels=False, node_cmap='viridis',
+def plot_multicomp_graph(multi_sorting_comparison, draw_labels=False, node_cmap='viridis',
                          edge_cmap='hot_r', alpha_edges=0.7, colorbar=False, figure=None, ax=None):
     """
     Plots multi sorting comparison graph.
@@ -13,8 +13,6 @@ def plot_multicomp_graph(multi_sorting_comparison, sorter_names=None, draw_label
     ----------
     multi_sorting_comparison: MultiSortingComparison
         The multi sorting comparison object
-    sorter_names: list
-        The names of the sorters
     draw_labels: bool
         If True unit labels are shown
     node_cmap: matplotlib colormap
@@ -41,7 +39,6 @@ def plot_multicomp_graph(multi_sorting_comparison, sorter_names=None, draw_label
         raise ImportError('Install networkx to use the multi comparison widget.')
     W = MultiCompGraphWidget(
         multi_sorting_comparison=multi_sorting_comparison,
-        sorternames=sorter_names,
         node_cmap=node_cmap,
         edge_cmap=edge_cmap,
         drawlabels=draw_labels,
@@ -54,12 +51,79 @@ def plot_multicomp_graph(multi_sorting_comparison, sorter_names=None, draw_label
     return W
 
 
+def plot_multicomp_agreement(multi_sorting_comparison, plot_type='pie',
+                             cmap='YlOrRd', figure=None, ax=None):
+    """
+    Plots multi sorting comparison agreement as pie or bar plot.
+
+    Parameters
+    ----------
+    multi_sorting_comparison: MultiSortingComparison
+        The multi sorting comparison object
+    plot_type: str
+        'pie' or 'bar'
+    cmap: matplotlib colormap
+        The colormap to be used for the nodes (default 'Reds')
+    figure: matplotlib figure
+        The figure to be used. If not given a figure is created
+    ax: matplotlib axis
+        The axis to be used. If not given an axis is created
+
+    Returns
+    -------
+    W: MultiCompGraphWidget
+        The output widget
+    """
+    W = MultiCompGlobalAgreementWidget(
+        multi_sorting_comparison=multi_sorting_comparison,
+        plot_type=plot_type,
+        cmap=cmap,
+        figure=figure,
+        ax=ax
+    )
+    W.plot()
+    return W
+
+
+def plot_multicomp_agreement_by_sorter(multi_sorting_comparison, plot_type='pie',
+                                       cmap='YlOrRd', figure=None, ax=None):
+    """
+    Plots multi sorting comparison agreement as pie or bar plot.
+
+    Parameters
+    ----------
+    multi_sorting_comparison: MultiSortingComparison
+        The multi sorting comparison object
+    plot_type: str
+        'pie' or 'bar'
+    cmap: matplotlib colormap
+        The colormap to be used for the nodes (default 'Reds')
+    figure: matplotlib figure
+        The figure to be used. If not given a figure is created
+    ax: matplotlib axis
+        The axis to be used. If not given an axis is created
+
+    Returns
+    -------
+    W: MultiCompGraphWidget
+        The output widget
+    """
+    W = MultiCompAgreementBySorterWidget(
+        multi_sorting_comparison=multi_sorting_comparison,
+        plot_type=plot_type,
+        cmap=cmap,
+        figure=figure,
+        ax=ax
+    )
+    W.plot()
+    return W
+
+
 class MultiCompGraphWidget(BaseWidget):
-    def __init__(self, *, multi_sorting_comparison, sorternames=None, drawlabels=False, node_cmap='viridis',
+    def __init__(self, multi_sorting_comparison, drawlabels=False, node_cmap='viridis',
                  edge_cmap='hot', alpha_edges=0.5, colorbar=False, figure=None, ax=None):
         BaseWidget.__init__(self, figure, ax)
         self._msc = multi_sorting_comparison
-        self._sorter_names = sorternames
         self._drawlabels = drawlabels
         self._node_cmap = node_cmap
         self._edge_cmap = edge_cmap
@@ -99,3 +163,86 @@ class MultiCompGraphWidget(BaseWidget):
             self.figure.colorbar(m)
 
         self.ax.axis('off')
+
+
+class MultiCompGlobalAgreementWidget(BaseWidget):
+    def __init__(self, multi_sorting_comparison, plot_type='pie', cmap='YlOrRd', fs=12,
+                 figure=None, ax=None):
+        BaseWidget.__init__(self, figure, ax)
+        self._msc = multi_sorting_comparison
+        self._type = plot_type
+        self._cmap = cmap
+        self._fs = fs
+        self.name = 'MultiCompGlobalAgreement'
+
+    def plot(self):
+        self._do_plot()
+
+    def _do_plot(self):
+        cmap = plt.get_cmap(self._cmap)
+        colors = np.array([cmap(i) for i in np.linspace(0.1, 0.8, len(self._msc.name_list))])
+        sg_names, sg_units = self._msc.compute_subgraphs()
+        # fraction of units with agreement > threshold
+        v, c = np.unique([len(np.unique(s)) for s in sg_names], return_counts=True)
+        if self._type == 'pie':
+            p = self.ax.pie(c, colors=colors[v - 1], autopct=lambda pct: _getabs(pct, c),
+                            pctdistance=1.25)
+            self.ax.legend(p[0], v, frameon=False, title='k=',
+                           bbox_to_anchor=(1., 1.), loc=2, borderaxespad=0., labelspacing=0.2, fontsize=self._fs)
+        elif self._type == 'bar':
+            self.ax.bar(v, c, color=colors[v - 1])
+            x_labels = [f'k={vi}' for vi in v]
+            self.ax.spines['top'].set_visible(False)
+            self.ax.spines['right'].set_visible(False)
+            self.ax.set_xticks(v)
+            self.ax.set_xticklabels(x_labels)
+        else:
+            raise AttributeError("Wrong plot_type. It can be 'pie' or 'bar'")
+        self.ax.set_title('Units agreed upon\nby k sorters')
+
+
+class MultiCompAgreementBySorterWidget(BaseMultiWidget):
+    def __init__(self, multi_sorting_comparison, plot_type='pie', cmap='YlOrRd', fs=10,
+                 figure=None, ax=None):
+        BaseMultiWidget.__init__(self, figure, ax)
+        self._msc = multi_sorting_comparison
+        self._type = plot_type
+        self._cmap = cmap
+        self._fs = fs
+        self.name = 'MultiCompGlobalAgreement'
+
+    def plot(self):
+        self._do_plot()
+
+    def _do_plot(self):
+        name_list = self._msc.name_list
+        cmap = plt.get_cmap(self._cmap)
+        colors = np.array([cmap(i) for i in np.linspace(0.1, 0.8, len(self._msc.name_list))])
+        sg_names, sg_units = self._msc.compute_subgraphs()
+        # fraction of units with agreement > threshold
+        for i, name in enumerate(name_list):
+            ax = self.get_tiled_ax(i, ncols=len(name_list), nrows=1)
+            v, c = np.unique([len(np.unique(sn)) for sn in sg_names if name in sn], return_counts=True)
+            if self._type == 'pie':
+                p = ax.pie(c, colors=colors[v - 1], textprops={'color': 'k', 'fontsize': self._fs},
+                       autopct=lambda pct: _getabs(pct, c),  pctdistance=1.15)
+                if i == len(name_list) - 1:
+                    plt.legend(p[0], v, frameon=False, title='k=',
+                               bbox_to_anchor=(1.15, 1.25), loc=2, borderaxespad=0., labelspacing=0.2)
+            elif self._type == 'bar':
+                ax.bar(v, c, color=colors[v - 1])
+                x_labels = [f'k={vi}' for vi in v]
+                ax.spines['top'].set_visible(False)
+                ax.spines['right'].set_visible(False)
+                ax.set_xticks(v)
+                ax.set_xticklabels(x_labels)
+            else:
+                raise AttributeError("Wrong plot_type. It can be 'pie' or 'bar'")
+            ax.set_title(name)
+
+        self.figure.set_size_inches((len(name_list) * 2, 2.4))
+
+
+def _getabs(pct, allvals):
+    absolute = int(np.round(pct / 100. * np.sum(allvals)))
+    return "{:d}".format(absolute)

@@ -25,6 +25,7 @@ class BaseWidget:
     def get_name(self):
         return self.name
 
+
 class BaseMultiWidget:
     def __init__(self, figure=None, ax=None):
         if figure is None and ax is None:

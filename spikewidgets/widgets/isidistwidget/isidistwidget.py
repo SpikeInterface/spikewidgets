@@ -49,7 +49,7 @@ def plot_isi_distribution(sorting, sampling_frequency=None, unit_ids=None, bins=
 
 
 class ISIDistributionWidget(BaseMultiWidget):
-    def __init__(self, *, sorting, sampling_frequency, unit_ids=None, bins=10, window=1, figure=None, ax=None):
+    def __init__(self, *, sorting, sampling_frequency, unit_ids=None, bins=10, window=1., figure=None, ax=None):
         BaseMultiWidget.__init__(self, figure, ax)
         self._sorting = sorting
         self._unit_ids = unit_ids
