@@ -1,1 +1,1 @@
-from .multicompgraphwidget import plot_multicomp_graph
+from .multicompgraphwidget import plot_multicomp_graph, plot_multicomp_agreement, plot_multicomp_agreement_by_sorter
