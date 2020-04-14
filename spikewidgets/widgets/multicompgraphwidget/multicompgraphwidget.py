@@ -143,9 +143,9 @@ class MultiCompGraphWidget(BaseWidget):
             n1, n2, d = e
             edge_col.append(d['weight'])
         nodes_col = np.array([])
-        for i, sort in enumerate(self._msc.get_sorting_list()):
+        for i, sort in enumerate(self._msc.sorting_list):
             nodes_col = np.concatenate((nodes_col, np.array([i] * len(sort.get_unit_ids()))))
-        nodes_col = nodes_col / len(self._msc.get_sorting_list())
+        nodes_col = nodes_col / len(self._msc.sorting_list)
 
         _ = plt.set_cmap(self._node_cmap)
         _ = nx.draw_networkx_nodes(g, pos=nx.circular_layout(sorted(g)), nodelist=sorted(g.nodes),
@@ -225,7 +225,7 @@ class MultiCompAgreementBySorterWidget(BaseMultiWidget):
             v, c = np.unique([len(np.unique(sn)) for sn in sg_names if name in sn], return_counts=True)
             if self._type == 'pie':
                 p = ax.pie(c, colors=colors[v - 1], textprops={'color': 'k', 'fontsize': self._fs},
-                       autopct=lambda pct: _getabs(pct, c),  pctdistance=1.15)
+                           autopct=lambda pct: _getabs(pct, c),  pctdistance=1.15)
                 if i == len(name_list) - 1:
                     plt.legend(p[0], v, frameon=False, title='k=',
                                bbox_to_anchor=(1.15, 1.25), loc=2, borderaxespad=0., labelspacing=0.2)

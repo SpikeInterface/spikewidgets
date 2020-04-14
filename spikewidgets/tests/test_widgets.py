@@ -65,6 +65,8 @@ class TestWidgets(unittest.TestCase):
     def test_multicomp_graph(self):
         msc = sc.compare_multiple_sorters([self._SX, self._SX, self._SX])
         sw.plot_multicomp_graph(msc, edge_cmap='viridis', node_cmap='rainbow', draw_labels=False)
+        sw.plot_multicomp_agreement(msc)
+        sw.plot_multicomp_agreement_by_sorter(msc)
 
 
 if __name__ == '__main__':
