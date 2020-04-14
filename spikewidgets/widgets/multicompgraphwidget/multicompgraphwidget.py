@@ -239,6 +239,11 @@ class MultiCompAgreementBySorterWidget(BaseMultiWidget):
             else:
                 raise AttributeError("Wrong plot_type. It can be 'pie' or 'bar'")
             ax.set_title(name)
+        if self._type == 'bar':
+            ylims = [np.max(ax_single.get_ylim()) for ax_single in self.axes]
+            max_yval = np.max(ylims)
+            for ax_single in self.axes:
+                ax_single.set_ylim([0, max_yval])
 
         self.figure.set_size_inches((len(name_list) * 2, 2.4))
 
