@@ -139,7 +139,7 @@ class UnitTemplateMapsWidget(BaseMultiWidget):
             ncols = self._ncols
             nrows = np.ceil(len(templates) / ncols)
 
-        for i, template in enumerate(templates):
+        for i, (template, unit) in enumerate(zip(templates, self._unit_ids)):
             ax = self.get_tiled_ax(i, nrows, ncols)
             temp_map = np.abs(fun(template, axis=1))
             if self._log:
@@ -148,6 +148,12 @@ class UnitTemplateMapsWidget(BaseMultiWidget):
             # normalize
             temp_map -= np.min(temp_map)
             temp_map /= np.ptp(temp_map)
+
+            if self._bg == 'on':
+                rect = plt.Rectangle((np.min(x) - pitch_x / 2, np.min(y) - pitch_y / 2),
+                                     float(np.ptp(x)) + pitch_x, float(np.ptp(y)) + pitch_y,
+                                     color=cm(0), edgecolor=None, alpha=0.9)
+                ax.add_patch(rect)
 
             self._drs = []
             for (loc, tval, ch) in zip(locations, temp_map, channel_ids):
@@ -159,11 +165,7 @@ class UnitTemplateMapsWidget(BaseMultiWidget):
                 dr.connect()
                 self._drs.append(dr)
 
-            if self._bg == 'on':
-                rect = plt.Rectangle((np.min(x) - pitch_x, np.min(y) - pitch_y), float(np.ptp(x)), float(np.ptp(y)),
-                                     color=cm(0), edgecolor=None, alpha=0.9)
-                ax.add_patch(rect)
-
+            ax.set_title(f'Unit {unit}', color='gray')
             ax.set_xlim(np.min(x) - elec_x / 2, np.max(x) + elec_x / 2)
             ax.set_ylim(np.min(y) - elec_y / 2, np.max(y) + elec_y / 2)
             ax.axis('equal')

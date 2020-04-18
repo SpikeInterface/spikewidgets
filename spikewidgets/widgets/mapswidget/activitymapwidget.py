@@ -89,6 +89,12 @@ class ActivityMapWidget(BaseWidget):
 
         cm = plt.get_cmap(self._cmap)
 
+        if self._bg == 'on':
+            rect = plt.Rectangle((np.min(x) - pitch_x / 2, np.min(y) - pitch_y / 2),
+                                 float(np.ptp(x)) + pitch_x, float(np.ptp(y)) + pitch_y,
+                                 color=cm(0), edgecolor=None, alpha=0.9)
+            self.ax.add_patch(rect)
+
         self._drs = []
         elec_x = 0.9 * pitch_x
         elec_y = 0.9 * pitch_y
@@ -101,10 +107,6 @@ class ActivityMapWidget(BaseWidget):
             dr.connect()
             self._drs.append(dr)
 
-        if self._bg == 'on':
-            rect = plt.Rectangle((np.min(x) - pitch_x, np.min(y) - pitch_y), float(np.ptp(x)), float(np.ptp(y)),
-                                 color=cm(0), edgecolor=None, alpha=0.9)
-            self.ax.add_patch(rect)
         self.ax.set_xlim(np.min(x) - pitch_x, np.max(x) + pitch_x)
         self.ax.set_ylim(np.min(y) - pitch_y, np.max(y) + pitch_y)
         self.ax.axis('equal')
