@@ -29,6 +29,9 @@ class TestWidgets(unittest.TestCase):
     def test_unittemplates(self):
         sw.plot_unit_templates(self._RX, self._SX)
 
+    def test_unittemplatemaps(self):
+        sw.plot_unit_template_maps(self._RX, self._SX)
+
     def test_ampdist(self):
         sw.plot_amplitudes_distribution(self._RX, self._SX)
 

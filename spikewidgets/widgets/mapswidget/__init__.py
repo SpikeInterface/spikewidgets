@@ -1,0 +1,2 @@
+from .activitymapwidget import plot_activity_map
+from .templatemapswidget import plot_unit_template_maps
