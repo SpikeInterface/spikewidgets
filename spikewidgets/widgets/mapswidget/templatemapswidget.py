@@ -104,6 +104,10 @@ class UnitTemplateMapsWidget(BaseMultiWidget):
             channel_ids = self._recording.get_channel_ids()
         else:
             channel_ids = self._channel_ids
+        if self._unit_ids is None:
+            unit_ids = self._sorting.get_unit_ids()
+        else:
+            unit_ids = self._unit_ids
         assert self._peak in ['neg', 'pos', 'both']
         if self._peak == 'min':
             fun = np.min
@@ -139,7 +143,7 @@ class UnitTemplateMapsWidget(BaseMultiWidget):
             ncols = self._ncols
             nrows = np.ceil(len(templates) / ncols)
 
-        for i, (template, unit) in enumerate(zip(templates, self._unit_ids)):
+        for i, (template, unit) in enumerate(zip(templates, unit_ids)):
             ax = self.get_tiled_ax(i, nrows, ncols)
             temp_map = np.abs(fun(template, axis=1))
             if self._log:
