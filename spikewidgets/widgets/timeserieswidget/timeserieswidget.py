@@ -100,8 +100,6 @@ class TimeseriesWidget(BaseWidget):
         for im, m in enumerate(self._visible_channels):
             self._plot_offsets[m] = offset0
             if self._color_groups:
-                print(m)
-                print(self._recording.get_channel_groups(channel_ids=[m]))
                 group = self._recording.get_channel_groups(channel_ids=[m])[0]
                 group_color_idx = self._group_color_map[group]
                 self._plots[m] = self.ax.plot(tt, self._plot_offsets[m] + chunk0[im, :],
