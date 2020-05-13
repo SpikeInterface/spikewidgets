@@ -37,6 +37,8 @@ def plot_electrode_geometry(recording, markersize=20, marker='o', figure=None, a
 
 class ElectrodeGeometryWidget(BaseWidget):
     def __init__(self, *, recording, markersize=10, marker='o', figure=None, ax=None):
+        if 'location' not in recording.get_shared_channel_property_names():
+            raise AttributeError("'location' not found as a property")
         BaseWidget.__init__(self, figure, ax)
         self._recording = recording
         self._ms = markersize
@@ -47,10 +49,7 @@ class ElectrodeGeometryWidget(BaseWidget):
         self._do_plot(width=width, height=height)
 
     def _do_plot(self, width, height):
-        R = self._recording
-        geom = np.array(R.get_channel_locations())
-
-
+        geom = np.array(self._recording.get_channel_locations())
         self.ax.axis('off')
 
         x = geom[:, 0]

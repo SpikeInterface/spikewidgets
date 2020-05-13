@@ -167,7 +167,10 @@ class UnitWaveformsWidget(BaseMultiWidget):
                     max_channel_idxs = np.argsort(np.abs(template[:, peak_idx]))[::-1][:self._max_channels]
                     max_channels_list.append(max_channel_idxs)
                 else:
-                    max_channels_list.append(np.arange(len(channel_ids)))
+                    if 'waveforms_channel_idxs' in self._sorting.get_unit_property_names(unit_id):
+                        max_channels_list.append(self._sorting.get_unit_property(unit_id, 'waveforms_channel_idxs'))
+                    else:
+                        max_channels_list.append(np.arange(len(channel_ids)))
                 spikes = random_wf
                 item = dict(
                     representative_waveforms=spikes,
