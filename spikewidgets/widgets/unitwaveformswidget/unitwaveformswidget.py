@@ -6,8 +6,9 @@ from spikewidgets.widgets.basewidget import BaseMultiWidget
 
 
 def plot_unit_waveforms(recording, sorting, channel_ids=None, unit_ids=None, ms_before=1., ms_after=2.,
-                        max_spikes_per_unit=100, max_channels=16, channel_locs=True,
-                        plot_templates=True, figure=None, ax=None):
+                        max_spikes_per_unit=100, max_channels=16, channel_locs=True, radius=None,
+                        plot_templates=True, figure=None, ax=None, show_all_channels=True, color='k', 
+                        lw=2, axis_equal=False, plot_channels=False, set_title=True):
     """
     Plots unit waveforms.
 
@@ -34,6 +35,8 @@ def plot_unit_waveforms(recording, sorting, channel_ids=None, unit_ids=None, ms_
         If False, waveforms are displayed in vertical order. (default)
     plot_templates: bool
         If True, templates are plotted over the waveforms
+    radius: float
+        If not None, all channels within a circle around the peak waveform will be displayed. Ignores max_spikes_per_unit.
     figure: matplotlib figure
         The figure to be used. If not given a figure is created
     ax: matplotlib axis
@@ -56,15 +59,23 @@ def plot_unit_waveforms(recording, sorting, channel_ids=None, unit_ids=None, ms_
         channel_locs=channel_locs,
         plot_templates=plot_templates,
         figure=figure,
-        ax=ax
+        ax=ax,
+        radius=radius,
+        show_all_channels=show_all_channels,
+        color=color,
+        lw=lw,
+        axis_equal=axis_equal,
+        plot_channels=plot_channels,
+        set_title=set_title
     )
     W.plot()
     return W
 
 
 def plot_unit_templates(recording, sorting, channel_ids=None, unit_ids=None, ms_before=1., ms_after=2.,
-                        max_spikes_per_unit=100, max_channels=16, channel_locs=True,
-                        figure=None, ax=None):
+                        max_spikes_per_unit=100, max_channels=16, channel_locs=True, radius=None,
+                        figure=None, ax=None, show_all_channels=True, color='k', lw=2, axis_equal=False,
+                        plot_channels=False, set_title=True):
     """
     Plots unit waveforms.
 
@@ -89,6 +100,8 @@ def plot_unit_templates(recording, sorting, channel_ids=None, unit_ids=None, ms_
     channel_locs: bool
         If True, channel locations are used to display the waveforms.
         If False, waveforms are displayed in vertical order. (default)
+    radius: float
+        If not None, all channels within a circle around the peak waveform will be displayed. Ignores max_spikes_per_unit.
     figure: matplotlib figure
         The figure to be used. If not given a figure is created
     ax: matplotlib axis
@@ -110,7 +123,14 @@ def plot_unit_templates(recording, sorting, channel_ids=None, unit_ids=None, ms_
         ms_after=ms_after,
         channel_locs=channel_locs,
         figure=figure,
-        ax=ax
+        ax=ax,
+        radius=radius,
+        show_all_channels=show_all_channels,
+        color=color,
+        lw=lw,
+        axis_equal=axis_equal,
+        plot_channels=plot_channels,
+        set_title=set_title
     )
     W.plot()
     return W
@@ -118,8 +138,9 @@ def plot_unit_templates(recording, sorting, channel_ids=None, unit_ids=None, ms_
 
 class UnitWaveformsWidget(BaseMultiWidget):
     def __init__(self, *, recording, sorting, channel_ids=None, unit_ids=None, max_spikes_per_unit=50,
-                 max_channels=16, ms_before=1., ms_after=2., channel_locs=True, plot_templates=True,
-                 figure=None, ax=None):
+                 max_channels=16, ms_before=1., ms_after=2., channel_locs=True, plot_templates=True, radius=None,
+                 show_all_channels=True, figure=None, ax=None, color='k', lw=2, axis_equal=False, 
+                 plot_channels=False, set_title=True):
         BaseMultiWidget.__init__(self, figure, ax)
         self._recording = recording
         self._sorting = sorting
@@ -133,6 +154,13 @@ class UnitWaveformsWidget(BaseMultiWidget):
         self.name = 'UnitWaveforms'
         self._plot_waveforms = True
         self._plot_templates = plot_templates
+        self._radius = radius
+        self._show_all_channels = show_all_channels
+        self._color=color
+        self._lw=lw
+        self._axis_equal=axis_equal
+        self._plot_channels=plot_channels
+        self._set_title = set_title
 
     def plot(self):
         self._do_plot()
@@ -146,7 +174,7 @@ class UnitWaveformsWidget(BaseMultiWidget):
             channel_ids = self._recording.get_channel_ids()
         if 'location' in self._recording.get_shared_channel_property_names():
             all_locations = np.array(self._recording.get_channel_locations())
-            channel_locations = np.array(self._recording.get_channel_locations(channel_ids=channel_ids))
+            channel_locations = np.array(self._recording.get_channel_locations(channel_ids=channel_ids)) 
         else:
             all_locations = None
             channel_locations = None
@@ -160,22 +188,37 @@ class UnitWaveformsWidget(BaseMultiWidget):
                                                                  ms_before=self._ms_before, ms_after=self._ms_after,
                                                                  max_spikes_per_unit=self._max_spikes_per_unit,
                                                                  save_as_features=False)[0]
-                if self._max_channels < self._recording.get_num_channels():
+                if self._radius is None:
+                    if self._max_channels < self._recording.get_num_channels():
+                        template = np.mean(random_wf, axis=0)
+                        peak_idx = np.unravel_index(np.argmax(np.abs(template)),
+                                                    template.shape)[1]
+                        max_channel_idxs = np.argsort(np.abs(template[:, peak_idx]))[::-1][:self._max_channels]
+                        max_channels_list.append(max_channel_idxs)
+                    else:
+                        if 'waveforms_channel_idxs' in self._sorting.get_unit_property_names(unit_id):
+                            max_channels_list.append(self._sorting.get_unit_property(unit_id, 'waveforms_channel_idxs'))
+                        else:
+                            max_channels_list.append(np.arange(len(channel_ids)))
+                else:
                     template = np.mean(random_wf, axis=0)
                     peak_idx = np.unravel_index(np.argmax(np.abs(template)),
                                                 template.shape)[1]
-                    max_channel_idxs = np.argsort(np.abs(template[:, peak_idx]))[::-1][:self._max_channels]
-                    max_channels_list.append(max_channel_idxs)
-                else:
-                    if 'waveforms_channel_idxs' in self._sorting.get_unit_property_names(unit_id):
-                        max_channels_list.append(self._sorting.get_unit_property(unit_id, 'waveforms_channel_idxs'))
-                    else:
-                        max_channels_list.append(np.arange(len(channel_ids)))
+                    max_channel_idx = np.argsort(np.abs(template[:, peak_idx]))[::-1][0]
+                    c = all_locations[max_channel_idx]
+                    d = np.sqrt(np.sum((channel_locations-c)**2, axis=1))
+                    max_channels_list.append(np.array(channel_ids)[np.where(d<=self._radius)[0]])
                 spikes = random_wf
-                item = dict(
-                    representative_waveforms=spikes,
-                    title='Unit {}'.format(int(unit_id))
-                )
+                if self._set_title:
+                    item = dict(
+                        representative_waveforms=spikes,
+                        title='Unit {}'.format(int(unit_id))
+                    )
+                else:
+                    item = dict(
+                        representative_waveforms=spikes,
+                        title=''
+                    )
                 list_spikes.append(item)
             else:
                 print(unit_id, ' spike train is None')
@@ -184,10 +227,12 @@ class UnitWaveformsWidget(BaseMultiWidget):
             if self._ch_locs:
                 self._plot_spike_shapes_multi(list_spikes, channel_locations=channel_locations,
                                               all_locations=all_locations, max_channels_list=max_channels_list,
-                                              plot_templates=self._plot_templates, plot_waveforms=self._plot_waveforms)
+                                              plot_templates=self._plot_templates, plot_waveforms=self._plot_waveforms, 
+                                              show_all_channels=self._show_all_channels, plot_channels=self._plot_channels)
             else:
                 self._plot_spike_shapes_multi(list_spikes, channel_locations=None, max_channels_list=max_channels_list,
-                                              plot_templates=self._plot_templates, plot_waveforms=self._plot_waveforms)
+                                              plot_templates=self._plot_templates, plot_waveforms=self._plot_waveforms, 
+                                              show_all_channels=self._show_all_channels, plot_channels=self._plot_channels)
 
     def _plot_spike_shapes_multi(self, list_spikes, max_channels_list, *, ncols=5, **kwargs):
         vscale, ylim = _determine_global_vscale_ylim(list_spikes)
@@ -196,28 +241,32 @@ class UnitWaveformsWidget(BaseMultiWidget):
         nrows = np.ceil(len(list_spikes) / ncols)
         for i, item in enumerate(list_spikes):
             ax = self.get_tiled_ax(i, nrows, ncols)
-            _plot_spike_shapes(**item, **kwargs, ax=ax, channels=max_channels_list[i], vscale=vscale, ylim_wf=ylim)
+            _plot_spike_shapes(**item, **kwargs, ax=ax, channels=max_channels_list[i], vscale=vscale, ylim_wf=ylim,
+                              color=self._color, lw=self._lw)
 
 
 class UnitTemplatesWidget(UnitWaveformsWidget):
     def __init__(self, *, recording, sorting, channel_ids=None, unit_ids=None, max_spikes_per_unit=50,
-                 max_channels=16, ms_before=1., ms_after=2., channel_locs=True, figure=None, ax=None):
+                 max_channels=16, ms_before=1., ms_after=2., channel_locs=True, figure=None, show_all_channels=True, 
+                 ax=None, radius=None, color='k', lw=2, axis_equal=False, plot_channels=False, set_title=True):
         UnitWaveformsWidget.__init__(self, recording=recording, sorting=sorting, channel_ids=channel_ids,
                                      unit_ids=unit_ids, max_spikes_per_unit=max_spikes_per_unit,
                                      max_channels=max_channels, ms_before=ms_before, ms_after=ms_after,
-                                     channel_locs=channel_locs, plot_templates=True, figure=figure, ax=ax)
+                                     channel_locs=channel_locs, plot_templates=True, figure=figure, ax=ax, 
+                                     radius=radius, show_all_channels=show_all_channels, color=color, lw=lw,
+                                     axis_equal=axis_equal, plot_channels=plot_channels, set_title=set_title)
         self.name = 'UnitTemplates'
         self._plot_waveforms = False
 
 
 def _plot_spike_shapes(*, ax, channels, representative_waveforms=None, channel_locations=None,
                        all_locations=None, color='blue', vscale=None, plot_waveforms=True, plot_templates=True,
-                       ylim_wf=None, title=''):
+                       ylim_wf=None, title='', show_all_channels=True, lw=2, axis_equal=False, plot_channels=False):
     if representative_waveforms is None:
         raise Exception('You must provide either average_waveform, representative waveforms, or both')
+        
     waveforms = representative_waveforms
     average_waveform = np.mean(waveforms, axis=0)
-
     M = average_waveform.shape[0]  # number of channels
     if channel_locations is None:
         channel_locations = np.zeros((M, 2))
@@ -234,21 +283,31 @@ def _plot_spike_shapes(*, ax, channels, representative_waveforms=None, channel_l
     if vscale is None:
         vscale = 1.5 * np.max(np.abs(average_waveform))
 
-    ylim_g = np.array([np.min(all_locations[:, 1]), np.max(all_locations[:, 1])])
+    if show_all_channels:
+        ylim_g = np.array([np.min(all_locations[:, 1]), np.max(all_locations[:, 1])])
+    else:
+        ylim_g = np.array([np.min(all_locations[channels, 1]), np.max(all_locations[channels, 1])])
     ptp = ylim_g[1] - ylim_g[0]
 
     # fix for linear horizontal layout
     if ptp == 0:
         ylim = ylim_wf / vscale
     else:
-        ylim = [ylim_g[0] - 0.1 * ptp, ylim_g[1] + 0.1 * ptp]
+        ylim = [ylim_g[0] - 0.2 * ptp, ylim_g[1] + 0.2 * ptp]
+
+    if plot_channels:
+        if show_all_channels:
+            mu.plot_probe(probe, type='planar', ax=ax, alpha_prb=0, alpha_elec=0.2)
+        else:
+            mu.plot_probe(mu.return_mea(info={'pos': channel_locations[channels], 'center': False}),
+                          type='planar', ax=ax, alpha_prb=0, alpha_elec=0.2)
 
     if plot_waveforms:
-        ax = mu.plot_mea_recording(waveforms, probe, colors=(0.5, 0.5, 0.5), alpha=0.3, lw=0.3, ax=ax, vscale=vscale,
-                                   ylim=ylim, channels=channels)
+        ax = mu.plot_mea_recording(waveforms, probe, colors=(0.5, 0.5, 0.5), alpha=0.3, lw=lw, ax=ax, vscale=vscale,
+                                   ylim=ylim, channels=channels, axis_equal=axis_equal)
     if plot_templates:
-        ax = mu.plot_mea_recording(average_waveform, probe, colors=color, ax=ax, lw=2, vscale=vscale, ylim=ylim,
-                                   channels=channels)
+        ax = mu.plot_mea_recording(average_waveform, probe, colors=color, ax=ax, lw=lw, vscale=vscale, ylim=ylim,
+                                   channels=channels, axis_equal=axis_equal, hide_axis=True)
 
     ax.set_xticks([])
     ax.set_yticks([])
