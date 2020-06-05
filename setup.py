@@ -9,7 +9,7 @@ long_description = open("README.md").read()
 setuptools.setup(
     name=pkg_name,
     version=version,
-    author="Jeremy Magland, Alessio Buccino",
+    author="Alessio Buccino, Cole Hurwitz, Samuel Garcia, Jeremy Magland, Matthias Hennig",
     author_email="jmagland@flatironinstitute.org",
     description="Python widgets for spike sorting and electrophysiology",
     url="https://github.com/SpikeInterface/spikewidgets",
