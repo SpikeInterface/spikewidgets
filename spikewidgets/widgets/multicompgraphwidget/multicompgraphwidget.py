@@ -86,7 +86,7 @@ def plot_multicomp_agreement(multi_sorting_comparison, plot_type='pie',
 
 
 def plot_multicomp_agreement_by_sorter(multi_sorting_comparison, plot_type='pie',
-                                       cmap='YlOrRd', figure=None, ax=None):
+                                       cmap='YlOrRd', figure=None, axes=None, show_legend=True):
     """
     Plots multi sorting comparison agreement as pie or bar plot.
 
@@ -100,8 +100,8 @@ def plot_multicomp_agreement_by_sorter(multi_sorting_comparison, plot_type='pie'
         The colormap to be used for the nodes (default 'Reds')
     figure: matplotlib figure
         The figure to be used. If not given a figure is created
-    ax: matplotlib axis
-        The axis to be used. If not given an axis is created
+    axes: list of matplotlib axis
+        The axese to be used. If not given the required axes are created
 
     Returns
     -------
@@ -113,7 +113,8 @@ def plot_multicomp_agreement_by_sorter(multi_sorting_comparison, plot_type='pie'
         plot_type=plot_type,
         cmap=cmap,
         figure=figure,
-        ax=ax
+        axes=axes,
+        show_legend=show_legend
     )
     W.plot()
     return W
@@ -203,13 +204,18 @@ class MultiCompGlobalAgreementWidget(BaseWidget):
 
 class MultiCompAgreementBySorterWidget(BaseMultiWidget):
     def __init__(self, multi_sorting_comparison, plot_type='pie', cmap='YlOrRd', fs=10,
-                 figure=None, ax=None):
-        BaseMultiWidget.__init__(self, figure, ax)
+                 figure=None, axes=None, ax=None, show_legend=True):
         self._msc = multi_sorting_comparison
         self._type = plot_type
         self._cmap = cmap
         self._fs = fs
-        self.name = 'MultiCompGlobalAgreement'
+        self._show_legend = show_legend
+        self._ax = axes
+        if ((axes is not None) and (len(axes) != len(self._msc.name_list))):
+            raise RuntimeError("Number of axes is not number of sortings.")
+        if axes is not None:
+            BaseMultiWidget.__init__(self, figure, axes[0])
+        self.name = 'MultiCompAgreementBySorterWidget'
 
     def plot(self):
         self._do_plot()
@@ -221,12 +227,15 @@ class MultiCompAgreementBySorterWidget(BaseMultiWidget):
         sg_names, sg_units = self._msc.compute_subgraphs()
         # fraction of units with agreement > threshold
         for i, name in enumerate(name_list):
-            ax = self.get_tiled_ax(i, ncols=len(name_list), nrows=1)
+            if self._ax is None:
+                ax = self.get_tiled_ax(i, ncols=len(name_list), nrows=1)
+            else:
+                ax = self._ax[i]
             v, c = np.unique([len(np.unique(sn)) for sn in sg_names if name in sn], return_counts=True)
             if self._type == 'pie':
                 p = ax.pie(c, colors=colors[v - 1], textprops={'color': 'k', 'fontsize': self._fs},
                            autopct=lambda pct: _getabs(pct, c),  pctdistance=1.15)
-                if i == len(name_list) - 1:
+                if (self._show_legend) and (i == len(name_list) - 1):
                     plt.legend(p[0], v, frameon=False, title='k=',
                                bbox_to_anchor=(1.15, 1.25), loc=2, borderaxespad=0., labelspacing=0.2)
             elif self._type == 'bar':
@@ -244,8 +253,8 @@ class MultiCompAgreementBySorterWidget(BaseMultiWidget):
             max_yval = np.max(ylims)
             for ax_single in self.axes:
                 ax_single.set_ylim([0, max_yval])
-
-        self.figure.set_size_inches((len(name_list) * 2, 2.4))
+        if self._ax is None:
+            self.figure.set_size_inches((len(name_list) * 2, 2.4))
 
 
 def _getabs(pct, allvals):
