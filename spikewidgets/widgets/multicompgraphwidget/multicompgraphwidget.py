@@ -215,6 +215,8 @@ class MultiCompAgreementBySorterWidget(BaseMultiWidget):
             raise RuntimeError("Number of axes is not number of sortings.")
         if axes is not None:
             BaseMultiWidget.__init__(self, figure, axes[0])
+        else:
+            BaseMultiWidget.__init__(self, figure, axes)
         self.name = 'MultiCompAgreementBySorterWidget'
 
     def plot(self):
