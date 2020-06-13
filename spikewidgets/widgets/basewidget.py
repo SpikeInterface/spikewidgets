@@ -28,7 +28,7 @@ class BaseWidget:
 
 class BaseMultiWidget:
     def __init__(self, figure=None, ax=None):
-        if (figure is None) and (ax is None):
+        if figure is None and ax is None:
             self.figure = plt.figure()
             self.ax = self.figure.add_subplot(111)
         elif ax is None:

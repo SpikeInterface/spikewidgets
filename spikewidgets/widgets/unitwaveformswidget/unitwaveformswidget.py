@@ -15,7 +15,7 @@ def plot_unit_waveforms(recording, sorting, channel_ids=None, unit_ids=None, ms_
     Parameters
     ----------
     recording: RecordingExtractor
-        The recordng extractor object
+        The recording extractor object
     sorting: SortingExtractor
         The sorting extractor object
     channel_ids: list
@@ -29,7 +29,7 @@ def plot_unit_waveforms(recording, sorting, channel_ids=None, unit_ids=None, ms_
     max_spikes_per_unit: int
         Maximum number of spikes to display per unit.
     max_channels: int
-        Maximum number of largest channels to plot waveform
+        Maximum number of largest channels to plot waveform.
     channel_locs: bool
         If True, channel locations are used to display the waveforms.
         If False, waveforms are displayed in vertical order. (default)
@@ -40,7 +40,19 @@ def plot_unit_waveforms(recording, sorting, channel_ids=None, unit_ids=None, ms_
     figure: matplotlib figure
         The figure to be used. If not given a figure is created
     ax: matplotlib axis
-        The axis to be used. If not given an axis is created
+        The axis to be used. If not given an axis is created.
+    set_title: bool
+        Create a plot title with the unit number if True.
+    plot_channels: bool
+        Plot channel locations below traces, only used if channel_locs is True.
+    axis_equal: bool
+        Equal aspext ratio for x and y axis, to visualise the array geometry to scale.
+    lw: float
+        Line width for the traces.
+    color: matplotlib color or list of colors
+        Color(s) of traces.
+    show_all_channels: bool
+        Show the whole probe if True, or only selected channels if False.
 
     Returns
     -------
@@ -82,7 +94,7 @@ def plot_unit_templates(recording, sorting, channel_ids=None, unit_ids=None, ms_
     Parameters
     ----------
     recording: RecordingExtractor
-        The recordng extractor object
+        The recording extractor object
     sorting: SortingExtractor
         The sorting extractor object
     channel_ids: list
@@ -96,7 +108,7 @@ def plot_unit_templates(recording, sorting, channel_ids=None, unit_ids=None, ms_
     max_spikes_per_unit: int
         Maximum number of spikes to display per unit.
     max_channels: int
-        Maximum number of largest channels to plot waveform
+        Maximum number of largest channels to plot waveform.
     channel_locs: bool
         If True, channel locations are used to display the waveforms.
         If False, waveforms are displayed in vertical order. (default)
@@ -106,6 +118,18 @@ def plot_unit_templates(recording, sorting, channel_ids=None, unit_ids=None, ms_
         The figure to be used. If not given a figure is created
     ax: matplotlib axis
         The axis to be used. If not given an axis is created
+    set_title: bool
+        Create a plot title with the unit number if True.
+    plot_channels: bool
+        Plot channel locations below traces, only used if channel_locs is True.
+    axis_equal: bool
+        Equal aspext ratio for x and y axis, to visualise the array geometry to scale.
+    lw: float
+        Line width for the traces.
+    color: matplotlib color or list of colors
+        Color(s) of traces.
+    show_all_channels: bool
+        Show the whole probe if True, or only selected channels if False.
 
     Returns
     -------
@@ -295,7 +319,7 @@ def _plot_spike_shapes(*, ax, channels, representative_waveforms=None, channel_l
     else:
         ylim = [ylim_g[0] - 0.2 * ptp, ylim_g[1] + 0.2 * ptp]
 
-    if plot_channels:
+    if plot_channels and channel_locations is not None:
         if show_all_channels:
             mu.plot_probe(probe, type='planar', ax=ax, alpha_prb=0, alpha_elec=0.2)
         else:
