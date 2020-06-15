@@ -7,8 +7,8 @@ from spikewidgets.widgets.basewidget import BaseMultiWidget
 
 def plot_unit_waveforms(recording, sorting, channel_ids=None, unit_ids=None, ms_before=1., ms_after=2.,
                         max_spikes_per_unit=100, max_channels=16, channel_locs=True, radius=None,
-                        plot_templates=True, figure=None, ax=None, show_all_channels=True, color='k', 
-                        lw=2, axis_equal=False, plot_channels=False, set_title=True):
+                        plot_templates=True, show_all_channels=True, color='k',  lw=2, axis_equal=False,
+                        plot_channels=False, set_title=True, figure=None, ax=None, axes=None):
     """
     Plots unit waveforms.
 
@@ -19,7 +19,7 @@ def plot_unit_waveforms(recording, sorting, channel_ids=None, unit_ids=None, ms_
     sorting: SortingExtractor
         The sorting extractor object
     channel_ids: list
-        The channel ids to display.
+        The channel ids to display
     unit_ids: list
         List of unit ids.
     ms_before: float
@@ -27,32 +27,36 @@ def plot_unit_waveforms(recording, sorting, channel_ids=None, unit_ids=None, ms_
     ms_after: float
         Time after peak (ms)
     max_spikes_per_unit: int
-        Maximum number of spikes to display per unit.
+        Maximum number of spikes to display per unit
     max_channels: int
-        Maximum number of largest channels to plot waveform.
+        Maximum number of largest channels to plot waveform
     channel_locs: bool
         If True, channel locations are used to display the waveforms.
-        If False, waveforms are displayed in vertical order. (default)
+        If False, waveforms are displayed in vertical order (default)
     plot_templates: bool
         If True, templates are plotted over the waveforms
     radius: float
-        If not None, all channels within a circle around the peak waveform will be displayed. Ignores max_spikes_per_unit.
-    figure: matplotlib figure
-        The figure to be used. If not given a figure is created
-    ax: matplotlib axis
-        The axis to be used. If not given an axis is created.
+        If not None, all channels within a circle around the peak waveform will be displayed
+        Ignores max_spikes_per_unit
     set_title: bool
         Create a plot title with the unit number if True.
     plot_channels: bool
-        Plot channel locations below traces, only used if channel_locs is True.
+        Plot channel locations below traces, only used if channel_locs is True
     axis_equal: bool
-        Equal aspext ratio for x and y axis, to visualise the array geometry to scale.
+        Equal aspext ratio for x and y axis, to visualise the array geometry to scale
     lw: float
         Line width for the traces.
     color: matplotlib color or list of colors
         Color(s) of traces.
     show_all_channels: bool
-        Show the whole probe if True, or only selected channels if False.
+        Show the whole probe if True, or only selected channels if False
+    figure: matplotlib figure
+        The figure to be used. If not given a figure is created
+    ax: matplotlib axis
+        The axis to be used. If not given an axis is created
+    axes: list of matplotlib axes
+        The axes to be used for the individual plots. If not given the required axes are created. If provided, the ax
+        and figure parameters are ignored
 
     Returns
     -------
@@ -72,6 +76,7 @@ def plot_unit_waveforms(recording, sorting, channel_ids=None, unit_ids=None, ms_
         plot_templates=plot_templates,
         figure=figure,
         ax=ax,
+        axes=axes,
         radius=radius,
         show_all_channels=show_all_channels,
         color=color,
@@ -86,8 +91,8 @@ def plot_unit_waveforms(recording, sorting, channel_ids=None, unit_ids=None, ms_
 
 def plot_unit_templates(recording, sorting, channel_ids=None, unit_ids=None, ms_before=1., ms_after=2.,
                         max_spikes_per_unit=100, max_channels=16, channel_locs=True, radius=None,
-                        figure=None, ax=None, show_all_channels=True, color='k', lw=2, axis_equal=False,
-                        plot_channels=False, set_title=True):
+                        show_all_channels=True, color='k', lw=2, axis_equal=False,
+                        plot_channels=False, set_title=True, figure=None, ax=None, axes=None):
     """
     Plots unit waveforms.
 
@@ -98,7 +103,7 @@ def plot_unit_templates(recording, sorting, channel_ids=None, unit_ids=None, ms_
     sorting: SortingExtractor
         The sorting extractor object
     channel_ids: list
-        The channel ids to display.
+        The channel ids to display
     unit_ids: list
         List of unit ids.
     ms_before: float
@@ -106,30 +111,35 @@ def plot_unit_templates(recording, sorting, channel_ids=None, unit_ids=None, ms_
     ms_after: float
         Time after peak (ms)
     max_spikes_per_unit: int
-        Maximum number of spikes to display per unit.
+        Maximum number of spikes to display per unit
     max_channels: int
-        Maximum number of largest channels to plot waveform.
+        Maximum number of largest channels to plot waveform
     channel_locs: bool
         If True, channel locations are used to display the waveforms.
         If False, waveforms are displayed in vertical order. (default)
     radius: float
-        If not None, all channels within a circle around the peak waveform will be displayed. Ignores max_spikes_per_unit.
-    figure: matplotlib figure
-        The figure to be used. If not given a figure is created
-    ax: matplotlib axis
-        The axis to be used. If not given an axis is created
+        If not None, all channels within a circle around the peak waveform will be displayed.
+        Ignores max_spikes_per_unit
     set_title: bool
-        Create a plot title with the unit number if True.
+        Create a plot title with the unit number if True
     plot_channels: bool
-        Plot channel locations below traces, only used if channel_locs is True.
+        Plot channel locations below traces, only used if channel_locs is True
     axis_equal: bool
-        Equal aspext ratio for x and y axis, to visualise the array geometry to scale.
+        Equal aspext ratio for x and y axis, to visualise the array geometry to scale
     lw: float
         Line width for the traces.
     color: matplotlib color or list of colors
         Color(s) of traces.
     show_all_channels: bool
-        Show the whole probe if True, or only selected channels if False.
+        Show the whole probe if True, or only selected channels if False
+    figure: matplotlib figure
+        The figure to be used. If not given a figure is created
+    ax: matplotlib axis
+        The axis to be used. If not given an axis is created
+    axes: list of matplotlib axes
+        The axes to be used for the individual plots. If not given the required axes are created. If provided, the ax
+        and figure parameters are ignored
+
 
     Returns
     -------
@@ -148,6 +158,7 @@ def plot_unit_templates(recording, sorting, channel_ids=None, unit_ids=None, ms_
         channel_locs=channel_locs,
         figure=figure,
         ax=ax,
+        axes=axes,
         radius=radius,
         show_all_channels=show_all_channels,
         color=color,
@@ -163,9 +174,9 @@ def plot_unit_templates(recording, sorting, channel_ids=None, unit_ids=None, ms_
 class UnitWaveformsWidget(BaseMultiWidget):
     def __init__(self, *, recording, sorting, channel_ids=None, unit_ids=None, max_spikes_per_unit=50,
                  max_channels=16, ms_before=1., ms_after=2., channel_locs=True, plot_templates=True, radius=None,
-                 show_all_channels=True, figure=None, ax=None, color='k', lw=2, axis_equal=False, 
+                 show_all_channels=True, figure=None, ax=None, axes=None, color='k', lw=2, axis_equal=False,
                  plot_channels=False, set_title=True):
-        BaseMultiWidget.__init__(self, figure, ax)
+        BaseMultiWidget.__init__(self, figure, ax, axes)
         self._recording = recording
         self._sorting = sorting
         self._channel_ids = channel_ids
@@ -272,11 +283,12 @@ class UnitWaveformsWidget(BaseMultiWidget):
 class UnitTemplatesWidget(UnitWaveformsWidget):
     def __init__(self, *, recording, sorting, channel_ids=None, unit_ids=None, max_spikes_per_unit=50,
                  max_channels=16, ms_before=1., ms_after=2., channel_locs=True, figure=None, show_all_channels=True, 
-                 ax=None, radius=None, color='k', lw=2, axis_equal=False, plot_channels=False, set_title=True):
+                 ax=None, axes=None, radius=None, color='k', lw=2, axis_equal=False, plot_channels=False,
+                 set_title=True):
         UnitWaveformsWidget.__init__(self, recording=recording, sorting=sorting, channel_ids=channel_ids,
                                      unit_ids=unit_ids, max_spikes_per_unit=max_spikes_per_unit,
                                      max_channels=max_channels, ms_before=ms_before, ms_after=ms_after,
-                                     channel_locs=channel_locs, plot_templates=True, figure=figure, ax=ax, 
+                                     channel_locs=channel_locs, plot_templates=True, figure=figure, ax=ax, axes=axes,
                                      radius=radius, show_all_channels=show_all_channels, color=color, lw=lw,
                                      axis_equal=axis_equal, plot_channels=plot_channels, set_title=set_title)
         self.name = 'UnitTemplates'

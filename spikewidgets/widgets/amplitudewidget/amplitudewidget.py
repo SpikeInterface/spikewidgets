@@ -4,7 +4,7 @@ from spikewidgets.widgets.basewidget import BaseMultiWidget
 
 
 def plot_amplitudes_distribution(recording, sorting, unit_ids=None, max_spikes_per_unit=100,
-                                 figure=None, ax=None):
+                                 figure=None, ax=None, axes=None):
     """
     Plots waveform amplitudes distribution.
 
@@ -17,11 +17,14 @@ def plot_amplitudes_distribution(recording, sorting, unit_ids=None, max_spikes_p
     unit_ids: list
         List of unit ids
     max_spikes_per_unit: int
-        Maximum number of spikes to display per unit.
+        Maximum number of spikes to display per unit
     figure: matplotlib figure
         The figure to be used. If not given a figure is created
     ax: matplotlib axis
         The axis to be used. If not given an axis is created
+    axes: list of matplotlib axes
+        The axes to be used for the individual plots. If not given the required axes are created. If provided, the ax
+        and figure parameters are ignored
 
     Returns
     -------
@@ -34,14 +37,15 @@ def plot_amplitudes_distribution(recording, sorting, unit_ids=None, max_spikes_p
         unit_ids=unit_ids,
         max_spikes_per_unit=max_spikes_per_unit,
         figure=figure,
-        ax=ax
+        ax=ax,
+        axes=axes
     )
     W.plot()
     return W
 
 
 def plot_amplitudes_timeseries(recording, sorting, unit_ids=None, max_spikes_per_unit=100,
-                               figure=None, ax=None):
+                               figure=None, ax=None, axes=None):
     """
     Plots waveform amplitudes timeseries.
 
@@ -59,6 +63,9 @@ def plot_amplitudes_timeseries(recording, sorting, unit_ids=None, max_spikes_per
         The figure to be used. If not given a figure is created
     ax: matplotlib axis
         The axis to be used. If not given an axis is created
+    axes: list of matplotlib axes
+        The axes to be used for the individual plots. If not given the required axes are created. If provided, the ax
+        and figure parameters are ignored
 
     Returns
     -------
@@ -71,15 +78,16 @@ def plot_amplitudes_timeseries(recording, sorting, unit_ids=None, max_spikes_per
         unit_ids=unit_ids,
         max_spikes_per_unit=max_spikes_per_unit,
         figure=figure,
-        ax=ax
+        ax=ax,
+        axes=axes
     )
     W.plot()
     return W
 
 
 class AmplitudeBaseWidget(BaseMultiWidget):
-    def __init__(self, recording, sorting, max_spikes_per_unit=100, figure=None, ax=None):
-        BaseMultiWidget.__init__(self, figure, ax)
+    def __init__(self, recording, sorting, max_spikes_per_unit=100, figure=None, ax=None, axes=None):
+        BaseMultiWidget.__init__(self, figure, ax, axes)
         self._sorting = sorting
         self._recording = recording
         self._max_spikes_per_unit = max_spikes_per_unit
@@ -100,8 +108,8 @@ class AmplitudeBaseWidget(BaseMultiWidget):
 
 
 class AmplitudeTimeseriesWidget(AmplitudeBaseWidget):
-    def __init__(self, *, recording, sorting, unit_ids=None, max_spikes_per_unit=100, figure=None, ax=None):
-        AmplitudeBaseWidget.__init__(self, recording, sorting, max_spikes_per_unit, figure, ax)
+    def __init__(self, *, recording, sorting, unit_ids=None, max_spikes_per_unit=100, figure=None, ax=None, axes=None):
+        AmplitudeBaseWidget.__init__(self, recording, sorting, max_spikes_per_unit, figure, ax, axes)
         self._unit_ids = unit_ids
         self.name = 'AmplitudeTimeseries'
 
@@ -142,8 +150,8 @@ class AmplitudeTimeseriesWidget(AmplitudeBaseWidget):
 
 
 class AmplitudeDistributionWidget(AmplitudeBaseWidget):
-    def __init__(self, *, recording, sorting, unit_ids=None, max_spikes_per_unit=100, figure=None, ax=None):
-        AmplitudeBaseWidget.__init__(self, recording, sorting, max_spikes_per_unit, figure, ax)
+    def __init__(self, *, recording, sorting, unit_ids=None, max_spikes_per_unit=100, figure=None, ax=None, axes=None):
+        AmplitudeBaseWidget.__init__(self, recording, sorting, max_spikes_per_unit, figure, ax, axes)
         self._unit_ids = unit_ids
         self.name = 'AmplitudeDistribution'
 

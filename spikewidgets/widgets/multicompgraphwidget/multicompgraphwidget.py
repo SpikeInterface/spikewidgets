@@ -103,7 +103,8 @@ def plot_multicomp_agreement_by_sorter(multi_sorting_comparison, plot_type='pie'
     ax: matplotlib axis
         A single axis used to create a matplotlib gridspec for the individual plots. If None, an axis will be created. 
     axes: list of matplotlib axes
-        The axes to be used for the individual plots. If not given the required axes are created. If provided, the ax and figure parameters are ignored.
+        The axes to be used for the individual plots. If not given the required axes are created. If provided, the ax
+        and figure parameters are ignored.
     show_legend: bool
         Show the legend in the last axes (default True).
         
@@ -210,19 +211,12 @@ class MultiCompGlobalAgreementWidget(BaseWidget):
 class MultiCompAgreementBySorterWidget(BaseMultiWidget):
     def __init__(self, multi_sorting_comparison, plot_type='pie', cmap='YlOrRd', fs=9,
                  figure=None, axes=None, ax=None, show_legend=True):
+        BaseMultiWidget.__init__(self, figure, ax, axes)
         self._msc = multi_sorting_comparison
         self._type = plot_type
         self._cmap = cmap
         self._fs = fs
         self._show_legend = show_legend
-        if axes is not None: # I admit tis is a hack!
-            self._ax = axes
-            if len(axes) != len(self._msc.name_list):
-                raise RuntimeError("Number of axes is not number of sortings.")
-            BaseMultiWidget.__init__(self, figure, axes[0])
-        else:
-            self._ax = ax
-            BaseMultiWidget.__init__(self, figure, ax)
         self.name = 'MultiCompAgreementBySorterWidget'
 
     def plot(self):
@@ -235,13 +229,7 @@ class MultiCompAgreementBySorterWidget(BaseMultiWidget):
         sg_names, sg_units = self._msc.compute_subgraphs()
         # fraction of units with agreement > threshold
         for i, name in enumerate(name_list):
-            if self._ax is not None:
-                if len(self._ax)>1:
-                    ax = self._ax[i]
-                else:
-                    ax = self.get_tiled_ax(i, ncols=len(name_list), nrows=1)
-            else:
-                ax = self.get_tiled_ax(i, ncols=len(name_list), nrows=1)
+            ax = self.get_tiled_ax(i, ncols=len(name_list), nrows=1)
             v, c = np.unique([len(np.unique(sn)) for sn in sg_names if name in sn], return_counts=True)
             if self._type == 'pie':
                 p = ax.pie(c, colors=colors[v - 1], textprops={'color': 'k', 'fontsize': self._fs},
@@ -264,7 +252,7 @@ class MultiCompAgreementBySorterWidget(BaseMultiWidget):
             max_yval = np.max(ylims)
             for ax_single in self.axes:
                 ax_single.set_ylim([0, max_yval])
-        if self._ax is None:
+        if self._use_gs:
             self.figure.set_size_inches((len(name_list) * 2, 2.4))
 
 
