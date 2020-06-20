@@ -4,7 +4,7 @@ from matplotlib.ticker import MaxNLocator
 from spikewidgets.widgets.basewidget import BaseWidget
 
 
-def plot_timeseries(recording, channel_ids=None, trange=None, color_groups=False,
+def plot_timeseries(recording, channel_ids=None, trange=None, color_groups=False, color=None, 
                     figure=None, ax=None):
     """
     Plots recording timeseries.
@@ -19,6 +19,8 @@ def plot_timeseries(recording, channel_ids=None, trange=None, color_groups=False
         List with start time and end time
     color_groups: bool
         If True groups are plotted with different colors
+    color: matplotlib color, default: None
+        The color used to draw the traces.
     figure: matplotlib figure
         The figure to be used. If not given a figure is created
     ax: matplotlib axis
@@ -34,6 +36,7 @@ def plot_timeseries(recording, channel_ids=None, trange=None, color_groups=False
         channel_ids=channel_ids,
         trange=trange,
         color_groups=color_groups,
+        color=color,
         figure=figure,
         ax=ax
     )
@@ -43,7 +46,7 @@ def plot_timeseries(recording, channel_ids=None, trange=None, color_groups=False
 
 class TimeseriesWidget(BaseWidget):
     def __init__(self, *, recording, channel_ids=None, trange=None,
-                 color_groups=False, figure=None,  ax=None):
+                 color_groups=False, color=None, figure=None,  ax=None):
         BaseWidget.__init__(self, figure, ax)
         self._recording = recording
         self._sampling_frequency = recording.get_sampling_frequency()
@@ -62,6 +65,7 @@ class TimeseriesWidget(BaseWidget):
         self._visible_trange = self._fix_trange(self._visible_trange)
         self._ax = ax
         self._color_groups = color_groups
+        self._color = color
         if color_groups:
             self._colors = []
             self._group_color_map = {}
@@ -105,7 +109,7 @@ class TimeseriesWidget(BaseWidget):
                 self._plots[m] = self.ax.plot(tt, self._plot_offsets[m] + chunk0[im, :],
                                               color=self._colors[group_color_idx])
             else:
-                self._plots[m] = self.ax.plot(tt, self._plot_offsets[m] + chunk0[im, :])
+                self._plots[m] = self.ax.plot(tt, self._plot_offsets[m] + chunk0[im, :], color=self._color)
             offset0 = offset0 - self._vspacing
 
     def _fix_trange(self, trange):

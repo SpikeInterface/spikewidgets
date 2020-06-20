@@ -3,7 +3,8 @@ from matplotlib import pyplot as plt
 from spikewidgets.widgets.basewidget import BaseMultiWidget
 
 
-def plot_isi_distribution(sorting, sampling_frequency=None, unit_ids=None, bins=10, window=1, figure=None, ax=None):
+def plot_isi_distribution(sorting, sampling_frequency=None, unit_ids=None, bins=10, window=1, figure=None, ax=None,
+                          axes=None):
     """
     Plots spike train ISI distribution.
 
@@ -23,6 +24,9 @@ def plot_isi_distribution(sorting, sampling_frequency=None, unit_ids=None, bins=
         The figure to be used. If not given a figure is created
     ax: matplotlib axis
         The axis to be used. If not given an axis is created
+    axes: list of matplotlib axes
+        The axes to be used for the individual plots. If not given the required axes are created. If provided, the ax
+        and figure parameters are ignored
 
     Returns
     -------
@@ -42,15 +46,17 @@ def plot_isi_distribution(sorting, sampling_frequency=None, unit_ids=None, bins=
         bins=bins,
         window=window,
         figure=figure,
-        ax=ax
+        ax=ax,
+        axes=axes
     )
     W.plot()
     return W
 
 
 class ISIDistributionWidget(BaseMultiWidget):
-    def __init__(self, *, sorting, sampling_frequency, unit_ids=None, bins=10, window=1., figure=None, ax=None):
-        BaseMultiWidget.__init__(self, figure, ax)
+    def __init__(self, *, sorting, sampling_frequency, unit_ids=None, bins=10, window=1., figure=None, ax=None,
+                 axes=None):
+        BaseMultiWidget.__init__(self, figure, ax, axes)
         self._sorting = sorting
         self._unit_ids = unit_ids
         self._sampling_frequency = sampling_frequency

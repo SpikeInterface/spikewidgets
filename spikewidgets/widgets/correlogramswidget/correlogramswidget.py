@@ -5,7 +5,7 @@ from .correlograms_phy import compute_correlograms
 
 
 def plot_autocorrelograms(sorting, sampling_frequency=None, unit_ids=None, bin_size=2, window=50,
-                          figure=None, ax=None):
+                          figure=None, ax=None, axes=None):
     """
     Plots spike train auto-correlograms.
 
@@ -25,6 +25,9 @@ def plot_autocorrelograms(sorting, sampling_frequency=None, unit_ids=None, bin_s
         The figure to be used. If not given a figure is created
     ax: matplotlib axis
         The axis to be used. If not given an axis is created
+    axes: list of matplotlib axes
+        The axes to be used for the individual plots. If not given the required axes are created. If provided, the ax
+        and figure parameters are ignored
 
     Returns
     -------
@@ -44,14 +47,15 @@ def plot_autocorrelograms(sorting, sampling_frequency=None, unit_ids=None, bin_s
         binsize=bin_size,
         window=window,
         figure=figure,
-        ax=ax
+        ax=ax,
+        axes=axes
     )
     W.plot()
     return W
 
 
 def plot_crosscorrelograms(sorting, sampling_frequency=None, unit_ids=None, bin_size=1, window=10,
-                           figure=None, ax=None):
+                           figure=None, ax=None, axes=None):
     """
     Plots spike train cross-correlograms.
 
@@ -71,6 +75,9 @@ def plot_crosscorrelograms(sorting, sampling_frequency=None, unit_ids=None, bin_
         The figure to be used. If not given a figure is created
     ax: matplotlib axis
         The axis to be used. If not given an axis is created
+    axes: list of matplotlib axes
+        The axes to be used for the individual plots. If not given the required axes are created. If provided, the ax
+        and figure parameters are ignored
 
     Returns
     -------
@@ -90,15 +97,17 @@ def plot_crosscorrelograms(sorting, sampling_frequency=None, unit_ids=None, bin_
         binsize=bin_size,
         window=window,
         figure=figure,
-        ax=ax
+        ax=ax,
+        axes=axes
     )
     W.plot()
     return W
 
 
 class AutoCorrelogramsWidget(BaseMultiWidget):
-    def __init__(self, *, sorting, sampling_frequency, unit_ids=None, binsize=2, window=50, figure=None, ax=None):
-        BaseMultiWidget.__init__(self, figure, ax)
+    def __init__(self, *, sorting, sampling_frequency, unit_ids=None, binsize=2, window=50, figure=None, ax=None,
+                 axes=None):
+        BaseMultiWidget.__init__(self, figure, ax=ax, axes=axes)
         self._sorting = sorting
         self._unit_ids = unit_ids
         self._sampling_frequency = sampling_frequency
@@ -144,8 +153,9 @@ class AutoCorrelogramsWidget(BaseMultiWidget):
             
 
 class CrossCorrelogramsWidget(BaseMultiWidget):
-    def __init__(self, *, sorting, sampling_frequency, unit_ids=None, binsize=2, window=50, figure=None, ax=None):
-        BaseMultiWidget.__init__(self, figure, ax)
+    def __init__(self, *, sorting, sampling_frequency, unit_ids=None, binsize=2, window=50, figure=None, ax=None,
+                 axes=None):
+        BaseMultiWidget.__init__(self, figure, ax, axes)
         self._sorting = sorting
         self._unit_ids = unit_ids
         self._sampling_frequency = sampling_frequency
@@ -191,7 +201,8 @@ class CrossCorrelogramsWidget(BaseMultiWidget):
             units = self._sorting.get_unit_ids()
         ncols = len(units)
         nrows = np.ceil(len(list_corr) / ncols)
-        self.figure.set_size_inches((3*ncols, 2*nrows))
+        if self._use_gs:
+            self.figure.set_size_inches((3*ncols, 2*nrows))
         for i, item in enumerate(list_corr):
             ax, diag = self.get_tiled_ax(i, nrows, ncols, hspace=1.5, wspace=0.2, is_diag=True)
             if diag:

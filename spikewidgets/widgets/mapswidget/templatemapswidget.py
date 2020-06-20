@@ -7,7 +7,7 @@ from spikewidgets.widgets.basewidget import BaseMultiWidget
 
 def plot_unit_template_maps(recording, sorting, channel_ids=None, unit_ids=None, peak='neg', log=False, ncols=10,
                             ms_before=1., ms_after=2., max_spikes_per_unit=100, background='on', cmap='viridis',
-                            label_color='r', ax=None, figure=None):
+                            label_color='r', figure=None, ax=None, axes=None):
     """
     Plots sorting comparison confusion matrix.
 
@@ -18,7 +18,7 @@ def plot_unit_template_maps(recording, sorting, channel_ids=None, unit_ids=None,
     sorting: SortingExtractor
         The sorting extractor object
     channel_ids: list
-        The channel ids to display.
+        The channel ids to display
     unit_ids: list
         List of unit ids.
     peak: str
@@ -43,6 +43,9 @@ def plot_unit_template_maps(recording, sorting, channel_ids=None, unit_ids=None,
         The figure to be used. If not given a figure is created
     ax: matplotlib axis
         The axis to be used. If not given an axis is created
+    axes: list of matplotlib axes
+        The axes to be used for the individual plots. If not given the required axes are created. If provided, the ax
+        and figure parameters are ignored
 
     Returns
     -------
@@ -65,6 +68,7 @@ def plot_unit_template_maps(recording, sorting, channel_ids=None, unit_ids=None,
         label_color=label_color,
         figure=figure,
         ax=ax,
+        axes=axes
     )
     W.plot()
     return W
@@ -72,8 +76,8 @@ def plot_unit_template_maps(recording, sorting, channel_ids=None, unit_ids=None,
 
 class UnitTemplateMapsWidget(BaseMultiWidget):
     def __init__(self,  recording, sorting, channel_ids, unit_ids, peak, log, ncols, max_spikes_per_unit, ms_before,
-                 ms_after, background, cmap, label_color='r', figure=None, ax=None):
-        BaseMultiWidget.__init__(self, figure, ax)
+                 ms_after, background, cmap, label_color='r', figure=None, ax=None, axes=None):
+        BaseMultiWidget.__init__(self, figure, ax, axes)
         self._recording = recording
         self._sorting = sorting
         self._channel_ids = channel_ids

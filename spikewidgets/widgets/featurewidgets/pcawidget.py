@@ -5,28 +5,32 @@ import spiketoolkit as st
 
 
 def plot_pca_features(recording, sorting, unit_ids=None, max_spikes_per_unit=100, nproj=4, colormap=None,
-                      figure=None, ax=None):
+                      figure=None, ax=None, axes=None):
     """
     Plots unit PCA features on best projections.
 
     Parameters
     ----------
     recording: RecordingExtractor
-        The recordng extractor object.
+        The recordng extractor object
     sorting: SortingExtractor
-        The sorting extractor object.
+        The sorting extractor object
     unit_ids: list
-        List of unit ids.
+        List of unit ids
     max_spikes_per_unit: int
-        Maximum number of spikes to display per unit.
+        Maximum number of spikes to display per unit
     nproj: int
-        Number of best projections to display.
+        Number of best projections to display
     colormap: matplotlib colormap
-        The colormap to be used. If not given default is used.
+        The colormap to be used. If not given default is used
     figure: matplotlib figure
-        The figure to be used. If not given a figure is created.
+        The figure to be used. If not given a figure is created
     ax: matplotlib axis
-        The axis to be used. If not given an axis is created.
+        The axis to be used. If not given an axis is created
+    axes: list of matplotlib axes
+        The axes to be used for the individual plots. If not given the required axes are created. If provided, the ax
+        and figure parameters are ignored
+
 
     Returns
     -------
@@ -41,7 +45,8 @@ def plot_pca_features(recording, sorting, unit_ids=None, max_spikes_per_unit=100
         nproj=nproj,
         colormap=colormap,
         figure=figure,
-        ax=ax
+        ax=ax,
+        axes=axes
     )
     W.plot()
     return W
@@ -49,8 +54,8 @@ def plot_pca_features(recording, sorting, unit_ids=None, max_spikes_per_unit=100
 
 class PCAWidget(BaseMultiWidget):
     def __init__(self, *, recording, sorting, unit_ids=None, max_spikes_per_unit=100, nproj=4, colormap=None,
-                 figure=None, ax=None, save_as_features=False, save_waveforms_as_features=False):
-        BaseMultiWidget.__init__(self, figure, ax)
+                 figure=None, ax=None, axes=None, save_as_features=False, save_waveforms_as_features=False):
+        BaseMultiWidget.__init__(self, figure, ax, axes)
         self._sorting = sorting
         self._recording = recording
         self._unit_ids = unit_ids
