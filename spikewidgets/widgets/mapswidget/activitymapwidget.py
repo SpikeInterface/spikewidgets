@@ -1,11 +1,11 @@
 import numpy as np
 import spiketoolkit as st
 import matplotlib.pylab as plt
-from .utils import LabeledRectangle
+from ..utils import LabeledRectangle
 from spikewidgets.widgets.basewidget import BaseWidget
 
 
-def plot_activity_map(recording, channel_ids=None, trange=None, cmap='viridis',  background='on', label_color='r',
+def plot_activity_map(recording, channel_ids=None, trange=None, cmap='viridis', background='on', label_color='r',
                       transpose=False, frame=False, ax=None, figure=None):
     """
     Plots spike rate (estimated using simple threshold detector) as 2D activity map.
@@ -52,7 +52,8 @@ def plot_activity_map(recording, channel_ids=None, trange=None, cmap='viridis', 
 
 class ActivityMapWidget(BaseWidget):
 
-    def __init__(self, recording, channel_ids, trange, cmap, background, label_color='r', transpose=False, frame=False, figure=None, ax=None):
+    def __init__(self, recording, channel_ids, trange, cmap, background, label_color='r', transpose=False, frame=False,
+                 figure=None, ax=None):
         BaseWidget.__init__(self, figure, ax)
         self._recording = recording
         self._channel_ids = channel_ids
@@ -81,7 +82,7 @@ class ActivityMapWidget(BaseWidget):
                                                                       start_frame=self._trange[0],
                                                                       end_frame=self._trange[1])
         if self._transpose:
-            locations = np.roll(locations,1,axis=1)
+            locations = np.roll(locations, 1, axis=1)
 
         x = locations[:, 0]
         y = locations[:, 1]
@@ -121,7 +122,8 @@ class ActivityMapWidget(BaseWidget):
         self.ax.set_xlim(np.min(x) - pitch_x, np.max(x) + pitch_x)
         self.ax.set_ylim(np.min(y) - pitch_y, np.max(y) + pitch_y)
         if self._frame:
-            rect = plt.Rectangle((np.min(x) - pitch_x, np.min(y) - pitch_y), np.max(x)-np.min(x) + 2*pitch_x, np.max(y) - np.min(y) + 2*pitch_y, fill=None, edgecolor='k')
+            rect = plt.Rectangle((np.min(x) - pitch_x, np.min(y) - pitch_y), np.max(x) - np.min(x) + 2 * pitch_x,
+                                 np.max(y) - np.min(y) + 2 * pitch_y, fill=None, edgecolor='k')
             self.ax.add_patch(rect)
         self.ax.axis('equal')
         self.ax.axis('off')

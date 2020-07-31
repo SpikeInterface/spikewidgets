@@ -1,7 +1,7 @@
 import numpy as np
 import spiketoolkit as st
 import matplotlib.pylab as plt
-from .utils import LabeledRectangle
+from ..utils import LabeledRectangle
 from spikewidgets.widgets.basewidget import BaseMultiWidget
 
 
