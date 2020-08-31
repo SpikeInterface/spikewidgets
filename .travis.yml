@@ -1,10 +1,26 @@
-language: python
-os:
-- linux
-services:
-- docker
-python:
-- '3.6'
+jobs:
+  include:
+    - name: "Python 3.7.0 on Xenial Linux"
+      os: linux
+      language: python
+      python:
+        - '3.7'
+      deploy:
+        provider: pypi
+        user: alejoe91
+        on:
+          tags: true
+        password:
+          secure: FT32Phc8v9Vz3gV08ixJpYxg3UOvCt11ehOCDGYCNi28CGB0/wRrviN1pntVkrbeEMdvCR/dsoG21+UkO5Eea5xHqwa+WwXvbwW451L4kEhvhS9QXX4sDfXue7p7dYfXV8YSNqf+nYRaEgD1tq2rjHQF2l8Y/GkIjWowO6QhIOdiLMHx/POEqHOkk1nAOTOAsc6jAjd8QR4TQBsRm0SoloNBCj+oqf2IUOVydTCb/8XO48pl7aKyVnxFdIX74QgKoQdhp8Uu5BMsWBsHLNjv9lilY+BtXt8LFIzx1vJpkQ6B1FW/YgCmnxYQ3BPWNcgoFRKEAYRlWZPeCc9nfLz/BIofjMVVZgWX/rnfBFukBm3uDMlpBSGUeX49sNIcr6+Lc+dfILqmqGUFenGDjpirGF0SCgU6yhN6Qdx+j1FFAdr7PWVAt5n02F9RFGdi4/x2m59MzqHTXiomHzyYH7R3nOKB3aV+d0s06LfnWCFhrBrWz9Ocl4ROQkaBrauGuKck0vnTvpOiHyzBJM4YsnWnI7HSI9pUtD83klL7feDwhWH+sLIC10NLjtmbxw1jv2HnRVitz5ZBfnmSz0mmzu5lGzyLq3mRftXC+B/MGYXsoXA6KnSgK1cXEJBE1S3PKtGHPGVe9H/DC0K67ya7rlhI6YZ9jV9zfruiWho/5B/keh0=
+
+    - name: "Python 3.7.0 on Windows"
+      os: windows
+      language: shell
+      before_install:
+        - choco install python --version 3.7.0
+        - python -m pip install --upgrade pip
+      env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
+
 install:
 - pip install https://github.com/SpikeInterface/spikeextractors/archive/master.zip
 - pip install https://github.com/SpikeInterface/spiketoolkit/archive/master.zip
@@ -15,10 +31,3 @@ install:
 - pip install .
 - pip install pytest
 script: pytest
-deploy:
-  provider: pypi
-  user: alejoe91
-  on:
-    tags: true
-  password:
-    secure: FT32Phc8v9Vz3gV08ixJpYxg3UOvCt11ehOCDGYCNi28CGB0/wRrviN1pntVkrbeEMdvCR/dsoG21+UkO5Eea5xHqwa+WwXvbwW451L4kEhvhS9QXX4sDfXue7p7dYfXV8YSNqf+nYRaEgD1tq2rjHQF2l8Y/GkIjWowO6QhIOdiLMHx/POEqHOkk1nAOTOAsc6jAjd8QR4TQBsRm0SoloNBCj+oqf2IUOVydTCb/8XO48pl7aKyVnxFdIX74QgKoQdhp8Uu5BMsWBsHLNjv9lilY+BtXt8LFIzx1vJpkQ6B1FW/YgCmnxYQ3BPWNcgoFRKEAYRlWZPeCc9nfLz/BIofjMVVZgWX/rnfBFukBm3uDMlpBSGUeX49sNIcr6+Lc+dfILqmqGUFenGDjpirGF0SCgU6yhN6Qdx+j1FFAdr7PWVAt5n02F9RFGdi4/x2m59MzqHTXiomHzyYH7R3nOKB3aV+d0s06LfnWCFhrBrWz9Ocl4ROQkaBrauGuKck0vnTvpOiHyzBJM4YsnWnI7HSI9pUtD83klL7feDwhWH+sLIC10NLjtmbxw1jv2HnRVitz5ZBfnmSz0mmzu5lGzyLq3mRftXC+B/MGYXsoXA6KnSgK1cXEJBE1S3PKtGHPGVe9H/DC0K67ya7rlhI6YZ9jV9zfruiWho/5B/keh0=
