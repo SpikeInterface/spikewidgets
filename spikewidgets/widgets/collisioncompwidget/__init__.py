@@ -1,1 +1,1 @@
-from .collisioncompwidget import plot_collision_gt_comparison
+from .collisioncompwidget import plot_comparison_collision_pair_by_pair, plot_comparison_collision_by_similarity
