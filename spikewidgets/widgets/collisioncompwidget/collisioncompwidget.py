@@ -217,6 +217,7 @@ class ComparisonCollisionBySimilarityWidget(BaseWidget):
         im = ax1.imshow(recall_scores[::-1, :],
                     cmap='viridis',
                     aspect='auto',
+                    interpolation='none',
                     extent=(lags[0], lags[-1], -0.5, n_pair-0.5),
                     )
         im.set_clim(0,1)
