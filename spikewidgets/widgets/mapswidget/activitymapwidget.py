@@ -9,7 +9,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 
 def plot_activity_map(recording, channel_ids=None, trange=None, cmap='viridis', background='on', label_color='r',
-                      transpose=False, frame=False, ax=None, figure=None, colorbar=False):
+                      transpose=False, frame=False, ax=None, figure=None, colorbar=False, recompute_info=False):
     """
     Plots spike rate (estimated using simple threshold detector) as 2D activity map.
 
@@ -48,7 +48,8 @@ def plot_activity_map(recording, channel_ids=None, trange=None, cmap='viridis', 
         frame=frame,
         figure=figure,
         ax=ax,
-        colorbar=colorbar
+        colorbar=colorbar,
+        recompute_info=recompute_info
     )
     W.plot()
     return W
@@ -57,7 +58,7 @@ def plot_activity_map(recording, channel_ids=None, trange=None, cmap='viridis', 
 class ActivityMapWidget(BaseWidget):
 
     def __init__(self, recording, channel_ids, trange, cmap, background, label_color='r', transpose=False, frame=False,
-                 figure=None, ax=None, colorbar=False):
+                 figure=None, ax=None, colorbar=False, recompute_info=False):
         BaseWidget.__init__(self, figure, ax)
         self._recording = recording
         self._channel_ids = channel_ids
@@ -68,6 +69,7 @@ class ActivityMapWidget(BaseWidget):
         self._bg = background
         self._label_color = label_color
         self._show_colorbar = colorbar
+        self._recompute_info = recompute_info
         self.colorbar = None
         self.name = 'ActivityMap'
         assert 'location' in self._recording.get_shared_channel_property_names(), "Activity map requires 'location'" \
@@ -88,7 +90,8 @@ class ActivityMapWidget(BaseWidget):
                                                                       start_frame=self._trange[0],
                                                                       end_frame=self._trange[1],
                                                                       normalize=False, 
-                                                                      recompute_info=False)
+                                                                      recompute_info=self._recompute_info,
+                                                                      method='detection')
         if self._transpose:
             locations = np.roll(locations, 1, axis=1)
 
@@ -140,7 +143,7 @@ class ActivityMapWidget(BaseWidget):
         self.ax.axis('off')
         if self._show_colorbar:
             cax = inset_axes(self.ax, width="0.5%", height="50%", loc='upper left', bbox_to_anchor=(0.02, 0., 1, 1),bbox_transform=self.ax.transAxes)
-            self.colorbar = plt.gcf().colorbar(mpl.collections.PatchCollection(self.ax.patches), cax=cax, orientation='vertical', shrink=0.5)
+            self.colorbar = plt.gcf().colorbar(mpl.collections.PatchCollection(self.ax.patches), cax=cax, orientation='vertical', shrink=0.2)
             cax.yaxis.set_ticks_position('left')
             cax.yaxis.set_label_position('left')
             self.colorbar.set_ticks((0,1))
