@@ -10,7 +10,8 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 def plot_activity_map(recording, channel_ids=None, trange=None, cmap='viridis', background='on', label_color='r',
                       transpose=False, frame=False, colorbar=False, colorbar_bbox=None,
-                      colorbar_orientation='vertical', colorbar_width=0.02, ax=None, figure=None):
+                      colorbar_orientation='vertical', colorbar_width=0.02, recompute_info=False,
+                      ax=None, figure=None):
     """
     Plots spike rate (estimated using simple threshold detector) as 2D activity map.
 
@@ -38,6 +39,8 @@ def plot_activity_map(recording, channel_ids=None, trange=None, cmap='viridis', 
         'vertical' or 'horizontal'
     colorbar_width: float
         Width of colorbar in figure coordinates (default 0.02)
+    recompute_info: bool
+        If True, spike rates are recomputed
     figure: matplotlib figure
         The figure to be used. If not given a figure is created
     ax: matplotlib axis
@@ -62,17 +65,17 @@ def plot_activity_map(recording, channel_ids=None, trange=None, cmap='viridis', 
         colorbar=colorbar,
         colorbar_bbox=colorbar_bbox,
         colorbar_orientation=colorbar_orientation,
-        colorbar_width=colorbar_width
+        colorbar_width=colorbar_width,
+        recompute_info=recompute_info
     )
     W.plot()
-
     return W
 
 
 class ActivityMapWidget(BaseWidget):
     def __init__(self, recording, channel_ids, trange, cmap, background, label_color='r', transpose=False, frame=False,
                  colorbar=False, colorbar_bbox=None, colorbar_orientation='vertical', colorbar_width=0.02,
-                 figure=None, ax=None):
+                 recompute_info=False, figure=None, ax=None):
         BaseWidget.__init__(self, figure, ax)
         self._recording = recording
         self._channel_ids = channel_ids
@@ -86,6 +89,7 @@ class ActivityMapWidget(BaseWidget):
         self._colorbar_bbox = colorbar_bbox
         self._colorbar_orient = colorbar_orientation
         self._colorbar_width = colorbar_width
+        self._recompute_info = recompute_info
         self.colorbar = None
         self.name = 'ActivityMap'
         assert 'location' in self._recording.get_shared_channel_property_names(), "Activity map requires 'location'" \
@@ -107,8 +111,7 @@ class ActivityMapWidget(BaseWidget):
                                                                       end_frame=self._trange[1],
                                                                       method='detection',
                                                                       align=False,
-                                                                      normalize=False,
-                                                                      recompute_info=False,
+                                                                      recompute_info=self._recompute_info,
                                                                       verbose=True)
         if self._transpose:
             locations = np.roll(locations, 1, axis=1)
@@ -140,7 +143,7 @@ class ActivityMapWidget(BaseWidget):
         elec_x = 0.9 * pitch_x
         elec_y = 0.9 * pitch_y
 
-        self._max_activity = np.round(np.max(activity), 2)
+        max_activity = np.round(np.max(activity), 2)
 
         # normalize
         activity -= np.min(activity)
@@ -162,9 +165,6 @@ class ActivityMapWidget(BaseWidget):
 
         self.ax.axis('equal')
         self.ax.axis('off')
-        self.ax.set_xlim(np.min(x) - pitch_x, np.max(x) + pitch_x)
-        self.ax.set_ylim(np.min(y) - pitch_y, np.max(y) + pitch_y)
-
         if self._show_colorbar:
             # The canvas need to be drawn to get the right transforms
             self.figure.canvas.draw()
@@ -206,6 +206,6 @@ class ActivityMapWidget(BaseWidget):
             cax.yaxis.set_ticks_position('left')
             cax.yaxis.set_label_position('left')
             self.colorbar.set_ticks((0, 1))
-            self.colorbar.set_ticklabels((0, self._max_activity))
+            self.colorbar.set_ticklabels((0, max_activity))
 
 
