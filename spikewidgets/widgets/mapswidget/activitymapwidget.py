@@ -133,7 +133,7 @@ class ActivityMapWidget(BaseWidget):
 
         cm = plt.get_cmap(self._cmap)
 
-        if self._bg == 'on':
+        if self._bg:
             rect = plt.Rectangle((np.min(x) - pitch_x / 2, np.min(y) - pitch_y / 2),
                                  float(np.ptp(x)) + pitch_x, float(np.ptp(y)) + pitch_y,
                                  color=cm(0), edgecolor=None, alpha=0.9)
@@ -159,8 +159,8 @@ class ActivityMapWidget(BaseWidget):
             self._drs.append(dr)
 
         if self._frame:
-            rect = plt.Rectangle((np.min(x) - pitch_x, np.min(y) - pitch_y), np.max(x) - np.min(x) + 2 * pitch_x,
-                                 np.max(y) - np.min(y) + 2 * pitch_y, fill=None, edgecolor='k')
+            rect = plt.Rectangle((np.min(x) - elec_x / 2, np.min(y) - elec_y / 2), np.max(x) - np.min(x) + elec_x,
+                                 np.max(y) - np.min(y) + elec_y, fill=None, edgecolor='k')
             self.ax.add_patch(rect)
 
         self.ax.axis('equal')
@@ -174,32 +174,28 @@ class ActivityMapWidget(BaseWidget):
                     colorbar_width = self._colorbar_width
                     bottom_left = (np.min(x) - pitch_x, np.min(y) - pitch_y)
                     top_left = (np.min(x) - pitch_x, np.max(y) + pitch_y)
-                    figure_to_data = self.figure.transFigure + self.ax.transData.inverted()
-                    data_to_figure = figure_to_data.inverted()
-                    corners_figure = data_to_figure.transform([bottom_left, top_left])
 
-                    bottom_left_fig = corners_figure[0]
-                    colorbar_height = (corners_figure[1] - corners_figure[0])[1]
-                    bbox = (bottom_left_fig[0] - 1.5 * colorbar_width, bottom_left_fig[1],
-                            colorbar_width, colorbar_height)
+                    axes_to_data = self.ax.transAxes + self.ax.transData.inverted()
+                    width_in_data = (axes_to_data.transform((colorbar_width, 0)) - axes_to_data.transform((0, 0)))[0]
+                    height_in_data = top_left[1] - bottom_left[1]
+                    bbox = (bottom_left[0] - 1.5 * width_in_data, bottom_left[1],
+                            width_in_data, height_in_data)
+
                 else:
                     colorbar_height = self._colorbar_width
                     bottom_left = (np.min(x) - pitch_x, np.min(y) - pitch_y)
                     bottom_right = (np.max(x) + pitch_x, np.min(y) - pitch_y)
-                    figure_to_data = self.figure.transFigure + self.ax.transData.inverted()
-                    data_to_figure = figure_to_data.inverted()
-                    corners_figure = data_to_figure.transform([bottom_left, bottom_right])
 
-                    bottom_left_fig = corners_figure[0]
-                    colorbar_width = (corners_figure[1] - corners_figure[0])[0]
-
-                    bbox = (bottom_left_fig[0], bottom_left_fig[1] - 1.5*colorbar_height,
-                            colorbar_width, colorbar_height)
-
+                    axes_to_data = self.ax.transAxes + self.ax.transData.inverted()
+                    height_in_data = (axes_to_data.transform((0, colorbar_height)) - axes_to_data.transform((0, 0)))[1]
+                    width_in_data = bottom_right[0] - bottom_left[0]
+                    bbox = (bottom_left[0], bottom_left[1] - 1.5 * height_in_data,
+                            width_in_data, height_in_data)
             else:
                 bbox = self._colorbar_bbox
 
-            cax = self.figure.add_axes(bbox)
+            cax = inset_axes(self.ax, width="100%", height="100%", bbox_to_anchor=bbox,
+                             bbox_transform=self.ax.transData)
             scalable = mpl.cm.ScalarMappable(norm=mpl.colors.Normalize(vmin=0, vmax=1), cmap=self._cmap)
             self.colorbar = self.figure.colorbar(scalable, cax=cax,
                                                  orientation=self._colorbar_orient)#, shrink=0.5)
