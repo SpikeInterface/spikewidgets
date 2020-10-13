@@ -175,6 +175,8 @@ class ActivityMapWidget(BaseWidget):
                     bottom_left = (np.min(x) - pitch_x, np.min(y) - pitch_y)
                     top_left = (np.min(x) - pitch_x, np.max(y) + pitch_y)
 
+                    print(top_left)
+
                     axes_to_data = self.ax.transAxes + self.ax.transData.inverted()
                     width_in_data = (axes_to_data.transform((colorbar_width, 0)) - axes_to_data.transform((0, 0)))[0]
                     height_in_data = top_left[1] - bottom_left[1]
@@ -203,5 +205,10 @@ class ActivityMapWidget(BaseWidget):
             cax.yaxis.set_label_position('left')
             self.colorbar.set_ticks((0, 1))
             self.colorbar.set_ticklabels((0, max_activity))
+            if self._colorbar_orient == 'vertical':
+                rotation = 90
+            else:
+                rotation = 0
+            self.colorbar.set_label('Spks/s', rotation=rotation)
 
 
