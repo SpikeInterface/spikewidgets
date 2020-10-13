@@ -112,7 +112,7 @@ class ActivityMapWidget(BaseWidget):
                                                                       method='detection',
                                                                       align=False,
                                                                       recompute_info=self._recompute_info,
-                                                                      verbose=True)
+                                                                      verbose=False)
         if self._transpose:
             locations = np.roll(locations, 1, axis=1)
 
