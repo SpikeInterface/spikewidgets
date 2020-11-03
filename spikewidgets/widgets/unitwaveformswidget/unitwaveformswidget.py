@@ -181,6 +181,8 @@ class UnitWaveformsWidget(BaseMultiWidget):
         self._recording = recording
         self._sorting = sorting
         self._channel_ids = channel_ids
+        if max_channels is None:
+            max_channels = len(recording.get_num_channels())
         self._max_channels = max_channels
         self._unit_ids = unit_ids
         self._ms_before = ms_before
