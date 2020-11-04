@@ -303,11 +303,11 @@ class UnitTemplatesWidget(UnitWaveformsWidget):
         UnitWaveformsWidget.__init__(self, recording=recording, sorting=sorting, channel_ids=channel_ids,
                                      unit_ids=unit_ids, max_spikes_per_unit=max_spikes_per_unit,
                                      max_channels=max_channels, ms_before=ms_before, ms_after=ms_after,
-                                     channel_locs=channel_locs, plot_templates=True, figure=figure, ax=ax, axes=axes,
+                                     channel_locs=channel_locs, plot_waveforms=False,
+                                     plot_templates=True, figure=figure, ax=ax, axes=axes,
                                      radius=radius, show_all_channels=show_all_channels, color=color, lw=lw,
                                      axis_equal=axis_equal, plot_channels=plot_channels, set_title=set_title)
         self.name = 'UnitTemplates'
-        self._plot_waveforms = False
 
 
 def _plot_spike_shapes(*, ax, channels, representative_waveforms=None, average_waveform=None,
