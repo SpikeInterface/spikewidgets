@@ -7,7 +7,7 @@ from spikewidgets.widgets.basewidget import BaseWidget
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 
-def plot_activity_map(recording, channel_ids=None, trange=None, activity='rate',
+def plot_activity_map(recording, channel_ids=None, trange=None, activity='rate', log=False,
                       cmap='viridis', background='on', label_color='r',
                       transpose=False, frame=False, colorbar=False, colorbar_bbox=None,
                       colorbar_orientation='vertical', colorbar_width=0.02, recompute_info=False,
@@ -20,19 +20,21 @@ def plot_activity_map(recording, channel_ids=None, trange=None, activity='rate',
     recording: RecordingExtractor
         The recordng extractor object
     channel_ids: list
-        The channel ids to display.
+        The channel ids to display
     trange: list
         List with start time and end time
     activity: str
-        'rate' or 'amplitude'. If 'rate' the channel spike rate is used. If 'amplitude' the spike amplitude is used.
+        'rate' or 'amplitude'. If 'rate' the channel spike rate is used. If 'amplitude' the spike amplitude is used
+    log: bool
+        If True, log scale is used
     cmap: matplotlib colormap
         The colormap to be used (default 'viridis')
     background: bool
         If True, a background is added in between electrodes
     transpose: bool, optional, default: False
-        Swap x and y channel coordinates if True.
+        Swap x and y channel coordinates if True
     frame: bool, optional, default: False
-        Draw a frame around the array if True.
+        Draw a frame around the array if True
     colorbar: bool
         If True, a colorbar is displayed
     colorbar_bbox: bbox
@@ -58,6 +60,7 @@ def plot_activity_map(recording, channel_ids=None, trange=None, activity='rate',
         channel_ids=channel_ids,
         trange=trange,
         activity=activity,
+        log=log,
         background=background,
         cmap=cmap,
         label_color=label_color,
@@ -76,7 +79,7 @@ def plot_activity_map(recording, channel_ids=None, trange=None, activity='rate',
 
 
 class ActivityMapWidget(BaseWidget):
-    def __init__(self, recording, channel_ids, activity, trange, cmap, background, label_color='r',
+    def __init__(self, recording, channel_ids, activity, log, trange, cmap, background, label_color='r',
                  transpose=False, frame=False, colorbar=False, colorbar_bbox=None, colorbar_orientation='vertical',
                  colorbar_width=0.02, recompute_info=False, figure=None, ax=None):
         BaseWidget.__init__(self, figure, ax)
@@ -84,6 +87,7 @@ class ActivityMapWidget(BaseWidget):
         self._channel_ids = channel_ids
         self._activity = activity
         self._trange = trange
+        self._log = log
         self._transpose = transpose
         self._cmap = cmap
         self._frame = frame
@@ -152,12 +156,18 @@ class ActivityMapWidget(BaseWidget):
         if self._activity == 'rate':
             activity = spike_rates
         else:  # amplitude
-            activity = spike_amplitudes
+            activity = np.abs(spike_amplitudes)
 
         max_activity = np.round(np.max(activity), 2)
+        min_activity = np.round(np.min(activity), 2)
+
+        if self._log:
+            if np.any(activity < 1):
+                activity += (1 - np.min(activity))
+            activity = np.log(activity)
 
         # normalize
-        activity -= np.min(activity)
+        activity -= (np.min(activity) + 1e-5)
         activity /= np.ptp(activity)
 
         for (loc, act, ch) in zip(locations, activity, self._recording.get_channel_ids()):
@@ -209,13 +219,17 @@ class ActivityMapWidget(BaseWidget):
 
             cax = inset_axes(self.ax, width="100%", height="100%", bbox_to_anchor=bbox,
                              bbox_transform=self.ax.transData)
-            scalable = mpl.cm.ScalarMappable(norm=mpl.colors.Normalize(vmin=0, vmax=1), cmap=self._cmap)
+            if self._log:
+                norm = mpl.colors.LogNorm(vmin=1e-5, vmax=1)
+            else:
+                norm = mpl.colors.Normalize(vmin=0, vmax=1)
+            scalable = mpl.cm.ScalarMappable(norm=norm, cmap=self._cmap)
             self.colorbar = self.figure.colorbar(scalable, cax=cax,
                                                  orientation=self._colorbar_orient)#, shrink=0.5)
             cax.yaxis.set_ticks_position('left')
             cax.yaxis.set_label_position('left')
             self.colorbar.set_ticks((0, 1))
-            self.colorbar.set_ticklabels((0, max_activity))
+            self.colorbar.set_ticklabels((min_activity, max_activity))
             if self._colorbar_orient == 'vertical':
                 rotation = 90
             else:
