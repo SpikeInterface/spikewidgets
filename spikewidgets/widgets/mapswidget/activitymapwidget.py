@@ -2,13 +2,13 @@ import numpy as np
 import spiketoolkit as st
 import matplotlib.pylab as plt
 import matplotlib as mpl
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 from ..utils import LabeledRectangle
 from spikewidgets.widgets.basewidget import BaseWidget
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 
-def plot_activity_map(recording, channel_ids=None, trange=None, cmap='viridis', background='on', label_color='r',
+def plot_activity_map(recording, channel_ids=None, trange=None, activity='rate',
+                      cmap='viridis', background='on', label_color='r',
                       transpose=False, frame=False, colorbar=False, colorbar_bbox=None,
                       colorbar_orientation='vertical', colorbar_width=0.02, recompute_info=False,
                       ax=None, figure=None):
@@ -23,6 +23,8 @@ def plot_activity_map(recording, channel_ids=None, trange=None, cmap='viridis', 
         The channel ids to display.
     trange: list
         List with start time and end time
+    activity: str
+        'rate' or 'amplitude'. If 'rate' the channel spike rate is used. If 'amplitude' the spike amplitude is used.
     cmap: matplotlib colormap
         The colormap to be used (default 'viridis')
     background: bool
@@ -55,6 +57,7 @@ def plot_activity_map(recording, channel_ids=None, trange=None, cmap='viridis', 
         recording=recording,
         channel_ids=channel_ids,
         trange=trange,
+        activity=activity,
         background=background,
         cmap=cmap,
         label_color=label_color,
@@ -73,12 +76,13 @@ def plot_activity_map(recording, channel_ids=None, trange=None, cmap='viridis', 
 
 
 class ActivityMapWidget(BaseWidget):
-    def __init__(self, recording, channel_ids, trange, cmap, background, label_color='r', transpose=False, frame=False,
-                 colorbar=False, colorbar_bbox=None, colorbar_orientation='vertical', colorbar_width=0.02,
-                 recompute_info=False, figure=None, ax=None):
+    def __init__(self, recording, channel_ids, activity, trange, cmap, background, label_color='r',
+                 transpose=False, frame=False, colorbar=False, colorbar_bbox=None, colorbar_orientation='vertical',
+                 colorbar_width=0.02, recompute_info=False, figure=None, ax=None):
         BaseWidget.__init__(self, figure, ax)
         self._recording = recording
         self._channel_ids = channel_ids
+        self._activity = activity
         self._trange = trange
         self._transpose = transpose
         self._cmap = cmap
@@ -92,6 +96,7 @@ class ActivityMapWidget(BaseWidget):
         self._recompute_info = recompute_info
         self.colorbar = None
         self.name = 'ActivityMap'
+        assert activity in ['rate', 'amplitude'], "'activity' can be either 'rate' or 'amplitude'"
         assert 'location' in self._recording.get_shared_channel_property_names(), "Activity map requires 'location'" \
                                                                                   "property"
 
@@ -106,13 +111,14 @@ class ActivityMapWidget(BaseWidget):
             self._trange = [int(t * self._recording.get_sampling_frequency()) for t in self._trange]
 
         locations = self._recording.get_channel_locations(channel_ids=self._channel_ids)
-        activity = st.postprocessing.compute_channel_spiking_activity(self._recording,
-                                                                      start_frame=self._trange[0],
-                                                                      end_frame=self._trange[1],
-                                                                      method='detection',
-                                                                      align=False,
-                                                                      recompute_info=self._recompute_info,
-                                                                      verbose=False)
+        spike_rates, spike_amplitudes = st.postprocessing.compute_channel_spiking_activity(self._recording,
+                                                                                           start_frame=self._trange[0],
+                                                                                           end_frame=self._trange[1],
+                                                                                           method='detection',
+                                                                                           align=False,
+                                                                                           recompute_info=
+                                                                                           self._recompute_info,
+                                                                                           verbose=False)
         if self._transpose:
             locations = np.roll(locations, 1, axis=1)
 
@@ -142,6 +148,11 @@ class ActivityMapWidget(BaseWidget):
         self._drs = []
         elec_x = 0.9 * pitch_x
         elec_y = 0.9 * pitch_y
+
+        if self._activity == 'rate':
+            activity = spike_rates
+        else:  # amplitude
+            activity = spike_amplitudes
 
         max_activity = np.round(np.max(activity), 2)
 
