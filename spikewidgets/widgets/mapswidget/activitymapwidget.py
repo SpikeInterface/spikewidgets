@@ -234,6 +234,7 @@ class ActivityMapWidget(BaseWidget):
                 rotation = 90
             else:
                 rotation = 0
-            self.colorbar.set_label('Sp/s', rotation=rotation)
-
-
+            if self._activity == 'rate':
+                self.colorbar.set_label('Sp/s', rotation=rotation)
+            else:
+                self.colorbar.set_label('Amp.', rotation=rotation)
