@@ -251,9 +251,9 @@ class UnitWaveformsWidget(BaseMultiWidget):
                     peak_idx = np.unravel_index(np.argmax(np.abs(template)),
                                                 template.shape)[1]
                     max_channel_idx = np.argsort(np.abs(template[:, peak_idx]))[::-1][0]
-                    c = all_locations[max_channel_idx]
-                    d = np.sqrt(np.sum((channel_locations - c) ** 2, axis=1))
-                    max_channels_list.append(np.array(channel_ids)[np.where(d <= self._radius)[0]])
+                    center_location = all_locations[max_channel_idx]
+                    dists = np.array([np.linalg.norm(loc - center_location) for loc in all_locations])
+                    max_channels_list.append(np.where(dists <= self._radius)[0])
                 spikes = random_wf
                 if self._set_title:
                     item = dict(
