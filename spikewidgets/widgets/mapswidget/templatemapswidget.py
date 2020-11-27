@@ -141,7 +141,10 @@ class UnitTemplateMapsWidget(BaseMultiWidget):
         for i, (template, unit) in enumerate(zip(templates, unit_ids)):
             ax = self.get_tiled_ax(i, nrows, ncols)
             temp_map = np.abs(fun(template, axis=1))
+
             if self._log:
+                if np.any(temp_map < 1):
+                    temp_map += (1 - np.min(temp_map))
                 temp_map = np.log(temp_map)
 
             # normalize

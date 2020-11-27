@@ -31,6 +31,10 @@ class TestWidgets(unittest.TestCase):
     def test_geometry(self):
         sw.plot_electrode_geometry(self._RX)
 
+    def test_activitymap(self):
+        sw.plot_activity_map(self._RX, activity='rate')
+        sw.plot_activity_map(self._RX, activity='amplitude')
+
     def test_unitwaveforms(self):
         for m in memmaps:
             sw.plot_unit_waveforms(self._RX, self._SX, memmap=m)
