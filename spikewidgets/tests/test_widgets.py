@@ -3,6 +3,12 @@ import spikewidgets as sw
 import spikecomparison as sc
 import matplotlib.pyplot as plt
 import unittest
+import sys
+
+if sys.platform == "win32":
+    memmaps = [False]
+else:
+    memmaps = [False, True]
 
 
 class TestWidgets(unittest.TestCase):
@@ -30,17 +36,20 @@ class TestWidgets(unittest.TestCase):
         sw.plot_activity_map(self._RX, activity='amplitude')
 
     def test_unitwaveforms(self):
-        sw.plot_unit_waveforms(self._RX, self._SX)
-        fig, axes = plt.subplots(self.num_units, 1)
-        sw.plot_unit_waveforms(self._RX, self._SX, axes=axes)
+        for m in memmaps:
+            sw.plot_unit_waveforms(self._RX, self._SX, memmap=m)
+            fig, axes = plt.subplots(self.num_units, 1)
+            sw.plot_unit_waveforms(self._RX, self._SX, axes=axes, memmap=m)
 
     def test_unittemplates(self):
-        sw.plot_unit_templates(self._RX, self._SX)
-        fig, axes = plt.subplots(self.num_units, 1)
-        sw.plot_unit_templates(self._RX, self._SX, axes=axes)
+        for m in memmaps:
+            sw.plot_unit_templates(self._RX, self._SX, memmap=m)
+            fig, axes = plt.subplots(self.num_units, 1)
+            sw.plot_unit_templates(self._RX, self._SX, axes=axes, memmap=m)
 
     def test_unittemplatemaps(self):
-        sw.plot_unit_template_maps(self._RX, self._SX)
+        for m in memmaps:
+            sw.plot_unit_template_maps(self._RX, self._SX, memmap=m)
 
     def test_ampdist(self):
         sw.plot_amplitudes_distribution(self._RX, self._SX)
@@ -53,9 +62,10 @@ class TestWidgets(unittest.TestCase):
         sw.plot_amplitudes_timeseries(self._RX, self._SX, axes=axes)
 
     def test_features(self):
-        sw.plot_pca_features(self._RX, self._SX)
-        fig, axes = plt.subplots(self.num_units, 1)
-        sw.plot_pca_features(self._RX, self._SX, axes=axes)
+        for m in memmaps:
+            sw.plot_pca_features(self._RX, self._SX, memap=m)
+            fig, axes = plt.subplots(self.num_units, 1)
+            sw.plot_pca_features(self._RX, self._SX, axes=axes, memap=m)
 
     def test_ach(self):
         sw.plot_autocorrelograms(self._SX, bin_size=1, window=10)

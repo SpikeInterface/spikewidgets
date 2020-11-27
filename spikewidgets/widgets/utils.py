@@ -31,7 +31,6 @@ class LabeledRectangle:
         self.press = x0, y0, event.xdata, event.ydata
         LabeledRectangle.lock = self
         self.text.set_visible(True)
-        self.text.draw()
 
     def on_release(self, event):
         'on release we reset the press data'
@@ -40,7 +39,6 @@ class LabeledRectangle:
         self.press = None
         LabeledRectangle.lock = None
         self.text.set_visible(False)
-        self.text.draw()
 
     def disconnect(self):
         'disconnect all the stored connection ids'
@@ -78,7 +76,6 @@ class LabeledEllipse:
         self.press = x0, y0, event.xdata, event.ydata
         LabeledEllipse.lock = self
         self.text.set_visible(True)
-        self.text.draw()
 
     def on_release(self, event):
         'on release we reset the press data'
@@ -87,7 +84,6 @@ class LabeledEllipse:
         self.press = None
         LabeledEllipse.lock = None
         self.text.set_visible(False)
-        self.text.draw()
 
     def disconnect(self):
         'disconnect all the stored connection ids'

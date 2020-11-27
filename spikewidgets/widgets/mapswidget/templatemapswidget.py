@@ -6,8 +6,8 @@ from spikewidgets.widgets.basewidget import BaseMultiWidget
 
 
 def plot_unit_template_maps(recording, sorting, channel_ids=None, unit_ids=None, peak='neg', log=False, ncols=10,
-                            ms_before=1., ms_after=2., max_spikes_per_unit=100, background='on', cmap='viridis',
-                            label_color='r', figure=None, ax=None, axes=None):
+                            background='on', cmap='viridis', label_color='r', figure=None, ax=None, axes=None,
+                            **templates_kwargs):
     """
     Plots sorting comparison confusion matrix.
 
@@ -27,12 +27,6 @@ def plot_unit_template_maps(recording, sorting, channel_ids=None, unit_ids=None,
         If True, log scale is used
     ncols: int
         Number of columns if multiple units are displayed
-    ms_before: float
-        Time before peak (ms)
-    ms_after: float
-        Time after peak (ms)
-    max_spikes_per_unit: int
-        Maximum number of spikes to display per unit.
     background: str
         'on' or 'off'
     cmap: matplotlib colormap
@@ -46,6 +40,8 @@ def plot_unit_template_maps(recording, sorting, channel_ids=None, unit_ids=None,
     axes: list of matplotlib axes
         The axes to be used for the individual plots. If not given the required axes are created. If provided, the ax
         and figure parameters are ignored
+    templates_kwargs: keyword arguments for st.postprocessing.get_unit_templates()
+
 
     Returns
     -------
@@ -57,26 +53,24 @@ def plot_unit_template_maps(recording, sorting, channel_ids=None, unit_ids=None,
         sorting=sorting,
         channel_ids=channel_ids,
         unit_ids=unit_ids,
-        max_spikes_per_unit=max_spikes_per_unit,
         peak=peak,
         log=log,
         ncols=ncols,
-        ms_before=ms_before,
-        ms_after=ms_after,
         background=background,
         cmap=cmap,
         label_color=label_color,
         figure=figure,
         ax=ax,
-        axes=axes
+        axes=axes,
+        **templates_kwargs
     )
     W.plot()
     return W
 
 
 class UnitTemplateMapsWidget(BaseMultiWidget):
-    def __init__(self,  recording, sorting, channel_ids, unit_ids, peak, log, ncols, max_spikes_per_unit, ms_before,
-                 ms_after, background, cmap, label_color='r', figure=None, ax=None, axes=None):
+    def __init__(self,  recording, sorting, channel_ids, unit_ids, peak, log, ncols, background, cmap, label_color='r',
+                 figure=None, ax=None, axes=None, **template_kwargs):
         BaseMultiWidget.__init__(self, figure, ax, axes)
         self._recording = recording
         self._sorting = sorting
@@ -85,12 +79,10 @@ class UnitTemplateMapsWidget(BaseMultiWidget):
         self._peak = peak
         self._log = log
         self._ncols = ncols
-        self._ms_before = ms_before
-        self._ms_after = ms_after
-        self._max_spikes_per_unit = max_spikes_per_unit
         self._bg = background
         self._cmap = cmap
         self._label_color = label_color
+        self._template_kwargs = template_kwargs
         self.name = 'UnitTemplateMaps'
         assert 'location' in self._recording.get_shared_channel_property_names(), "Activity map requires 'location'" \
                                                                                   "property"
@@ -102,8 +94,7 @@ class UnitTemplateMapsWidget(BaseMultiWidget):
         locations = self._recording.get_channel_locations(channel_ids=self._channel_ids)
         templates = st.postprocessing.get_unit_templates(self._recording, self._sorting, channel_ids=self._channel_ids,
                                                          unit_ids=self._unit_ids,
-                                                         max_spikes_per_unit=self._max_spikes_per_unit,
-                                                         ms_before=self._ms_before, ms_after=self._ms_after)
+                                                         **self._template_kwargs)
         if self._channel_ids is None:
             channel_ids = self._recording.get_channel_ids()
         else:

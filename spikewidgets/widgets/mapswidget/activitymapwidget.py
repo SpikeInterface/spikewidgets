@@ -10,8 +10,8 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 def plot_activity_map(recording, channel_ids=None, trange=None, activity='rate', log=False,
                       cmap='viridis', background='on', label_color='r',
                       transpose=False, frame=False, colorbar=False, colorbar_bbox=None,
-                      colorbar_orientation='vertical', colorbar_width=0.02, recompute_info=False,
-                      ax=None, figure=None):
+                      colorbar_orientation='vertical', colorbar_width=0.02,
+                      ax=None, figure=None, **activity_kwargs):
     """
     Plots spike rate (estimated using simple threshold detector) as 2D activity map.
 
@@ -43,12 +43,11 @@ def plot_activity_map(recording, channel_ids=None, trange=None, activity='rate',
         'vertical' or 'horizontal'
     colorbar_width: float
         Width of colorbar in figure coordinates (default 0.02)
-    recompute_info: bool
-        If True, spike rates are recomputed
     figure: matplotlib figure
         The figure to be used. If not given a figure is created
     ax: matplotlib axis
         The axis to be used. If not given an axis is created
+    activity_kwargs: keyword arguments for st.postprocessing.compute_channel_spiking_activity()
 
     Returns
     -------
@@ -72,7 +71,7 @@ def plot_activity_map(recording, channel_ids=None, trange=None, activity='rate',
         colorbar_bbox=colorbar_bbox,
         colorbar_orientation=colorbar_orientation,
         colorbar_width=colorbar_width,
-        recompute_info=recompute_info
+        **activity_kwargs
     )
     W.plot()
     return W
@@ -81,7 +80,7 @@ def plot_activity_map(recording, channel_ids=None, trange=None, activity='rate',
 class ActivityMapWidget(BaseWidget):
     def __init__(self, recording, channel_ids, activity, log, trange, cmap, background, label_color='r',
                  transpose=False, frame=False, colorbar=False, colorbar_bbox=None, colorbar_orientation='vertical',
-                 colorbar_width=0.02, recompute_info=False, figure=None, ax=None):
+                 colorbar_width=0.02, figure=None, ax=None, **activity_kwargs):
         BaseWidget.__init__(self, figure, ax)
         self._recording = recording
         self._channel_ids = channel_ids
@@ -93,11 +92,11 @@ class ActivityMapWidget(BaseWidget):
         self._frame = frame
         self._bg = background
         self._label_color = label_color
+        self._activity_kwargs = activity_kwargs
         self._show_colorbar = colorbar
         self._colorbar_bbox = colorbar_bbox
         self._colorbar_orient = colorbar_orientation
         self._colorbar_width = colorbar_width
-        self._recompute_info = recompute_info
         self.colorbar = None
         self.name = 'ActivityMap'
         assert activity in ['rate', 'amplitude'], "'activity' can be either 'rate' or 'amplitude'"
@@ -118,11 +117,7 @@ class ActivityMapWidget(BaseWidget):
         spike_rates, spike_amplitudes = st.postprocessing.compute_channel_spiking_activity(self._recording,
                                                                                            start_frame=self._trange[0],
                                                                                            end_frame=self._trange[1],
-                                                                                           method='detection',
-                                                                                           align=False,
-                                                                                           recompute_info=
-                                                                                           self._recompute_info,
-                                                                                           verbose=False)
+                                                                                           **self._activity_kwargs)
         if self._transpose:
             locations = np.roll(locations, 1, axis=1)
 
