@@ -6,7 +6,7 @@ from spikewidgets.widgets.basewidget import BaseWidget
 
 
 def plot_activity_map(recording, channel_ids=None, trange=None, cmap='viridis', background='on', label_color='r',
-                      transpose=False, frame=False, ax=None, figure=None):
+                      transpose=False, frame=False, ax=None, figure=None, **activity_kwargs):
     """
     Plots spike rate (estimated using simple threshold detector) as 2D activity map.
 
@@ -28,6 +28,7 @@ def plot_activity_map(recording, channel_ids=None, trange=None, cmap='viridis', 
         The figure to be used. If not given a figure is created
     ax: matplotlib axis
         The axis to be used. If not given an axis is created
+    activity_kwargs: keyword arguments for st.postprocessing.compute_channel_spiking_activity()
 
     Returns
     -------
@@ -45,6 +46,7 @@ def plot_activity_map(recording, channel_ids=None, trange=None, cmap='viridis', 
         frame=frame,
         figure=figure,
         ax=ax,
+        **activity_kwargs
     )
     W.plot()
     return W
@@ -53,7 +55,7 @@ def plot_activity_map(recording, channel_ids=None, trange=None, cmap='viridis', 
 class ActivityMapWidget(BaseWidget):
 
     def __init__(self, recording, channel_ids, trange, cmap, background, label_color='r', transpose=False, frame=False,
-                 figure=None, ax=None):
+                 figure=None, ax=None, **activity_kwargs):
         BaseWidget.__init__(self, figure, ax)
         self._recording = recording
         self._channel_ids = channel_ids
@@ -63,6 +65,7 @@ class ActivityMapWidget(BaseWidget):
         self._frame = frame
         self._bg = background
         self._label_color = label_color
+        self._activity_kwargs = activity_kwargs
         self.name = 'ActivityMap'
         assert 'location' in self._recording.get_shared_channel_property_names(), "Activity map requires 'location'" \
                                                                                   "property"
@@ -80,7 +83,8 @@ class ActivityMapWidget(BaseWidget):
         locations = self._recording.get_channel_locations(channel_ids=self._channel_ids)
         activity = st.postprocessing.compute_channel_spiking_activity(self._recording,
                                                                       start_frame=self._trange[0],
-                                                                      end_frame=self._trange[1])
+                                                                      end_frame=self._trange[1],
+                                                                      **self._activity_kwargs)
         if self._transpose:
             locations = np.roll(locations, 1, axis=1)
 

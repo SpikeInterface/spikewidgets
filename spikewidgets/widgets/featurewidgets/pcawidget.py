@@ -5,7 +5,7 @@ import spiketoolkit as st
 
 
 def plot_pca_features(recording, sorting, unit_ids=None, max_spikes_per_unit=100, nproj=4, colormap=None,
-                      figure=None, ax=None, axes=None):
+                      figure=None, ax=None, axes=None, **pca_kwargs):
     """
     Plots unit PCA features on best projections.
 
@@ -30,6 +30,7 @@ def plot_pca_features(recording, sorting, unit_ids=None, max_spikes_per_unit=100
     axes: list of matplotlib axes
         The axes to be used for the individual plots. If not given the required axes are created. If provided, the ax
         and figure parameters are ignored
+    pca_kwargs: keyword arguments for st.postprocessing.compute_unit_pca_scores()
 
 
     Returns
@@ -46,35 +47,30 @@ def plot_pca_features(recording, sorting, unit_ids=None, max_spikes_per_unit=100
         colormap=colormap,
         figure=figure,
         ax=ax,
-        axes=axes
+        axes=axes,
+        **pca_kwargs
     )
     W.plot()
     return W
 
 
 class PCAWidget(BaseMultiWidget):
-    def __init__(self, *, recording, sorting, unit_ids=None, max_spikes_per_unit=100, nproj=4, colormap=None,
-                 figure=None, ax=None, axes=None, save_as_features=False, save_waveforms_as_features=False):
+    def __init__(self, *, recording, sorting, unit_ids=None, nproj=4, colormap=None,
+                 figure=None, ax=None, axes=None, **pca_kwargs):
         BaseMultiWidget.__init__(self, figure, ax, axes)
         self._sorting = sorting
         self._recording = recording
         self._unit_ids = unit_ids
-        self._nproj = nproj
-        self._max_spikes_per_unit = max_spikes_per_unit
         self._pca_scores = None
+        self._nproj = nproj
         self._colormap = colormap
-        self._save_as_features = save_as_features
-        self._save_waveforms_as_features = save_waveforms_as_features
+        self._pca_kwargs = pca_kwargs
         self.name = 'Feature'
 
     def _compute_pca(self):
         self._pca_scores = st.postprocessing.compute_unit_pca_scores(recording=self._recording,
                                                                      sorting=self._sorting,
-                                                                     by_electrode=True,
-                                                                     max_spikes_per_unit=self._max_spikes_per_unit,
-                                                                     save_as_features=self._save_as_features,
-                                                                     save_waveforms_as_features=
-                                                                     self._save_waveforms_as_features)
+                                                                     **self._pca_kwargs)
 
     def plot(self):
         self._do_plot()
@@ -106,8 +102,7 @@ class PCAWidget(BaseMultiWidget):
                                 distances.append(dist)
                                 proj.append([ch1, pc1, ch2, pc2])
 
-        list_best_proj = np.array(
-            proj)[np.argsort(distances)[::-1][:self._nproj]]
+        list_best_proj = np.array(proj)[np.argsort(distances)[::-1][:self._nproj]]
         self._plot_proj_multi(list_best_proj)
 
     def compute_cluster_average_distance(self, pc1, ch1, pc2, ch2):
