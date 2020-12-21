@@ -181,7 +181,6 @@ class UnitWaveformsWidget(BaseMultiWidget):
         self._plot_channels = plot_channels
         self._set_title = set_title
         self._kwargs = kwargs
-        print(self._kwargs)
 
     def plot(self):
         self._do_plot()
