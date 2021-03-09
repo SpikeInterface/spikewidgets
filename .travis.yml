@@ -25,9 +25,9 @@ install:
 - pip install https://github.com/SpikeInterface/spikeextractors/archive/master.zip
 - pip install https://github.com/SpikeInterface/spiketoolkit/archive/master.zip
 - pip install https://github.com/SpikeInterface/spikecomparison/archive/master.zip
-- pip install requests
 - pip install networkx
 - pip install matplotlib
+- pip install numpy==1.20
 - pip install .
 - pip install pytest
 script: pytest
