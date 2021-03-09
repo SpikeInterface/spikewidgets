@@ -1,5 +1,5 @@
 import numpy as np
-import sklearn
+
 
 from matplotlib import pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -11,7 +11,7 @@ from spikewidgets.widgets.basewidget import BaseWidget, BaseMultiWidget
 
 def plot_comparison_collision_pair_by_pair(comp, unit_ids=None, nbins=10, figure=None, ax=None):
     """
-    Plots multi sorting comparison graph.
+    Plots CollisionGTComparison pair by pair.
 
     Parameters
     ----------
@@ -44,6 +44,26 @@ def plot_comparison_collision_pair_by_pair(comp, unit_ids=None, nbins=10, figure
 
 def plot_comparison_collision_by_similarity(comp, templates, metric='cosine_similarity', 
         unit_ids=None, nbins=10, figure=None, ax=None):
+    """
+    Plots CollisionGTComparison pair by pair orderer by cosine_similarity
+
+    Parameters
+    ----------
+    comp: CollisionGTComparison
+        The collision ground truth comparison object
+    templates: array
+        template of units
+    metric: cosine_similarity',
+        metric for ordering
+    unit_ids: list
+        List of considered units
+    nbins: int
+        Number of bins
+    figure: matplotlib figure
+        The figure to be used. If not given a figure is created
+    ax: matplotlib axis
+        The axis to be used. If not given an axis is created
+    """
     
     W = ComparisonCollisionBySimilarityWidget(
         comp=comp,
@@ -146,6 +166,8 @@ class ComparisonCollisionBySimilarityWidget(BaseWidget):
         self._do_plot()
 
     def _do_plot(self):
+        import sklearn
+        
         fig = self.figure
 
         for ax in fig.axes:
@@ -166,7 +188,7 @@ class ComparisonCollisionBySimilarityWidget(BaseWidget):
         else:
             raise NotImplementedError('metric=...')
         
-        #~ print(similarity_matrix)
+        # print(similarity_matrix)
 
         n = len(self.unit_ids)
         
