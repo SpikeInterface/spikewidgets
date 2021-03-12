@@ -18,10 +18,10 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'numpy',
-        'spiketoolkit>=0.7.2',
+        'spiketoolkit>=0.7.3',
         'spikecomparison>=0.3.2',
         'matplotlib',
-        'MEAutility>=1.4.6'
+        'MEAutility>=1.4.8'
     ],
     classifiers=(
         "Programming Language :: Python :: 3",
