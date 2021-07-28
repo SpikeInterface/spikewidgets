@@ -18,8 +18,9 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'numpy',
-        'spiketoolkit>=0.7.3',
-        'spikecomparison>=0.3.2',
+        'spikeextractors>=0.9.7',
+        'spiketoolkit>=0.7.6',
+        'spikecomparison>=0.3.3',
         'matplotlib',
         'MEAutility>=1.4.8'
     ],

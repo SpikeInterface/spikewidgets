@@ -4,7 +4,7 @@ from spikewidgets.widgets.basewidget import BaseMultiWidget
 from .correlograms_phy import compute_correlograms
 
 
-def plot_autocorrelograms(sorting, sampling_frequency=None, unit_ids=None, bin_size=2, window=50,
+def plot_autocorrelograms(sorting, sampling_frequency=None, unit_ids=None, bin_size=0.1, window=1,
                           figure=None, ax=None, axes=None):
     """
     Plots spike train auto-correlograms.

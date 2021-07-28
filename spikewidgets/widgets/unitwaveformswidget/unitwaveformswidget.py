@@ -6,7 +6,8 @@ from spikewidgets.widgets.basewidget import BaseMultiWidget
 
 
 def plot_unit_waveforms(recording, sorting, channel_ids=None, unit_ids=None, channel_locs=True, radius=None,
-                        max_channels=None, plot_templates=True, show_all_channels=True, color='k', lw=2, axis_equal=False,
+                        max_channels=None, plot_templates=True, show_all_channels=True, color='k', lw=2,
+                        axis_equal=False,
                         plot_channels=False, set_title=True, figure=None, ax=None, axes=None, **waveforms_kwargs):
     """
     Plots unit waveforms.
